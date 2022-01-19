@@ -79,7 +79,7 @@ public class DeleteNodeCommand extends AbstractCanvasGraphCommand {
         return deleteProcessor.getCommand();
     }
 
-    CompositeCommand<AbstractCanvasHandler, CanvasViolation> getCommand() {
+    public CompositeCommand<AbstractCanvasHandler, CanvasViolation> getCompositedCommand() {
         return deleteProcessor.getCommand();
     }
 
