@@ -47,7 +47,13 @@ public class PatchHandler {
     @SuppressWarnings("all")
     private void applyPatchForCommand(AbstractCanvasHandler canvasHandler,
                                       Command<AbstractCanvasHandler, CanvasViolation> command) {
-        Patch[] patches = builder.build(canvasHandler, command);
+        Patch[] patches = new Patch[0];
+        try {
+            patches = builder.build(canvasHandler, command);
+        } catch (Exception e) {
+            DomGlobal.console.error("ERROR building JSON patch: " + (null == e.getCause() ? e.getMessage() : e.getCause().getMessage()));
+            patches = new Patch[0];
+        }
         if (null != patches && patches.length > 0) {
             String raw = Marshaller.stringify(patches);
             DomGlobal.console.log("-> " + raw);

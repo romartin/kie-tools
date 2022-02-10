@@ -88,7 +88,7 @@ public class AnyStateShapeDef<W> implements ShapeViewDef<W, SVGShapeView>,
         return ShapeViewFactory.class;
     }
 
-    private static final TitleHandler<ShapeView> TITLE_HANDLER = new TitleHandler<>();
+    public static final TitleHandler<ShapeView> TITLE_HANDLER = new TitleHandler<>();
 
     private final ViewAttributesHandler<W, SVGShapeView> VIEW_HANDLER =
             new ViewAttributesHandler.Builder<W, SVGShapeView>().build();

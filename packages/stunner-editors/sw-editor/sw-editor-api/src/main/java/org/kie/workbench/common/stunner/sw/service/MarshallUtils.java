@@ -151,7 +151,7 @@ public class MarshallUtils {
     public static class VerticalLayoutBuilder {
 
         private static double X = 200;
-        private static double YDELTA = 100;
+        private static double YDELTA = 150;
         private double y = 0;
 
         public Point2D getNextLocation() {
@@ -160,7 +160,7 @@ public class MarshallUtils {
         }
 
         public Point2D getEndLocation(int statesCount) {
-            return new Point2D(X, (statesCount + 3) * YDELTA);
+            return new Point2D(X, (statesCount + 2) * YDELTA);
         }
     }
 

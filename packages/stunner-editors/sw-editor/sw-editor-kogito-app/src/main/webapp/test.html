@@ -314,6 +314,11 @@
     </div>
 
     <div style="display: inline; float: left; padding: 25px">
+      <label for="selectExample">Examples:&nbsp;</label>
+      <select id="selectExample">
+        <option value="Basic" selected>basic</option>
+        <option value="Errors">errors</option>
+      </select>
       <input type="button" onclick="loadText()" value="Load JSON Content" style="display: block; margin-bottom: 5px" />
       <textarea id="jsonRawContent" rows="50" cols="50" style="font-size: larger"></textarea>
     </div>
@@ -336,27 +341,61 @@
         return document.getElementById("jsonRawContent").value;
       }
 
-      // var swBasicExample = "{  \"id\": \"helloworld\",  \"version\": \"1.0\",  \"specVersion\": \"0.8\",  \"name\": \"Hello World Workflow\",  \"description\": \"Inject Hello World\",  \"start\": \"Hello State\",  \"states\": [    {      \"name\": \"Hello State\",      \"type\": \"inject\",      \"data\": {        \"result\": \"Hello World!\"      },      \"end\": true    }  ]}";
-      var swBasicExample =
+      const examples = [
+        // Basic example
         "{\n" +
-        '  "id": "helloworld",\n' +
-        '  "version": "1.0",\n' +
-        '  "specVersion": "0.8",\n' +
-        '  "name": "Hello World Workflow",\n' +
-        '  "description": "Inject Hello World",\n' +
-        '  "start": "Hello State",\n' +
-        '  "states": [\n' +
-        "    {\n" +
-        '      "name": "Hello State",\n' +
-        '      "type": "inject",\n' +
-        '      "data": {\n' +
-        '        "result": "Hello World!"\n' +
-        "      },\n" +
-        '      "end": true\n' +
-        "    }\n" +
-        "  ]\n" +
-        "}";
-      setText(swBasicExample);
+          '  "id": "helloworld",\n' +
+          '  "version": "1.0",\n' +
+          '  "specVersion": "0.8",\n' +
+          '  "name": "Hello World Workflow",\n' +
+          '  "description": "Inject Hello World",\n' +
+          '  "start": "Hello State",\n' +
+          '  "states": [\n' +
+          "    {\n" +
+          '      "name": "Hello State",\n' +
+          '      "type": "inject",\n' +
+          '      "data": {\n' +
+          '        "result": "Hello World!"\n' +
+          "      },\n" +
+          '      "end": true\n' +
+          "    }\n" +
+          "  ]\n" +
+          "}",
+        // Error example
+        "{\n" +
+          '  "id": "helloworld",\n' +
+          '  "version": "1.0",\n' +
+          '  "specVersion": "0.8",\n' +
+          '  "name": "Hello World Workflow",\n' +
+          '  "description": "Inject Hello World",\n' +
+          '  "start": "Hello State",\n' +
+          '  "states": [\n' +
+          "    {\n" +
+          '      "name": "Hello State",\n' +
+          '      "type": "inject",\n' +
+          '      "end": false,\n' +
+          '      "onErrors": [\n' +
+          "        {\n" +
+          '          "errorRef": "Some Error",\n' +
+          '          "transition": "e1"\n' +
+          "        }\n" +
+          "      ]\n" +
+          "    },\n" +
+          "    {\n" +
+          '      "name": "e1",\n' +
+          '      "type": "inject",\n' +
+          '      "end": false\n' +
+          "    }\n" +
+          "  ]\n" +
+          "}",
+      ];
+
+      document.getElementById("selectExample").onchange = function (e) {
+        var i = document.getElementById("selectExample").selectedIndex;
+        setText(examples[i]);
+      };
+
+      setText(examples[0]);
 
       window.frames.editorFrame.contentWindow.jsonpatch = jsonpatch;
 

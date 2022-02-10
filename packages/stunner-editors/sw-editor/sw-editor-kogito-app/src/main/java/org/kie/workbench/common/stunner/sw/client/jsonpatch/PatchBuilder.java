@@ -32,7 +32,6 @@ import org.kie.workbench.common.stunner.core.client.canvas.command.SetConnection
 import org.kie.workbench.common.stunner.core.client.canvas.command.UpdateElementPropertyCommand;
 import org.kie.workbench.common.stunner.core.client.command.CanvasViolation;
 import org.kie.workbench.common.stunner.core.command.Command;
-import org.kie.workbench.common.stunner.core.command.impl.CompositeCommand;
 import org.kie.workbench.common.stunner.core.graph.Edge;
 import org.kie.workbench.common.stunner.core.graph.Element;
 import org.kie.workbench.common.stunner.core.graph.Node;
@@ -107,24 +106,23 @@ public class PatchBuilder {
             patches.push(patch);
             getMarshallerContext().removeStateIndex(candidate.getUUID());
         }
-        // TODO: Doesn't work well yet... refactor / review this logic.
-        if (false) {
-            CompositeCommand<GraphCommandExecutionContext, RuleViolation> graphCommand =
-                    (CompositeCommand<GraphCommandExecutionContext, RuleViolation>) command.getGraphCommand(canvasHandler);
-            graphCommand.getCommands().stream()
-                    .filter(c -> c instanceof org.kie.workbench.common.stunner.core.graph.command.impl.DeleteConnectorCommand)
-                    .forEach(c -> {
-                        org.kie.workbench.common.stunner.core.graph.command.impl.DeleteConnectorCommand gc = (org.kie.workbench.common.stunner.core.graph.command.impl.DeleteConnectorCommand) c;
-                        Patch[] edgePatches = deleteEdge(canvasHandler, gc.getEdge(), gc.getLastSourceNodeUUID(), gc.getLastTargetNodeUUID());
-                        patches.push(edgePatches);
-                    });
-        }
+        List<Command<GraphCommandExecutionContext, RuleViolation>> graphCommands = command.getGraphCommands();
+        graphCommands.stream()
+                .filter(c -> c instanceof org.kie.workbench.common.stunner.core.graph.command.impl.DeleteConnectorCommand)
+                .forEach(c -> {
+                    org.kie.workbench.common.stunner.core.graph.command.impl.DeleteConnectorCommand gc = (org.kie.workbench.common.stunner.core.graph.command.impl.DeleteConnectorCommand) c;
+                    Patch[] edgePatches = deleteEdge(canvasHandler, gc.getEdge(), gc.getLastSourceNodeUUID(), gc.getLastTargetNodeUUID());
+                    patches.push(edgePatches);
+                });
         return toArray(patches);
     }
 
     @SuppressWarnings("all")
     private Patch[] addNode(AddNodeCommand command) {
         Node candidate = command.getCandidate();
+        if (Marshaller.isStartState(candidate) || Marshaller.isEndState(candidate)) {
+            return new Patch[0];
+        }
         int count = getStatesCount();
         CNCFState jsCandidate = marshaller.marshall(candidate);
         Patch patch = PatchFactory.add("/states/" + count, jsCandidate);

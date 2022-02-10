@@ -16,19 +16,23 @@
 
 package org.kie.workbench.common.stunner.sw.client.shapes;
 
+import java.util.Optional;
 import java.util.function.BiConsumer;
 
 import org.kie.workbench.common.stunner.core.client.shape.view.ShapeView;
+import org.kie.workbench.common.stunner.core.client.shape.view.handler.FontHandler;
 import org.kie.workbench.common.stunner.core.client.shape.view.handler.ViewAttributesHandler;
 import org.kie.workbench.common.stunner.core.definition.shape.Glyph;
 import org.kie.workbench.common.stunner.core.definition.shape.ShapeDef;
 import org.kie.workbench.common.stunner.core.definition.shape.ShapeViewDef;
+import org.kie.workbench.common.stunner.svg.client.shape.view.SVGShapeView;
 import org.kie.workbench.common.stunner.sw.client.resources.GlyphFactory;
 import org.kie.workbench.common.stunner.sw.definition.ErrorTransition;
 import org.kie.workbench.common.stunner.sw.definition.StartTransition;
 import org.kie.workbench.common.stunner.sw.definition.Transition;
 
 import static org.kie.workbench.common.stunner.core.definition.adapter.binding.BindableAdapterUtils.getDefinitionId;
+import static org.kie.workbench.common.stunner.sw.client.shapes.AnyStateShapeDef.TITLE_HANDLER;
 
 public class TransitionShapeDef<W>
         implements ShapeViewDef<W, TransitionView> {
@@ -48,6 +52,28 @@ public class TransitionShapeDef<W>
     @Override
     public BiConsumer<W, TransitionView> viewHandler() {
         return new ViewAttributesHandlerBuilder().build()::handle;
+    }
+
+    private static final String FONT_FAMILY = "Open Sans";
+    private static final String FONT_COLOR = "#000000";
+    private static final String FONT_STROKE_COLOR = "#393f44";
+    private static final double FONT_SIZE = 10d;
+    private static final double STROKE_SIZE = 0.5d;
+
+    @Override
+    public Optional<BiConsumer<W, TransitionView>> fontHandler() {
+        return Optional.of(new FontHandler.Builder<W, TransitionView>()
+                                   .fontFamily(c -> FONT_FAMILY)
+                                   .fontSize(c -> FONT_SIZE)
+                                   .fontColor(c -> FONT_COLOR)
+                                   .strokeColor(c -> FONT_STROKE_COLOR)
+                                   .strokeSize(c -> STROKE_SIZE)
+                            .build()::handle);
+    }
+
+    @Override
+    public Optional<BiConsumer<String, TransitionView>> titleHandler() {
+        return Optional.of(TITLE_HANDLER::handle);
     }
 
     @Override

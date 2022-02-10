@@ -55,9 +55,9 @@ import org.kie.workbench.common.stunner.sw.spec.CNCFWorkflow;
 @ApplicationScoped
 public class Marshaller {
 
-    private static final String STATE_START = "start";
-    private static final String EDGE_START = "start";
-    private static final String STATE_END = "end";
+    private static final String STATE_START = "startState";
+    private static final String STATE_END = "endState";
+    private static final String EDGE_START = "startEdge";
     private static final String TYPE_INJECT = "inject";
     private static final String TYPE_SWITCH = "switch";
 
@@ -108,13 +108,21 @@ public class Marshaller {
         return result;
     }
 
+    public static boolean isStartState(Node node) {
+        return ((View<?>) node.getContent()).getDefinition() instanceof Start;
+    }
+
+    public static boolean isEndState(Node node) {
+        return ((View<?>) node.getContent()).getDefinition() instanceof End;
+    }
+
     public CNCFState marshall(CNCFState state, Edge edge) {
         Object edgeBean = ((View<?>) edge.getContent()).getDefinition();
         Node targetNode = edge.getTargetNode();
         boolean isEnd = false;
         String targetName = null;
         if (null != targetNode) {
-            if (targetNode.getUUID().equals(STATE_END)) {
+            if (isEndState(targetNode)) {
                 isEnd = true;
             } else {
                 // TODO: Obtain bean's name via DefinitionAdapter
