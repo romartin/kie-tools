@@ -16,12 +16,26 @@
 
 package org.kie.workbench.common.stunner.sw.definition;
 
-public class Categories {
+import jsinterop.annotations.JsType;
+import org.jboss.errai.databinding.client.api.Bindable;
+import org.kie.workbench.common.stunner.core.definition.annotation.Definition;
+import org.kie.workbench.common.stunner.core.definition.annotation.Property;
+import org.kie.workbench.common.stunner.core.definition.annotation.morph.Morph;
 
-    public static final transient String START = "SWStart";
-    public static final transient String END = "SWEnd";
-    public static final transient String STATES = "SWStates";
-    public static final transient String TRANSITIONS = "SWTransitions";
-    public static final transient String EVENTS = "SWEvents";
-    public static final transient String ACTIONS = "SWActions";
+@Bindable
+@Definition
+@Morph(base = ActionNode.class)
+@JsType
+public class CallSubflow extends ActionNode {
+
+    @Property
+    public String subFlowRef;
+
+    public String getSubFlowRef() {
+        return subFlowRef;
+    }
+
+    public void setSubFlowRef(String subFlowRef) {
+        this.subFlowRef = subFlowRef;
+    }
 }

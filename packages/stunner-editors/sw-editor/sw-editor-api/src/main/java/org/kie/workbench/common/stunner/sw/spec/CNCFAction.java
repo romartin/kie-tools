@@ -14,14 +14,16 @@
  * limitations under the License.
  */
 
-package org.kie.workbench.common.stunner.sw.definition;
+package org.kie.workbench.common.stunner.sw.spec;
 
-public class Categories {
+import jsinterop.annotations.JsType;
 
-    public static final transient String START = "SWStart";
-    public static final transient String END = "SWEnd";
-    public static final transient String STATES = "SWStates";
-    public static final transient String TRANSITIONS = "SWTransitions";
-    public static final transient String EVENTS = "SWEvents";
-    public static final transient String ACTIONS = "SWActions";
+@JsType
+public class CNCFAction {
+
+    public String id;
+    public String name;
+    public String functionRef;
+    public String eventRef;
+    public String subFlowRef;
 }

@@ -24,5 +24,6 @@ public class CNCFWorkflow {
     public String id;
     public String name;
     public String start;
+    public CNCFEvent[] events;
     public CNCFState[] states;
 }

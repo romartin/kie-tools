@@ -20,6 +20,7 @@ import java.util.List;
 
 import io.serverlessworkflow.api.Workflow;
 import io.serverlessworkflow.api.end.End;
+import io.serverlessworkflow.api.events.EventDefinition;
 import io.serverlessworkflow.api.interfaces.State;
 import io.serverlessworkflow.api.start.Start;
 import io.serverlessworkflow.api.states.DefaultState;
@@ -59,6 +60,9 @@ public class CNCFSWTests {
     public void testApi() {
 
         Workflow workflow = Workflow.fromSource(YAML);
+
+        List<EventDefinition> eventDefs = workflow.getEvents().getEventDefs();
+        EventDefinition eventDefinition0 = eventDefs.get(0);
 
         assertNotNull(workflow);
         assertEquals("greeting", workflow.getId());

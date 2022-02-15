@@ -23,8 +23,14 @@ import org.kie.workbench.common.stunner.core.definition.annotation.DefinitionSet
 import org.kie.workbench.common.stunner.core.definition.builder.Builder;
 import org.kie.workbench.common.stunner.core.factory.graph.GraphFactory;
 import org.kie.workbench.common.stunner.core.rule.annotation.Occurrences;
+import org.kie.workbench.common.stunner.sw.definition.ActionTransition;
+import org.kie.workbench.common.stunner.sw.definition.CallFunction;
+import org.kie.workbench.common.stunner.sw.definition.CallSubflow;
 import org.kie.workbench.common.stunner.sw.definition.End;
 import org.kie.workbench.common.stunner.sw.definition.ErrorTransition;
+import org.kie.workbench.common.stunner.sw.definition.EventNode;
+import org.kie.workbench.common.stunner.sw.definition.EventState;
+import org.kie.workbench.common.stunner.sw.definition.EventTransition;
 import org.kie.workbench.common.stunner.sw.definition.InjectState;
 import org.kie.workbench.common.stunner.sw.definition.Start;
 import org.kie.workbench.common.stunner.sw.definition.StartTransition;
@@ -41,8 +47,14 @@ import org.kie.workbench.common.stunner.sw.definition.Transition;
                 End.class,
                 InjectState.class,
                 SwitchState.class,
+                EventState.class,
+                EventNode.class,
+                CallFunction.class,
+                CallSubflow.class,
                 StartTransition.class,
                 ErrorTransition.class,
+                EventTransition.class,
+                ActionTransition.class,
                 Transition.class
         },
         builder = Definitions.DefinitionsBuilder.class

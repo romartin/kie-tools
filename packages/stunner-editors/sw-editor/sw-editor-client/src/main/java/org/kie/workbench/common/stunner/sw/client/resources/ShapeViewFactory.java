@@ -28,6 +28,8 @@ public interface ShapeViewFactory {
     String PATH_CSS = "images/shapes/shapes.css";
     String PATH_STATE = "images/shapes/state.svg";
     String PATH_START = "images/shapes/start.svg";
+    String PATH_EVENT = "images/shapes/event.svg";
+    String PATH_ACTION = "images/shapes/action.svg";
     String PATH_END = "images/shapes/end.svg";
 
     @SVGSource(PATH_STATE)
@@ -39,9 +41,18 @@ public interface ShapeViewFactory {
     @SVGSource(PATH_STATE)
     SVGShapeViewResource operationState();
 
+    @SVGSource(PATH_STATE)
+    SVGShapeViewResource eventState();
+
     @SVGSource(PATH_START)
     SVGShapeViewResource startState();
 
     @SVGSource(PATH_END)
     SVGShapeViewResource endState();
+
+    @SVGSource(PATH_EVENT)
+    SVGShapeViewResource event();
+
+    @SVGSource(PATH_ACTION)
+    SVGShapeViewResource action();
 }

@@ -53,6 +53,14 @@
   fill: #393f44;
 }
 
+.state_group_event {
+  opacity: 0;
+}
+
+.state_event_icon {
+  fill: #393f44;
+}
+
 #injectState .state_group_inject {
   opacity: 1;
 }
@@ -62,6 +70,10 @@
 }
 
 #operationState .state_group_operation {
+  opacity: 1;
+}
+
+#eventState .state_group_event {
   opacity: 1;
 }
 
@@ -92,6 +104,35 @@
 .end {
   opacity: 1;
   fill: #333333;
+}
+
+/*
+    ******************
+    Event.
+    ******************
+ */
+.event_background {
+  opacity: 1;
+  fill: #ffffff;
+}
+
+.event_border {
+  opacity: 1;
+  fill: #0000ff;
+}
+
+/*
+    ******************
+    Action.
+    ******************
+ */
+.action_background {
+  fill: #ff0000;
+}
+
+.action_border {
+  stroke: #000000;
+  stroke-width: 1px;
 }
 
 /*

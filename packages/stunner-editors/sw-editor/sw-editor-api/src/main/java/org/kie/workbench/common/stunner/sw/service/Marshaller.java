@@ -39,16 +39,28 @@ import org.kie.workbench.common.stunner.core.graph.processing.index.GraphIndexBu
 import org.kie.workbench.common.stunner.core.graph.processing.index.Index;
 import org.kie.workbench.common.stunner.core.rule.RuleViolation;
 import org.kie.workbench.common.stunner.core.util.DefinitionUtils;
+import org.kie.workbench.common.stunner.sw.definition.ActionNode;
+import org.kie.workbench.common.stunner.sw.definition.ActionTransition;
+import org.kie.workbench.common.stunner.sw.definition.CallFunction;
+import org.kie.workbench.common.stunner.sw.definition.CallSubflow;
 import org.kie.workbench.common.stunner.sw.definition.End;
 import org.kie.workbench.common.stunner.sw.definition.ErrorTransition;
+import org.kie.workbench.common.stunner.sw.definition.EventNode;
+import org.kie.workbench.common.stunner.sw.definition.EventState;
+import org.kie.workbench.common.stunner.sw.definition.EventTransition;
 import org.kie.workbench.common.stunner.sw.definition.InjectState;
 import org.kie.workbench.common.stunner.sw.definition.Start;
 import org.kie.workbench.common.stunner.sw.definition.StartTransition;
 import org.kie.workbench.common.stunner.sw.definition.State;
 import org.kie.workbench.common.stunner.sw.definition.SwitchState;
 import org.kie.workbench.common.stunner.sw.definition.Transition;
+import org.kie.workbench.common.stunner.sw.factory.EventsRegistry;
 import org.kie.workbench.common.stunner.sw.service.MarshallUtils.VerticalLayoutBuilder;
+import org.kie.workbench.common.stunner.sw.spec.CNCFAction;
 import org.kie.workbench.common.stunner.sw.spec.CNCFError;
+import org.kie.workbench.common.stunner.sw.spec.CNCFEvent;
+import org.kie.workbench.common.stunner.sw.spec.CNCFEventState;
+import org.kie.workbench.common.stunner.sw.spec.CNCFOnEvent;
 import org.kie.workbench.common.stunner.sw.spec.CNCFState;
 import org.kie.workbench.common.stunner.sw.spec.CNCFWorkflow;
 
@@ -60,6 +72,7 @@ public class Marshaller {
     private static final String EDGE_START = "startEdge";
     private static final String TYPE_INJECT = "inject";
     private static final String TYPE_SWITCH = "switch";
+    private static final String TYPE_EVENT = "event";
 
     private final DefinitionUtils definitionUtils;
     private final FactoryManager factoryManager;
@@ -91,6 +104,8 @@ public class Marshaller {
             type = TYPE_INJECT;
         } else if (state instanceof SwitchState) {
             type = TYPE_SWITCH;
+        } else if (state instanceof EventState) {
+            type = TYPE_EVENT;
         }
         if (null != type) {
             result.type = type;
@@ -155,6 +170,9 @@ public class Marshaller {
     public Graph unmarshall(Metadata metadata, String raw) {
         final Object root = Global.JSON.parse(raw);
         final CNCFWorkflow workflow = Js.uncheckedCast(root);
+
+        unmarshallEventDefs(workflow.events);
+
         final CNCFState[] states = workflow.states;
 
         final VerticalLayoutBuilder layout = new VerticalLayoutBuilder();
@@ -207,12 +225,74 @@ public class Marshaller {
         return graph;
     }
 
+    @SuppressWarnings("all")
+    private void parseEventState(CNCFState stateRaw,
+                                 Node node,
+                                 Point2D location,
+                                 CompositeCommand.Builder storageCommands,
+                                 CompositeCommand.Builder connectionCommands) {
+        CNCFEventState eventStateRaw = Js.uncheckedCast(stateRaw);
+        EventState state = ((View<EventState>) node.getContent()).getDefinition();
+        state.setExclusive(eventStateRaw.exclusive);
+        CNCFOnEvent[] onEvents = eventStateRaw.onEvents;
+        if (null != onEvents) {
+            for (CNCFOnEvent onEvent : onEvents) {
+                String[] eventRefs = onEvent.eventRefs;
+                CNCFAction[] actions = onEvent.actions;
+
+                // TODO: Only parsing a SINGLE (FIRST) event & action defitions.
+                String eventRef = eventRefs[0];
+                CNCFAction actionDef = actions[0];
+
+                // Event Node.
+                String eventNodeUUID = MarshallerContext.generateUUID();
+                EventNode event = new EventNode();
+                event.setEventRef(eventRef);
+                event.setName(eventRef);
+                final Node eventNode = utils.createNodeAt(eventNodeUUID, event, location, storageCommands);
+
+                // Transition to Event Node.
+                final EventTransition t = new EventTransition();
+                t.setName("On " + eventRef);
+                Edge edge = parseTransitionByTargetUUID(t, node, eventNodeUUID, storageCommands, connectionCommands);
+
+                // Action Node.
+                String actionNodeUUID = MarshallerContext.generateUUID();
+                ActionNode action = null;
+                String actionName = actionDef.name;
+                if (null != actionDef.functionRef) {
+                    actionName = actionDef.functionRef;
+                    action = new CallFunction();
+                    CallFunction callFunctionAction = (CallFunction) action;
+                    callFunctionAction.setId(actionNodeUUID);
+                    callFunctionAction.setName(actionDef.functionRef);
+                    callFunctionAction.setFunctionRef(actionDef.functionRef);
+                } else if (null != actionDef.subFlowRef) {
+                    actionName = actionDef.subFlowRef;
+                    action = new CallSubflow();
+                    CallSubflow callSubflowAction = (CallSubflow) action;
+                    callSubflowAction.setId(actionNodeUUID);
+                    callSubflowAction.setName(actionDef.subFlowRef);
+                    callSubflowAction.setSubFlowRef(actionDef.subFlowRef);
+                }
+                final Node actionNode = utils.createNodeAt(actionNodeUUID, action, new Point2D(location.getX() + 200, location.getY()), storageCommands);
+
+                // Transition to Action Node.
+                final ActionTransition at = new ActionTransition();
+                at.setName("Call " + actionName);
+                Edge edgeToAction = parseTransitionByTargetUUID(at, eventNode, actionNodeUUID, storageCommands, connectionCommands);
+            }
+        }
+    }
+
+    @SuppressWarnings("all")
     private Node parseState(CNCFState stateRaw,
                             Point2D location,
                             CompositeCommand.Builder storageCommands,
                             CompositeCommand.Builder connectionCommands) {
 
         State state = null;
+
         switch (stateRaw.type) {
             case TYPE_INJECT:
                 state = new InjectState();
@@ -220,25 +300,33 @@ public class Marshaller {
             case TYPE_SWITCH:
                 state = new SwitchState();
                 break;
+            case TYPE_EVENT:
+                state = new EventState();
+                break;
         }
+
+        // Parse common fields.
         String name = stateRaw.name;
         String uuid = context.getUUID(name);
         state.setName(name);
         final Node stateNode = utils.createNodeAt(uuid, state, location, storageCommands);
 
+        // Parse end.
         if (stateRaw.end) {
             final Transition tend = new Transition();
             tend.setName(name + " to End");
-            Edge tendEdge = parseTransition(tend, stateNode, STATE_END, storageCommands, connectionCommands);
+            Edge tendEdge = parseTransitionByTargetName(tend, stateNode, STATE_END, storageCommands, connectionCommands);
         }
 
+        // Parse transition.
         String transition = stateRaw.transition;
         if (isValidString(transition)) {
             final Transition t = new Transition();
             t.setName(name + " to " + transition);
-            Edge edge = parseTransition(t, stateNode, transition, storageCommands, connectionCommands);
+            Edge edge = parseTransitionByTargetName(t, stateNode, transition, storageCommands, connectionCommands);
         }
 
+        // Parse on-errors.
         CNCFError[] onErrors = stateRaw.onErrors;
         if (null != onErrors && onErrors.length > 0) {
             for (int i = 0; i < onErrors.length; i++) {
@@ -247,27 +335,60 @@ public class Marshaller {
                     final ErrorTransition t = new ErrorTransition();
                     t.setErrorRef(onError.errorRef);
                     if (onError.end) {
-                        Edge edge = parseTransition(t, stateNode, STATE_END, storageCommands, connectionCommands);
+                        Edge edge = parseTransitionByTargetName(t, stateNode, STATE_END, storageCommands, connectionCommands);
                     } else if (isValidString(onError.transition)) {
-                        Edge edge = parseTransition(t, stateNode, onError.transition, storageCommands, connectionCommands);
+                        Edge edge = parseTransitionByTargetName(t, stateNode, onError.transition, storageCommands, connectionCommands);
                     }
                 }
             }
         }
 
+        // Parse specific declarations.
+        switch (stateRaw.type) {
+            case TYPE_INJECT:
+                break;
+            case TYPE_SWITCH:
+                break;
+            case TYPE_EVENT:
+                parseEventState(stateRaw, stateNode, new Point2D(location.getX() + 250, location.getY()), storageCommands, connectionCommands);
+                break;
+        }
+
         return stateNode;
     }
 
-    private Edge parseTransition(Object transition,
-                                 Node source,
-                                 String target,
-                                 CompositeCommand.Builder storageCommands,
-                                 CompositeCommand.Builder connectionCommands) {
-        String targetUUID = context.getUUID(target);
+    @SuppressWarnings("all")
+    private Edge parseTransitionByTargetUUID(Object transition,
+                                             Node source,
+                                             String targetUUID,
+                                             CompositeCommand.Builder storageCommands,
+                                             CompositeCommand.Builder connectionCommands) {
         String transitionUUID = MarshallerContext.generateUUID();
         Edge tEdge = utils.createEdge(transitionUUID, transition, source, storageCommands);
         utils.connect(tEdge, source, targetUUID, connectionCommands);
         return tEdge;
+    }
+
+    @SuppressWarnings("all")
+    private Edge parseTransitionByTargetName(Object transition,
+                                             Node source,
+                                             String target,
+                                             CompositeCommand.Builder storageCommands,
+                                             CompositeCommand.Builder connectionCommands) {
+        String targetUUID = context.getUUID(target);
+        return parseTransitionByTargetUUID(transition, source, targetUUID, storageCommands, connectionCommands);
+    }
+
+    @Inject
+    private EventsRegistry eventsRegistry;
+
+    private void unmarshallEventDefs(CNCFEvent[] events) {
+        eventsRegistry.clear();
+        if (null != events) {
+            for (CNCFEvent event : events) {
+                eventsRegistry.register(event);
+            }
+        }
     }
 
     public MarshallerContext getContext() {

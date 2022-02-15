@@ -25,9 +25,10 @@ import org.kie.workbench.common.stunner.core.client.shape.view.handler.ViewAttri
 import org.kie.workbench.common.stunner.core.definition.shape.Glyph;
 import org.kie.workbench.common.stunner.core.definition.shape.ShapeDef;
 import org.kie.workbench.common.stunner.core.definition.shape.ShapeViewDef;
-import org.kie.workbench.common.stunner.svg.client.shape.view.SVGShapeView;
 import org.kie.workbench.common.stunner.sw.client.resources.GlyphFactory;
+import org.kie.workbench.common.stunner.sw.definition.ActionTransition;
 import org.kie.workbench.common.stunner.sw.definition.ErrorTransition;
+import org.kie.workbench.common.stunner.sw.definition.EventTransition;
 import org.kie.workbench.common.stunner.sw.definition.StartTransition;
 import org.kie.workbench.common.stunner.sw.definition.Transition;
 
@@ -40,7 +41,9 @@ public class TransitionShapeDef<W>
     enum Type {
         TRANSITION,
         START,
-        ERROR
+        ERROR,
+        EVENT,
+        ACTION
     }
 
     enum Direction {
@@ -68,7 +71,7 @@ public class TransitionShapeDef<W>
                                    .fontColor(c -> FONT_COLOR)
                                    .strokeColor(c -> FONT_STROKE_COLOR)
                                    .strokeSize(c -> STROKE_SIZE)
-                            .build()::handle);
+                                   .build()::handle);
     }
 
     @Override
@@ -85,6 +88,12 @@ public class TransitionShapeDef<W>
         }
         if (type == Type.ERROR) {
             return GlyphFactory.TRANSITION_ERROR;
+        }
+        if (type == Type.EVENT) {
+            return GlyphFactory.TRANSITION_EVENT;
+        }
+        if (type == Type.ACTION) {
+            return GlyphFactory.TRANSITION_ACTION;
         }
         return GlyphFactory.TRANSITION;
     }
@@ -107,6 +116,8 @@ public class TransitionShapeDef<W>
     private static final String TYPE_TRANSITION = getDefinitionId(Transition.class);
     private static final String TYPE_START = getDefinitionId(StartTransition.class);
     private static final String TYPE_ERROR = getDefinitionId(ErrorTransition.class);
+    private static final String TYPE_EVENT = getDefinitionId(EventTransition.class);
+    private static final String TYPE_ACTION = getDefinitionId(ActionTransition.class);
 
     public static Type getType(Object transition) {
         Type type = getTypeOrNull(transition);
@@ -139,6 +150,12 @@ public class TransitionShapeDef<W>
         if (TYPE_ERROR.equals(id)) {
             return Type.ERROR;
         }
+        if (TYPE_EVENT.equals(id)) {
+            return Type.EVENT;
+        }
+        if (TYPE_ACTION.equals(id)) {
+            return Type.ACTION;
+        }
         return null;
     }
 
@@ -149,6 +166,12 @@ public class TransitionShapeDef<W>
         }
         if (type == Type.ERROR) {
             return "#FF0000";
+        }
+        if (type == Type.EVENT) {
+            return "#00FF00";
+        }
+        if (type == Type.ACTION) {
+            return "#00FF00";
         }
         return "#000000";
     }

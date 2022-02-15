@@ -31,8 +31,14 @@ import org.kie.workbench.common.stunner.sw.client.shapes.AnyStateShapeDef;
 import org.kie.workbench.common.stunner.sw.client.shapes.TransitionShape;
 import org.kie.workbench.common.stunner.sw.client.shapes.TransitionShapeDef;
 import org.kie.workbench.common.stunner.sw.client.shapes.TransitionView;
+import org.kie.workbench.common.stunner.sw.definition.ActionTransition;
+import org.kie.workbench.common.stunner.sw.definition.CallFunction;
+import org.kie.workbench.common.stunner.sw.definition.CallSubflow;
 import org.kie.workbench.common.stunner.sw.definition.End;
 import org.kie.workbench.common.stunner.sw.definition.ErrorTransition;
+import org.kie.workbench.common.stunner.sw.definition.EventNode;
+import org.kie.workbench.common.stunner.sw.definition.EventState;
+import org.kie.workbench.common.stunner.sw.definition.EventTransition;
 import org.kie.workbench.common.stunner.sw.definition.InjectState;
 import org.kie.workbench.common.stunner.sw.definition.Start;
 import org.kie.workbench.common.stunner.sw.definition.StartTransition;
@@ -48,11 +54,17 @@ public class ShapeFactory
     private static final Map<Class<?>, ShapeViewDef> typeViewDefinitions = new HashMap<Class<?>, ShapeViewDef>() {{
         put(Start.class, new AnyStateShapeDef());
         put(End.class, new AnyStateShapeDef());
+        put(EventNode.class, new AnyStateShapeDef());
+        put(CallFunction.class, new AnyStateShapeDef());
+        put(CallSubflow.class, new AnyStateShapeDef());
         put(InjectState.class, new AnyStateShapeDef());
         put(SwitchState.class, new AnyStateShapeDef());
+        put(EventState.class, new AnyStateShapeDef());
         put(Transition.class, new TransitionShapeDef());
         put(StartTransition.class, new TransitionShapeDef());
         put(ErrorTransition.class, new TransitionShapeDef());
+        put(EventTransition.class, new TransitionShapeDef());
+        put(ActionTransition.class, new TransitionShapeDef());
     }};
 
     private final SVGShapeFactory svgShapeFactory;

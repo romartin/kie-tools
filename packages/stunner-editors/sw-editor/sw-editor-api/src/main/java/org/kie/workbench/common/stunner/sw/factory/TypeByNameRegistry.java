@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Red Hat, Inc. and/or its affiliates.
+ * Copyright 2018 Red Hat, Inc. and/or its affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,14 +14,13 @@
  * limitations under the License.
  */
 
-package org.kie.workbench.common.stunner.sw.definition;
+package org.kie.workbench.common.stunner.sw.factory;
 
-public class Categories {
+import java.util.Collection;
 
-    public static final transient String START = "SWStart";
-    public static final transient String END = "SWEnd";
-    public static final transient String STATES = "SWStates";
-    public static final transient String TRANSITIONS = "SWTransitions";
-    public static final transient String EVENTS = "SWEvents";
-    public static final transient String ACTIONS = "SWActions";
+public interface TypeByNameRegistry<T> {
+
+    Collection<T> items();
+
+    T get(String name);
 }
