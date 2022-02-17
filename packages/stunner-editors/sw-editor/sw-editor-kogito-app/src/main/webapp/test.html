@@ -364,30 +364,37 @@
           "}",
         // Error example
         "{\n" +
-          '  "id": "helloworld",\n' +
-          '  "version": "1.0",\n' +
-          '  "specVersion": "0.8",\n' +
-          '  "name": "Hello World Workflow",\n' +
-          '  "description": "Inject Hello World",\n' +
-          '  "start": "Hello State",\n' +
-          '  "states": [\n' +
+          ' "id": "helloworld",\n' +
+          ' "version": "1.0",\n' +
+          ' "specVersion": "0.8",\n' +
+          ' "name": "Hello World Workflow",\n' +
+          ' "description": "Inject Hello World",\n' +
+          ' "start": "Hello State",\n' +
+          ' "states": [\n' +
+          "  {\n" +
+          '   "name": "Hello State",\n' +
+          '   "type": "inject",\n' +
+          '   "end": false,\n' +
+          '   "transition": "NewState",\n' +
+          '   "onErrors": [\n' +
           "    {\n" +
-          '      "name": "Hello State",\n' +
-          '      "type": "inject",\n' +
-          '      "end": false,\n' +
-          '      "onErrors": [\n' +
-          "        {\n" +
-          '          "errorRef": "Some Error",\n' +
-          '          "transition": "e1"\n' +
-          "        }\n" +
-          "      ]\n" +
-          "    },\n" +
-          "    {\n" +
-          '      "name": "e1",\n' +
-          '      "type": "inject",\n' +
-          '      "end": false\n' +
+          '     "errorRef": "Some Error",\n' +
+          '     "end": false,\n' +
+          '     "transition": "e1"\n' +
           "    }\n" +
-          "  ]\n" +
+          "   ]\n" +
+          "  },\n" +
+          "  {\n" +
+          '   "name": "e1",\n' +
+          '   "type": "inject",\n' +
+          '   "end": true\n' +
+          "  },\n" +
+          "  {\n" +
+          '   "name": "NewState",\n' +
+          '   "type": "inject",\n' +
+          '   "end": true\n' +
+          "  }\n" +
+          " ]\n" +
           "}",
         // Simple Event State Example
         "{\n" +
