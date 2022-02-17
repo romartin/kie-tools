@@ -32,6 +32,7 @@ import org.kie.workbench.common.stunner.core.graph.Graph;
 import org.kie.workbench.common.stunner.core.graph.Node;
 import org.kie.workbench.common.stunner.core.graph.command.DirectGraphCommandExecutionContext;
 import org.kie.workbench.common.stunner.core.graph.command.GraphCommandExecutionContext;
+import org.kie.workbench.common.stunner.core.graph.content.Bounds;
 import org.kie.workbench.common.stunner.core.graph.content.view.Point2D;
 import org.kie.workbench.common.stunner.core.graph.content.view.View;
 import org.kie.workbench.common.stunner.core.graph.impl.GraphImpl;
@@ -41,19 +42,21 @@ import org.kie.workbench.common.stunner.core.rule.RuleViolation;
 import org.kie.workbench.common.stunner.core.util.DefinitionUtils;
 import org.kie.workbench.common.stunner.sw.definition.ActionNode;
 import org.kie.workbench.common.stunner.sw.definition.ActionTransition;
-import org.kie.workbench.common.stunner.sw.definition.CallFunction;
-import org.kie.workbench.common.stunner.sw.definition.CallSubflow;
+import org.kie.workbench.common.stunner.sw.definition.CallFunctionAction;
+import org.kie.workbench.common.stunner.sw.definition.CallSubflowAction;
 import org.kie.workbench.common.stunner.sw.definition.End;
 import org.kie.workbench.common.stunner.sw.definition.ErrorTransition;
-import org.kie.workbench.common.stunner.sw.definition.EventNode;
+import org.kie.workbench.common.stunner.sw.definition.EventRef;
 import org.kie.workbench.common.stunner.sw.definition.EventState;
 import org.kie.workbench.common.stunner.sw.definition.EventTransition;
 import org.kie.workbench.common.stunner.sw.definition.InjectState;
+import org.kie.workbench.common.stunner.sw.definition.OnEvents;
 import org.kie.workbench.common.stunner.sw.definition.Start;
 import org.kie.workbench.common.stunner.sw.definition.StartTransition;
 import org.kie.workbench.common.stunner.sw.definition.State;
 import org.kie.workbench.common.stunner.sw.definition.SwitchState;
 import org.kie.workbench.common.stunner.sw.definition.Transition;
+import org.kie.workbench.common.stunner.sw.definition.Workflow;
 import org.kie.workbench.common.stunner.sw.factory.EventsRegistry;
 import org.kie.workbench.common.stunner.sw.service.MarshallUtils.VerticalLayoutBuilder;
 import org.kie.workbench.common.stunner.sw.spec.CNCFAction;
@@ -67,6 +70,7 @@ import org.kie.workbench.common.stunner.sw.spec.CNCFWorkflow;
 @ApplicationScoped
 public class Marshaller {
 
+    public static final String WORKFLOW_UUID = "workflowRoot";
     private static final String STATE_START = "startState";
     private static final String STATE_END = "endState";
     private static final String EDGE_START = "startEdge";
@@ -180,13 +184,22 @@ public class Marshaller {
         final CompositeCommand.Builder connectionCommands = new CompositeCommand.Builder();
         context = new MarshallerContext(workflow);
 
+        // Workflow root node.
+        final Workflow w = new Workflow();
+        w.setId(workflow.id);
+        w.setName(workflow.name);
+        String wUUID = context.getUUID(WORKFLOW_UUID);
+        // TODO: Use Factory instead?
+        Node<View<Workflow>, Edge> wNode = utils.createNodeAt(wUUID, w, new Point2D(0, 0), storageCommands);
+        wNode.getContent().setBounds(Bounds.create(0, 0, 950, 950));
+
         // Start state.
         String start = workflow.start;
         if (isValidString(start)) {
             String startUUID = context.getUUID(STATE_START);
             Start startBean = new Start();
             Point2D startLocation = layout.getNextLocation();
-            Node startNode = utils.createNodeAt(startUUID, startBean, startLocation, storageCommands);
+            Node startNode = utils.createChildNodeAt(startUUID, startBean, startLocation, wNode, storageCommands);
             StartTransition tstart = new StartTransition();
             Edge startEdge = utils.createEdge(EDGE_START, tstart, startNode, storageCommands);
             String targetUUID = context.getUUID(start);
@@ -197,13 +210,13 @@ public class Marshaller {
         final End end = new End();
         String endUUID = context.getUUID(STATE_END);
         Point2D endLocation = layout.getEndLocation(states.length);
-        Node endNode = utils.createNodeAt(endUUID, end, endLocation, storageCommands);
+        Node endNode = utils.createChildNodeAt(endUUID, end, endLocation, wNode, storageCommands);
 
         // States.
         for (int i = 0; i < states.length; i++) {
             CNCFState state = states[i];
             Point2D nodeLocation = layout.getNextLocation();
-            Node stateNode = parseState(state, nodeLocation, storageCommands, connectionCommands);
+            Node stateNode = parseState(state, nodeLocation, wNode, storageCommands, connectionCommands);
             context.uuidIndexes.add(stateNode.getUUID());
         }
 
@@ -228,6 +241,7 @@ public class Marshaller {
     @SuppressWarnings("all")
     private void parseEventState(CNCFState stateRaw,
                                  Node node,
+                                 Node parent,
                                  Point2D location,
                                  CompositeCommand.Builder storageCommands,
                                  CompositeCommand.Builder connectionCommands) {
@@ -235,8 +249,21 @@ public class Marshaller {
         EventState state = ((View<EventState>) node.getContent()).getDefinition();
         state.setExclusive(eventStateRaw.exclusive);
         CNCFOnEvent[] onEvents = eventStateRaw.onEvents;
-        if (null != onEvents) {
+        if (null != onEvents && onEvents.length > 0) {
+            // OnEvents Node.
+            String onEventsNodeUUID = MarshallerContext.generateUUID();
+            OnEvents onEventsBean = new OnEvents();
+            final Node onEventsNode = utils.createChildNodeAt(onEventsNodeUUID, onEventsBean, location, parent, storageCommands);
+
+            // Transition to OnEvents Node.
+            final EventTransition onEventsTransition = new EventTransition();
+            onEventsTransition.setName("OnEvents");
+            Edge onEventsEdge = parseTransitionByTargetUUID(onEventsTransition, node, onEventsNodeUUID, storageCommands, connectionCommands);
+
+            double x = 50;
+            double y = 50;
             for (CNCFOnEvent onEvent : onEvents) {
+                x = 50;
                 String[] eventRefs = onEvent.eventRefs;
                 CNCFAction[] actions = onEvent.actions;
 
@@ -246,15 +273,10 @@ public class Marshaller {
 
                 // Event Node.
                 String eventNodeUUID = MarshallerContext.generateUUID();
-                EventNode event = new EventNode();
+                EventRef event = new EventRef();
                 event.setEventRef(eventRef);
                 event.setName(eventRef);
-                final Node eventNode = utils.createNodeAt(eventNodeUUID, event, location, storageCommands);
-
-                // Transition to Event Node.
-                final EventTransition t = new EventTransition();
-                t.setName("On " + eventRef);
-                Edge edge = parseTransitionByTargetUUID(t, node, eventNodeUUID, storageCommands, connectionCommands);
+                final Node eventNode = utils.createChildNodeAt(eventNodeUUID, event, new Point2D(x, y), onEventsNode, storageCommands);
 
                 // Action Node.
                 String actionNodeUUID = MarshallerContext.generateUUID();
@@ -262,25 +284,27 @@ public class Marshaller {
                 String actionName = actionDef.name;
                 if (null != actionDef.functionRef) {
                     actionName = actionDef.functionRef;
-                    action = new CallFunction();
-                    CallFunction callFunctionAction = (CallFunction) action;
+                    action = new CallFunctionAction();
+                    CallFunctionAction callFunctionAction = (CallFunctionAction) action;
                     callFunctionAction.setId(actionNodeUUID);
                     callFunctionAction.setName(actionDef.functionRef);
                     callFunctionAction.setFunctionRef(actionDef.functionRef);
                 } else if (null != actionDef.subFlowRef) {
                     actionName = actionDef.subFlowRef;
-                    action = new CallSubflow();
-                    CallSubflow callSubflowAction = (CallSubflow) action;
+                    action = new CallSubflowAction();
+                    CallSubflowAction callSubflowAction = (CallSubflowAction) action;
                     callSubflowAction.setId(actionNodeUUID);
                     callSubflowAction.setName(actionDef.subFlowRef);
                     callSubflowAction.setSubFlowRef(actionDef.subFlowRef);
                 }
-                final Node actionNode = utils.createNodeAt(actionNodeUUID, action, new Point2D(location.getX() + 200, location.getY()), storageCommands);
+                final Node actionNode = utils.createChildNodeAt(actionNodeUUID, action, new Point2D(x + 150, y), onEventsNode, storageCommands);
 
-                // Transition to Action Node.
+                // Transition to Actions Node.
                 final ActionTransition at = new ActionTransition();
                 at.setName("Call " + actionName);
-                Edge edgeToAction = parseTransitionByTargetUUID(at, eventNode, actionNodeUUID, storageCommands, connectionCommands);
+                Edge actionsEdge = parseTransitionByTargetUUID(at, eventNode, actionNodeUUID, storageCommands, connectionCommands);
+
+                y += 100;
             }
         }
     }
@@ -288,6 +312,7 @@ public class Marshaller {
     @SuppressWarnings("all")
     private Node parseState(CNCFState stateRaw,
                             Point2D location,
+                            Node parent,
                             CompositeCommand.Builder storageCommands,
                             CompositeCommand.Builder connectionCommands) {
 
@@ -309,7 +334,7 @@ public class Marshaller {
         String name = stateRaw.name;
         String uuid = context.getUUID(name);
         state.setName(name);
-        final Node stateNode = utils.createNodeAt(uuid, state, location, storageCommands);
+        final Node stateNode = utils.createChildNodeAt(uuid, state, location, parent, storageCommands);
 
         // Parse end.
         if (stateRaw.end) {
@@ -350,7 +375,7 @@ public class Marshaller {
             case TYPE_SWITCH:
                 break;
             case TYPE_EVENT:
-                parseEventState(stateRaw, stateNode, new Point2D(location.getX() + 250, location.getY()), storageCommands, connectionCommands);
+                parseEventState(stateRaw, stateNode, parent, new Point2D(location.getX() + 250, location.getY()), storageCommands, connectionCommands);
                 break;
         }
 

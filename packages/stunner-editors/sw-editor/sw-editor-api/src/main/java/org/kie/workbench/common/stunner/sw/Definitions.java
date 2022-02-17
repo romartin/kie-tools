@@ -22,20 +22,23 @@ import org.jboss.errai.databinding.client.api.Bindable;
 import org.kie.workbench.common.stunner.core.definition.annotation.DefinitionSet;
 import org.kie.workbench.common.stunner.core.definition.builder.Builder;
 import org.kie.workbench.common.stunner.core.factory.graph.GraphFactory;
+import org.kie.workbench.common.stunner.core.rule.annotation.CanContain;
 import org.kie.workbench.common.stunner.core.rule.annotation.Occurrences;
 import org.kie.workbench.common.stunner.sw.definition.ActionTransition;
-import org.kie.workbench.common.stunner.sw.definition.CallFunction;
-import org.kie.workbench.common.stunner.sw.definition.CallSubflow;
+import org.kie.workbench.common.stunner.sw.definition.CallFunctionAction;
+import org.kie.workbench.common.stunner.sw.definition.CallSubflowAction;
 import org.kie.workbench.common.stunner.sw.definition.End;
 import org.kie.workbench.common.stunner.sw.definition.ErrorTransition;
-import org.kie.workbench.common.stunner.sw.definition.EventNode;
+import org.kie.workbench.common.stunner.sw.definition.EventRef;
 import org.kie.workbench.common.stunner.sw.definition.EventState;
 import org.kie.workbench.common.stunner.sw.definition.EventTransition;
 import org.kie.workbench.common.stunner.sw.definition.InjectState;
+import org.kie.workbench.common.stunner.sw.definition.OnEvents;
 import org.kie.workbench.common.stunner.sw.definition.Start;
 import org.kie.workbench.common.stunner.sw.definition.StartTransition;
 import org.kie.workbench.common.stunner.sw.definition.SwitchState;
 import org.kie.workbench.common.stunner.sw.definition.Transition;
+import org.kie.workbench.common.stunner.sw.definition.Workflow;
 
 @ApplicationScoped
 @Bindable
@@ -43,14 +46,16 @@ import org.kie.workbench.common.stunner.sw.definition.Transition;
         graphFactory = GraphFactory.class,
         qualifier = SWEditor.class,
         definitions = {
+                Workflow.class,
                 Start.class,
                 End.class,
                 InjectState.class,
                 SwitchState.class,
                 EventState.class,
-                EventNode.class,
-                CallFunction.class,
-                CallSubflow.class,
+                OnEvents.class,
+                EventRef.class,
+                CallFunctionAction.class,
+                CallSubflowAction.class,
                 StartTransition.class,
                 ErrorTransition.class,
                 EventTransition.class,
@@ -59,8 +64,10 @@ import org.kie.workbench.common.stunner.sw.definition.Transition;
         },
         builder = Definitions.DefinitionsBuilder.class
 )
-@Occurrences(role = Start.LABEL_START, min = 1, max = 1)
-@Occurrences(role = End.LABEL_END, min = 0, max = 1)
+@CanContain(roles = {Workflow.LABEL_WORKFLOW})
+@Occurrences(role = Workflow.LABEL_WORKFLOW, max = 1)
+@Occurrences(role = Start.LABEL_START, max = 1)
+@Occurrences(role = End.LABEL_END, max = 1)
 public class Definitions {
 
     public Definitions() {

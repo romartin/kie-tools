@@ -32,11 +32,11 @@ import org.kie.workbench.common.stunner.core.rule.annotation.EdgeOccurrences;
 
 @Bindable
 @Definition(graphFactory = EdgeFactory.class)
-@CanConnect(startRole = State.LABEL_STATE, endRole = EventNode.LABEL_EVENT)
+@CanConnect(startRole = State.LABEL_STATE, endRole = OnEvents.LABEL_ONEVENTS)
 @EdgeOccurrences(role = State.LABEL_STATE, type = EdgeOccurrences.EdgeType.INCOMING, max = 0)
 @EdgeOccurrences(role = State.LABEL_STATE, type = EdgeOccurrences.EdgeType.OUTGOING, max = -1)
-@EdgeOccurrences(role = EventNode.LABEL_EVENT, type = EdgeOccurrences.EdgeType.INCOMING, max = -1)
-@EdgeOccurrences(role = EventNode.LABEL_EVENT, type = EdgeOccurrences.EdgeType.OUTGOING, max = 0)
+@EdgeOccurrences(role = OnEvents.LABEL_ONEVENTS, type = EdgeOccurrences.EdgeType.INCOMING, max = -1)
+@EdgeOccurrences(role = OnEvents.LABEL_ONEVENTS, type = EdgeOccurrences.EdgeType.OUTGOING, max = 0)
 @EdgeOccurrences(role = Start.LABEL_START, type = EdgeOccurrences.EdgeType.INCOMING, max = 0)
 @EdgeOccurrences(role = Start.LABEL_START, type = EdgeOccurrences.EdgeType.OUTGOING, max = 0)
 @EdgeOccurrences(role = End.LABEL_END, type = EdgeOccurrences.EdgeType.OUTGOING, max = 0)

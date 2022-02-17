@@ -30,7 +30,7 @@ import org.kie.workbench.common.stunner.core.definition.property.PropertyMetaTyp
 
 @Bindable
 @Definition
-@MorphBase(defaultType = CallFunction.class)
+@MorphBase(defaultType = CallFunctionAction.class)
 @JsType
 public class ActionNode {
 
@@ -41,6 +41,7 @@ public class ActionNode {
 
     @Labels
     private final Set<String> labels = new Sets.Builder<String>()
+            .add(Workflow.LABEL_ROOT_NODE)
             .add(LABEL_ACTION)
             .build();
 

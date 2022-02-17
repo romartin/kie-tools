@@ -37,6 +37,8 @@ import org.kie.workbench.common.stunner.sw.factory.DiagramFactory;
 import org.kie.workbench.common.stunner.sw.service.Marshaller;
 import org.uberfire.client.promise.Promises;
 
+import static org.kie.workbench.common.stunner.sw.service.Marshaller.WORKFLOW_UUID;
+
 @ApplicationScoped
 public class ClientDiagramService {
 
@@ -139,12 +141,12 @@ public class ClientDiagramService {
     }
 
     private void updateClientMetadata(final Diagram diagram) {
-        if (null != diagram) {
-            final Metadata metadata = diagram.getMetadata();
-            if (Objects.nonNull(metadata) && isEmpty(metadata.getShapeSetId())) {
-                final String sId = shapeManager.getDefaultShapeSet(metadata.getDefinitionSetId()).getId();
-                metadata.setShapeSetId(sId);
-            }
+        final Metadata metadata = diagram.getMetadata();
+        String rootUUID = marshaller.getContext().getUUID(WORKFLOW_UUID);
+        metadata.setCanvasRootUUID(rootUUID);
+        if (isEmpty(metadata.getShapeSetId())) {
+            final String sId = shapeManager.getDefaultShapeSet(metadata.getDefinitionSetId()).getId();
+            metadata.setShapeSetId(sId);
         }
     }
 

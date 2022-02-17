@@ -30,6 +30,7 @@ import org.kie.workbench.common.stunner.core.definition.adapter.DefinitionId;
 import org.kie.workbench.common.stunner.core.graph.Edge;
 import org.kie.workbench.common.stunner.core.graph.Node;
 import org.kie.workbench.common.stunner.core.graph.command.GraphCommandExecutionContext;
+import org.kie.workbench.common.stunner.core.graph.command.impl.AddChildNodeCommand;
 import org.kie.workbench.common.stunner.core.graph.content.Bounds;
 import org.kie.workbench.common.stunner.core.graph.content.view.MagnetConnection;
 import org.kie.workbench.common.stunner.core.graph.content.view.Point2D;
@@ -95,10 +96,6 @@ public class MarshallUtils {
         return edge;
     }
 
-    public Node createNodeAt(String uuid, Object bean, double x, double y, CompositeCommand.Builder builder) {
-        return createNodeAt(uuid, bean, new Point2D(x, y), builder);
-    }
-
     public Node createNodeAt(String uuid, Object bean, Point2D location, CompositeCommand.Builder builder) {
         Node node = createNode(uuid, bean, location.getX(), location.getY());
         builder.addCommand(commands.addNode(node));
@@ -106,8 +103,16 @@ public class MarshallUtils {
         return node;
     }
 
+    public Node createChildNodeAt(String uuid, Object bean, Point2D location, Node parent, CompositeCommand.Builder builder) {
+        Node node = createNode(uuid, bean, location.getX(), location.getY());
+        AddChildNodeCommand addChildNodeCommand = new AddChildNodeCommand(parent, node, location);
+        builder.addCommand(addChildNodeCommand);
+        return node;
+    }
+
     @SuppressWarnings("all")
-    public Node createNode(String uuid, Object bean, double x, double y) {
+    // TODO: Refactor / remove this - use NodeFactory'ies instead.
+    private Node createNode(String uuid, Object bean, double x, double y) {
         final Node node = new NodeImpl(uuid);
         final Bounds bounds = definitionUtils.buildBounds(bean, x, y);
         final View content = new ViewImpl<>(bean, bounds);

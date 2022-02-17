@@ -23,6 +23,7 @@ import javax.inject.Inject;
 
 import elemental2.core.JsArray;
 import org.kie.workbench.common.stunner.core.client.canvas.AbstractCanvasHandler;
+import org.kie.workbench.common.stunner.core.client.canvas.command.AddChildNodeCommand;
 import org.kie.workbench.common.stunner.core.client.canvas.command.AddNodeCommand;
 import org.kie.workbench.common.stunner.core.client.canvas.command.DeleteConnectorCommand;
 import org.kie.workbench.common.stunner.core.client.canvas.command.DeleteNodeCommand;
@@ -40,6 +41,7 @@ import org.kie.workbench.common.stunner.core.graph.content.view.View;
 import org.kie.workbench.common.stunner.core.rule.RuleViolation;
 import org.kie.workbench.common.stunner.sw.definition.StartTransition;
 import org.kie.workbench.common.stunner.sw.definition.State;
+import org.kie.workbench.common.stunner.sw.definition.Workflow;
 import org.kie.workbench.common.stunner.sw.service.Marshaller;
 import org.kie.workbench.common.stunner.sw.service.MarshallerContext;
 import org.kie.workbench.common.stunner.sw.spec.CNCFState;
@@ -55,6 +57,15 @@ public class PatchBuilder {
                          Command<AbstractCanvasHandler, CanvasViolation> command) {
         if (command instanceof AddNodeCommand) {
             return addNode((AddNodeCommand) command);
+        }
+        if (command instanceof AddChildNodeCommand) {
+            AddChildNodeCommand c = (AddChildNodeCommand) command;
+            Node<View<?>, Edge> parent = c.getParent();
+            if (parent.getContent().getDefinition() instanceof Workflow) {
+                return addNode(c.getCandidate());
+            } else {
+                // TODO
+            }
         }
         if (command instanceof DeleteNodeCommand) {
             return deleteNode(canvasHandler, (DeleteNodeCommand) command);
@@ -120,6 +131,11 @@ public class PatchBuilder {
     @SuppressWarnings("all")
     private Patch[] addNode(AddNodeCommand command) {
         Node candidate = command.getCandidate();
+        return addNode(candidate);
+    }
+
+    @SuppressWarnings("all")
+    private Patch[] addNode(Node candidate) {
         if (Marshaller.isStartState(candidate) || Marshaller.isEndState(candidate)) {
             return new Patch[0];
         }
@@ -179,23 +195,25 @@ public class PatchBuilder {
                                String lastSourceNodeUUID,
                                String lastTargetNodeUUID) {
         JsArray<Patch> patches = new JsArray<>();
-        Object bean = ((View<?>) edge.getContent()).getDefinition();
-        if (bean instanceof StartTransition) {
-            Patch replaceStartPatch = PatchFactory.replace("/start", "");
-            patches.push(replaceStartPatch);
-        } else {
-            if (null != lastSourceNodeUUID) {
-                Node lastSource = canvasHandler.getGraphIndex().getNode(lastSourceNodeUUID);
-                if (null != lastSource) {
-                    Patch[] sourcePatch = updateNode(lastSource);
-                    patches.push(sourcePatch);
+        if (edge.getContent() instanceof View) {
+            Object bean = ((View<?>) edge.getContent()).getDefinition();
+            if (bean instanceof StartTransition) {
+                Patch replaceStartPatch = PatchFactory.replace("/start", "");
+                patches.push(replaceStartPatch);
+            } else {
+                if (null != lastSourceNodeUUID) {
+                    Node lastSource = canvasHandler.getGraphIndex().getNode(lastSourceNodeUUID);
+                    if (null != lastSource) {
+                        Patch[] sourcePatch = updateNode(lastSource);
+                        patches.push(sourcePatch);
+                    }
                 }
-            }
-            if (null != lastTargetNodeUUID) {
-                Node lastTarget = canvasHandler.getGraphIndex().getNode(lastTargetNodeUUID);
-                if (null != lastTarget) {
-                    Patch[] targetPatch = updateNode(lastTarget);
-                    patches.push(targetPatch);
+                if (null != lastTargetNodeUUID) {
+                    Node lastTarget = canvasHandler.getGraphIndex().getNode(lastTargetNodeUUID);
+                    if (null != lastTarget) {
+                        Patch[] targetPatch = updateNode(lastTarget);
+                        patches.push(targetPatch);
+                    }
                 }
             }
         }
@@ -206,21 +224,23 @@ public class PatchBuilder {
     private Patch[] updateEdge(Edge edge) {
         JsArray<Patch> patches = new JsArray<>();
         if (null != edge) {
-            Object bean = ((View<?>) edge.getContent()).getDefinition();
-            if (bean instanceof StartTransition) {
-                Node targetNode = edge.getTargetNode();
-                if (null != targetNode) {
-                    String name = getStateNodeName(edge.getTargetNode());
-                    Patch replaceStartPatch = PatchFactory.replace("/start", null != name ? name : "");
-                    patches.push(replaceStartPatch);
+            if (edge.getContent() instanceof View) {
+                Object bean = ((View<?>) edge.getContent()).getDefinition();
+                if (bean instanceof StartTransition) {
+                    Node targetNode = edge.getTargetNode();
+                    if (null != targetNode) {
+                        String name = getStateNodeName(edge.getTargetNode());
+                        Patch replaceStartPatch = PatchFactory.replace("/start", null != name ? name : "");
+                        patches.push(replaceStartPatch);
+                    }
+                } else {
+                    Node sourceNode = edge.getSourceNode();
+                    Patch[] sourcePatch = updateNode(sourceNode);
+                    patches.push(sourcePatch);
+                    Node targetNode = edge.getTargetNode();
+                    Patch[] targetPatches = updateNode(targetNode);
+                    patches.push(targetPatches);
                 }
-            } else {
-                Node sourceNode = edge.getSourceNode();
-                Patch[] sourcePatch = updateNode(sourceNode);
-                patches.push(sourcePatch);
-                Node targetNode = edge.getTargetNode();
-                Patch[] targetPatches = updateNode(targetNode);
-                patches.push(targetPatches);
             }
         }
         return toArray(patches);

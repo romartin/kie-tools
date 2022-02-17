@@ -31,7 +31,7 @@ public class MarshallerContext {
     public List<String> uuidIndexes;
 
     public MarshallerContext(CNCFWorkflow workflow) {
-        int size = workflow.states.length + 2;
+        int size = workflow.states.length + 3;
         this.workflow = workflow;
         this.nameToIdBindings = new HashMap<>(size);
         this.uuidIndexes = new ArrayList<>(size);

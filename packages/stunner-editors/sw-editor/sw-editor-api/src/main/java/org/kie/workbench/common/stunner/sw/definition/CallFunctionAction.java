@@ -26,7 +26,7 @@ import org.kie.workbench.common.stunner.core.definition.annotation.morph.Morph;
 @Definition
 @Morph(base = ActionNode.class)
 @JsType
-public class CallFunction extends ActionNode {
+public class CallFunctionAction extends ActionNode {
 
     @Property
     public String functionRef;

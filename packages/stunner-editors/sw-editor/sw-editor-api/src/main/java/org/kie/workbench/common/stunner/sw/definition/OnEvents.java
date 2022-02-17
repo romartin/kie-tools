@@ -25,34 +25,29 @@ import org.kie.workbench.common.stunner.core.definition.annotation.Definition;
 import org.kie.workbench.common.stunner.core.definition.annotation.Property;
 import org.kie.workbench.common.stunner.core.definition.annotation.definition.Category;
 import org.kie.workbench.common.stunner.core.definition.annotation.definition.Labels;
-import org.kie.workbench.common.stunner.core.definition.property.PropertyMetaTypes;
+import org.kie.workbench.common.stunner.core.rule.annotation.CanContain;
 
 @Bindable
 @Definition
+@CanContain(roles = {EventRef.LABEL_EVENT, ActionNode.LABEL_ACTION})
 @JsType
-public class EventNode {
+public class OnEvents {
 
-    public static final String LABEL_EVENT = "event";
+    public static final String LABEL_ONEVENTS = "on_events";
 
     @Category
     public static final transient String category = Categories.EVENTS;
 
     @Labels
     private final Set<String> labels = new Sets.Builder<String>()
-            .add(LABEL_EVENT)
+            .add(Workflow.LABEL_ROOT_NODE)
+            .add(LABEL_ONEVENTS)
             .build();
 
     @Property
-    // TODO: Is there a real need for making this dynamic?
-    // @Id
-    // @Title
-    // @Description
-    public String eventRef;
+    public String actionMode;
 
-    @Property(meta = PropertyMetaTypes.NAME)
-    public String name;
-
-    public EventNode() {
+    public OnEvents() {
     }
 
     public Set<String> getLabels() {
@@ -63,19 +58,11 @@ public class EventNode {
         return category;
     }
 
-    public String getEventRef() {
-        return eventRef;
+    public String getActionMode() {
+        return actionMode;
     }
 
-    public void setEventRef(String eventRef) {
-        this.eventRef = eventRef;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
+    public void setActionMode(String actionMode) {
+        this.actionMode = actionMode;
     }
 }

@@ -137,6 +137,20 @@
 
 /*
     ******************
+    Container.
+    ******************
+ */
+.container_background {
+  fill: #ffffff;
+}
+
+.container_border {
+  stroke: #000000;
+  stroke-width: 0.5px;
+}
+
+/*
+    ******************
     Font styling.
     ******************
  */

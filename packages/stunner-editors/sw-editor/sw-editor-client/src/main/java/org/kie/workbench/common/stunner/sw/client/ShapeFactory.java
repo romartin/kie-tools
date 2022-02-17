@@ -32,18 +32,20 @@ import org.kie.workbench.common.stunner.sw.client.shapes.TransitionShape;
 import org.kie.workbench.common.stunner.sw.client.shapes.TransitionShapeDef;
 import org.kie.workbench.common.stunner.sw.client.shapes.TransitionView;
 import org.kie.workbench.common.stunner.sw.definition.ActionTransition;
-import org.kie.workbench.common.stunner.sw.definition.CallFunction;
-import org.kie.workbench.common.stunner.sw.definition.CallSubflow;
+import org.kie.workbench.common.stunner.sw.definition.CallFunctionAction;
+import org.kie.workbench.common.stunner.sw.definition.CallSubflowAction;
 import org.kie.workbench.common.stunner.sw.definition.End;
 import org.kie.workbench.common.stunner.sw.definition.ErrorTransition;
-import org.kie.workbench.common.stunner.sw.definition.EventNode;
+import org.kie.workbench.common.stunner.sw.definition.EventRef;
 import org.kie.workbench.common.stunner.sw.definition.EventState;
 import org.kie.workbench.common.stunner.sw.definition.EventTransition;
 import org.kie.workbench.common.stunner.sw.definition.InjectState;
+import org.kie.workbench.common.stunner.sw.definition.OnEvents;
 import org.kie.workbench.common.stunner.sw.definition.Start;
 import org.kie.workbench.common.stunner.sw.definition.StartTransition;
 import org.kie.workbench.common.stunner.sw.definition.SwitchState;
 import org.kie.workbench.common.stunner.sw.definition.Transition;
+import org.kie.workbench.common.stunner.sw.definition.Workflow;
 
 import static org.kie.workbench.common.stunner.core.definition.adapter.binding.BindableAdapterUtils.getDefinitionId;
 
@@ -51,12 +53,15 @@ import static org.kie.workbench.common.stunner.core.definition.adapter.binding.B
 public class ShapeFactory
         implements org.kie.workbench.common.stunner.core.client.shape.factory.ShapeFactory<Object, Shape> {
 
+    // TODO: Refactor this, no need for storing state...
     private static final Map<Class<?>, ShapeViewDef> typeViewDefinitions = new HashMap<Class<?>, ShapeViewDef>() {{
+        put(Workflow.class, new AnyStateShapeDef());
         put(Start.class, new AnyStateShapeDef());
         put(End.class, new AnyStateShapeDef());
-        put(EventNode.class, new AnyStateShapeDef());
-        put(CallFunction.class, new AnyStateShapeDef());
-        put(CallSubflow.class, new AnyStateShapeDef());
+        put(OnEvents.class, new AnyStateShapeDef());
+        put(EventRef.class, new AnyStateShapeDef());
+        put(CallFunctionAction.class, new AnyStateShapeDef());
+        put(CallSubflowAction.class, new AnyStateShapeDef());
         put(InjectState.class, new AnyStateShapeDef());
         put(SwitchState.class, new AnyStateShapeDef());
         put(EventState.class, new AnyStateShapeDef());

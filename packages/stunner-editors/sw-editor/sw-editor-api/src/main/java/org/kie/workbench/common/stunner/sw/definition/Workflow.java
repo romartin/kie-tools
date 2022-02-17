@@ -26,45 +26,49 @@ import org.kie.workbench.common.stunner.core.definition.annotation.Property;
 import org.kie.workbench.common.stunner.core.definition.annotation.definition.Category;
 import org.kie.workbench.common.stunner.core.definition.annotation.definition.Labels;
 import org.kie.workbench.common.stunner.core.definition.property.PropertyMetaTypes;
-import org.kie.workbench.common.stunner.core.factory.graph.EdgeFactory;
-import org.kie.workbench.common.stunner.core.rule.annotation.CanConnect;
-import org.kie.workbench.common.stunner.core.rule.annotation.EdgeOccurrences;
+import org.kie.workbench.common.stunner.core.rule.annotation.CanContain;
 
 @Bindable
-@Definition(graphFactory = EdgeFactory.class)
-@CanConnect(startRole = EventRef.LABEL_EVENT, endRole = ActionNode.LABEL_ACTION)
-@EdgeOccurrences(role = EventRef.LABEL_EVENT, type = EdgeOccurrences.EdgeType.INCOMING, max = 0)
-@EdgeOccurrences(role = EventRef.LABEL_EVENT, type = EdgeOccurrences.EdgeType.OUTGOING, max = -1)
-@EdgeOccurrences(role = ActionNode.LABEL_ACTION, type = EdgeOccurrences.EdgeType.INCOMING, max = -1)
-@EdgeOccurrences(role = ActionNode.LABEL_ACTION, type = EdgeOccurrences.EdgeType.OUTGOING, max = 0)
-@EdgeOccurrences(role = Start.LABEL_START, type = EdgeOccurrences.EdgeType.INCOMING, max = 0)
-@EdgeOccurrences(role = Start.LABEL_START, type = EdgeOccurrences.EdgeType.OUTGOING, max = 0)
-@EdgeOccurrences(role = End.LABEL_END, type = EdgeOccurrences.EdgeType.OUTGOING, max = 0)
+@Definition
+@CanContain(roles = {Workflow.LABEL_ROOT_NODE})
 @JsType
-public class ActionTransition {
+// TODO: Missing to create a custom GraphFactory, so when creating a new graph it just adds the parent Workflow node by default?
+public class Workflow {
 
-    public static final String LABEL_TRANSITION_ACTION = "transition_action";
+    public static final String LABEL_WORKFLOW = "workflow";
+    public static final String LABEL_ROOT_NODE = "rootNode";
 
     @Category
-    public static final transient String category = Categories.TRANSITIONS;
+    public static final transient String category = Categories.STATES;
 
     @Labels
     private final Set<String> labels = new Sets.Builder<String>()
-            .add(LABEL_TRANSITION_ACTION)
+            .add(LABEL_WORKFLOW)
             .build();
+
+    @Property
+    public String id;
 
     @Property(meta = PropertyMetaTypes.NAME)
     public String name;
 
-    public ActionTransition() {
+    public Workflow() {
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 
     public String getName() {
         return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     public Set<String> getLabels() {

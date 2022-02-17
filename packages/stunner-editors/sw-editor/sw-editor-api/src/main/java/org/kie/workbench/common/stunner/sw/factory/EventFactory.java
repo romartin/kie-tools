@@ -22,15 +22,15 @@ import javax.inject.Inject;
 import org.kie.workbench.common.stunner.core.definition.adapter.binding.BindableAdapterUtils;
 import org.kie.workbench.common.stunner.core.definition.builder.Builder;
 import org.kie.workbench.common.stunner.core.factory.definition.DefinitionFactory;
-import org.kie.workbench.common.stunner.sw.definition.EventNode;
+import org.kie.workbench.common.stunner.sw.definition.EventRef;
 import org.kie.workbench.common.stunner.sw.spec.CNCFEvent;
 
 // TODO: Really need for this?
 @ApplicationScoped
 public class EventFactory
-        implements DefinitionFactory<EventNode> {
+        implements DefinitionFactory<EventRef> {
 
-    private static final String PREFIX = BindableAdapterUtils.getGenericClassName(EventNode.class);
+    private static final String PREFIX = BindableAdapterUtils.getGenericClassName(EventRef.class);
 
     private final EventsRegistry registry;
 
@@ -51,8 +51,8 @@ public class EventFactory
     }
 
     @Override
-    public EventNode build(final String identifier) {
-        final String name = BindableAdapterUtils.getDynamicId(EventNode.class,
+    public EventRef build(final String identifier) {
+        final String name = BindableAdapterUtils.getDynamicId(EventRef.class,
                                                               identifier);
         return null != name ?
                 buildItem(name) :
@@ -60,7 +60,7 @@ public class EventFactory
     }
 
     @SuppressWarnings("all")
-    public EventNode buildItem(final String name) {
+    public EventRef buildItem(final String name) {
         final CNCFEvent eventDef = getRegistry().get(name);
 
         return new EventBuilder(eventDef).build();
@@ -70,7 +70,7 @@ public class EventFactory
         return registry;
     }
 
-    public static class EventBuilder implements Builder<EventNode> {
+    public static class EventBuilder implements Builder<EventRef> {
 
         private final CNCFEvent eventDef;
 
@@ -78,13 +78,13 @@ public class EventFactory
             this.eventDef = eventDef;
         }
 
-        public static EventNode newInstance() {
-            return new EventNode();
+        public static EventRef newInstance() {
+            return new EventRef();
         }
 
         @Override
-        public EventNode build() {
-            final EventNode event = newInstance();
+        public EventRef build() {
+            final EventRef event = newInstance();
 
             if (null != eventDef) {
                 event.setName(eventDef.name);

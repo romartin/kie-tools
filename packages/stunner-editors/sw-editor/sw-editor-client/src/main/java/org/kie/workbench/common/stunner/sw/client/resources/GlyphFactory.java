@@ -32,6 +32,8 @@ public interface GlyphFactory {
 
     ImageDataUriGlyph STATE_EVENT = ImageDataUriGlyph.create(ImageResources.INSTANCE.stateEvent().getSafeUri());
 
+    ImageDataUriGlyph EVENTS = ImageDataUriGlyph.create(ImageResources.INSTANCE.events().getSafeUri());
+
     ImageDataUriGlyph EVENT = ImageDataUriGlyph.create(ImageResources.INSTANCE.event().getSafeUri());
 
     ImageDataUriGlyph CALL_FUNCTION = ImageDataUriGlyph.create(ImageResources.INSTANCE.callFunction().getSafeUri());

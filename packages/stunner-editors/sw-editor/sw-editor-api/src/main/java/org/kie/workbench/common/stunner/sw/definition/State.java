@@ -41,6 +41,7 @@ public class State {
 
     @Labels
     private final Set<String> labels = new Sets.Builder<String>()
+            .add(Workflow.LABEL_ROOT_NODE)
             .add(LABEL_STATE)
             .build();
 

@@ -42,6 +42,9 @@ public interface ImageResources extends ClientBundleWithLookup {
     @Source("images/icons/state-event.png")
     ImageResource stateEvent();
 
+    @Source("images/icons/events.png")
+    ImageResource events();
+
     @Source("images/icons/event.png")
     ImageResource event();
 

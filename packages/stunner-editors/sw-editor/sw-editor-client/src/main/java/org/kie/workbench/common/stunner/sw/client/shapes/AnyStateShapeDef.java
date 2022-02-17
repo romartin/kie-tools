@@ -34,39 +34,49 @@ import org.kie.workbench.common.stunner.svg.client.shape.factory.SVGShapeViewRes
 import org.kie.workbench.common.stunner.svg.client.shape.view.SVGShapeView;
 import org.kie.workbench.common.stunner.sw.client.resources.GlyphFactory;
 import org.kie.workbench.common.stunner.sw.client.resources.ShapeViewFactory;
-import org.kie.workbench.common.stunner.sw.definition.CallFunction;
-import org.kie.workbench.common.stunner.sw.definition.CallSubflow;
+import org.kie.workbench.common.stunner.sw.definition.CallFunctionAction;
+import org.kie.workbench.common.stunner.sw.definition.CallSubflowAction;
 import org.kie.workbench.common.stunner.sw.definition.End;
-import org.kie.workbench.common.stunner.sw.definition.EventNode;
+import org.kie.workbench.common.stunner.sw.definition.EventRef;
 import org.kie.workbench.common.stunner.sw.definition.EventState;
 import org.kie.workbench.common.stunner.sw.definition.InjectState;
+import org.kie.workbench.common.stunner.sw.definition.OnEvents;
 import org.kie.workbench.common.stunner.sw.definition.Start;
 import org.kie.workbench.common.stunner.sw.definition.SwitchState;
+import org.kie.workbench.common.stunner.sw.definition.Workflow;
 
 public class AnyStateShapeDef<W> implements ShapeViewDef<W, SVGShapeView>,
                                             SVGShapeViewDef<W, ShapeViewFactory> {
 
+    // TODO: Refactor this, no need for storing state...
     public static final SVGShapeViewResources<Object, ShapeViewFactory> VIEW_RESOURCES =
             new SVGShapeViewResources<Object, ShapeViewFactory>()
                     .put(InjectState.class, ShapeViewFactory::injectState)
                     .put(SwitchState.class, ShapeViewFactory::switchState)
                     .put(EventState.class, ShapeViewFactory::eventState)
+                    // TODO: Why need for workflow here?
+                    .put(Workflow.class, ShapeViewFactory::container)
                     .put(Start.class, ShapeViewFactory::startState)
                     .put(End.class, ShapeViewFactory::endState)
-                    .put(EventNode.class, ShapeViewFactory::event)
-                    .put(CallFunction.class, ShapeViewFactory::action)
-                    .put(CallSubflow.class, ShapeViewFactory::action);
+                    .put(OnEvents.class, ShapeViewFactory::container)
+                    .put(EventRef.class, ShapeViewFactory::event)
+                    .put(CallFunctionAction.class, ShapeViewFactory::action)
+                    .put(CallSubflowAction.class, ShapeViewFactory::action);
 
+    // TODO: Refactor this, no need for storing state...
     public static final Map<Class<?>, Glyph> GLYPHS =
             new Maps.Builder<Class<?>, Glyph>()
                     .put(InjectState.class, GlyphFactory.STATE_INJECT)
                     .put(SwitchState.class, GlyphFactory.STATE_SWITCH)
                     .put(EventState.class, GlyphFactory.STATE_EVENT)
+                    // TODO: Why need for workflow here?
+                    .put(Workflow.class, GlyphFactory.TRANSITION)
                     .put(Start.class, GlyphFactory.START)
                     .put(End.class, GlyphFactory.END)
-                    .put(EventNode.class, GlyphFactory.EVENT)
-                    .put(CallFunction.class, GlyphFactory.CALL_FUNCTION)
-                    .put(CallSubflow.class, GlyphFactory.CALL_SUBFLOW)
+                    .put(OnEvents.class, GlyphFactory.EVENTS)
+                    .put(EventRef.class, GlyphFactory.EVENT)
+                    .put(CallFunctionAction.class, GlyphFactory.CALL_FUNCTION)
+                    .put(CallSubflowAction.class, GlyphFactory.CALL_SUBFLOW)
                     .build();
 
     @Override
