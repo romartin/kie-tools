@@ -18,6 +18,7 @@ package org.kie.workbench.common.stunner.sw.definition;
 
 import java.util.Set;
 
+import jsinterop.annotations.JsIgnore;
 import jsinterop.annotations.JsType;
 import org.jboss.errai.databinding.client.api.Bindable;
 import org.kie.soup.commons.util.Sets;
@@ -31,9 +32,14 @@ import org.kie.workbench.common.stunner.core.rule.annotation.CanContain;
 @Definition
 @CanContain(roles = {EventRef.LABEL_EVENT, ActionNode.LABEL_ACTION})
 @JsType
-public class OnEvents {
+public class OnEvents implements BaseNode {
 
     public static final String LABEL_ONEVENTS = "on_events";
+
+    @JsIgnore
+    public static final double BB_WIDTH = 56d;
+    @JsIgnore
+    public static final double BB_HEIGHT = 56d;
 
     @Category
     public static final transient String category = Categories.EVENTS;
@@ -64,5 +70,17 @@ public class OnEvents {
 
     public void setActionMode(String actionMode) {
         this.actionMode = actionMode;
+    }
+
+    @Override
+    @JsIgnore
+    public double getWidth() {
+        return BB_WIDTH;
+    }
+
+    @Override
+    @JsIgnore
+    public double getHeight() {
+        return BB_HEIGHT;
     }
 }

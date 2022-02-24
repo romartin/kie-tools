@@ -18,6 +18,7 @@ package org.kie.workbench.common.stunner.sw.definition;
 
 import java.util.Set;
 
+import jsinterop.annotations.JsIgnore;
 import jsinterop.annotations.JsType;
 import org.jboss.errai.databinding.client.api.Bindable;
 import org.kie.soup.commons.util.Sets;
@@ -32,9 +33,13 @@ import org.kie.workbench.common.stunner.core.definition.property.PropertyMetaTyp
 @Definition
 @MorphBase(defaultType = InjectState.class)
 @JsType
-public class State {
+public class State implements BaseNode {
 
     public static final String LABEL_STATE = "state";
+    @JsIgnore
+    public static final double BB_WIDTH = 154d;
+    @JsIgnore
+    public static final double BB_HEIGHT = 102d;
 
     @Category
     public static final transient String category = Categories.STATES;
@@ -65,5 +70,17 @@ public class State {
 
     public String getCategory() {
         return category;
+    }
+
+    @Override
+    @JsIgnore
+    public double getWidth() {
+        return BB_WIDTH;
+    }
+
+    @Override
+    @JsIgnore
+    public double getHeight() {
+        return BB_HEIGHT;
     }
 }

@@ -18,6 +18,7 @@ package org.kie.workbench.common.stunner.sw.definition;
 
 import java.util.Set;
 
+import jsinterop.annotations.JsIgnore;
 import jsinterop.annotations.JsType;
 import org.jboss.errai.databinding.client.api.Bindable;
 import org.kie.soup.commons.util.Sets;
@@ -28,9 +29,13 @@ import org.kie.workbench.common.stunner.core.definition.annotation.definition.La
 @Bindable
 @Definition
 @JsType
-public class End {
+public class End implements BaseNode {
 
     public static final String LABEL_END = "end";
+    @JsIgnore
+    public static final double BB_WIDTH = 56d;
+    @JsIgnore
+    public static final double BB_HEIGHT = 56d;
 
     @Category
     public static final transient String category = Categories.END;
@@ -50,5 +55,17 @@ public class End {
 
     public String getCategory() {
         return category;
+    }
+
+    @Override
+    @JsIgnore
+    public double getWidth() {
+        return BB_WIDTH;
+    }
+
+    @Override
+    @JsIgnore
+    public double getHeight() {
+        return BB_HEIGHT;
     }
 }

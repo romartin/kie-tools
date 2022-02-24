@@ -18,6 +18,7 @@ package org.kie.workbench.common.stunner.sw.definition;
 
 import java.util.Set;
 
+import jsinterop.annotations.JsIgnore;
 import jsinterop.annotations.JsType;
 import org.jboss.errai.databinding.client.api.Bindable;
 import org.kie.soup.commons.util.Sets;
@@ -30,9 +31,14 @@ import org.kie.workbench.common.stunner.core.definition.property.PropertyMetaTyp
 @Bindable
 @Definition
 @JsType
-public class EventRef {
+public class EventRef implements BaseNode {
 
     public static final String LABEL_EVENT = "event";
+
+    @JsIgnore
+    public static final double BB_WIDTH = 56d;
+    @JsIgnore
+    public static final double BB_HEIGHT = 56d;
 
     @Category
     public static final transient String category = Categories.EVENTS;
@@ -78,5 +84,17 @@ public class EventRef {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    @Override
+    @JsIgnore
+    public double getWidth() {
+        return BB_WIDTH;
+    }
+
+    @Override
+    @JsIgnore
+    public double getHeight() {
+        return BB_HEIGHT;
     }
 }

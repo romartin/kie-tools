@@ -18,6 +18,7 @@ package org.kie.workbench.common.stunner.sw.definition;
 
 import java.util.Set;
 
+import jsinterop.annotations.JsIgnore;
 import jsinterop.annotations.JsType;
 import org.jboss.errai.databinding.client.api.Bindable;
 import org.kie.soup.commons.util.Sets;
@@ -32,9 +33,13 @@ import org.kie.workbench.common.stunner.core.definition.property.PropertyMetaTyp
 @Definition
 @MorphBase(defaultType = CallFunctionAction.class)
 @JsType
-public class ActionNode {
+public class ActionNode implements BaseNode {
 
     public static final String LABEL_ACTION = "action";
+    @JsIgnore
+    public static final double BB_WIDTH = 154d;
+    @JsIgnore
+    public static final double BB_HEIGHT = 51d;
 
     @Category
     public static final transient String category = Categories.ACTIONS;
@@ -76,5 +81,17 @@ public class ActionNode {
 
     public String getCategory() {
         return category;
+    }
+
+    @Override
+    @JsIgnore
+    public double getWidth() {
+        return BB_WIDTH;
+    }
+
+    @Override
+    @JsIgnore
+    public double getHeight() {
+        return BB_HEIGHT;
     }
 }

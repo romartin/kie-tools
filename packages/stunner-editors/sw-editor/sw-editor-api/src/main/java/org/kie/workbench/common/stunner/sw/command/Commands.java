@@ -20,6 +20,7 @@ import org.kie.workbench.common.stunner.core.command.Command;
 import org.kie.workbench.common.stunner.core.graph.Edge;
 import org.kie.workbench.common.stunner.core.graph.Node;
 import org.kie.workbench.common.stunner.core.graph.content.view.Connection;
+import org.kie.workbench.common.stunner.core.graph.content.view.ControlPoint;
 import org.kie.workbench.common.stunner.core.graph.content.view.Point2D;
 import org.kie.workbench.common.stunner.core.graph.content.view.View;
 
@@ -42,4 +43,8 @@ public interface Commands<C extends Command> {
     C setTargetNode(Node<? extends View<?>, Edge> targetNode,
                     Edge<? extends View<?>, Node> edge,
                     Connection connection);
+
+    C addControlPoint(Edge edge,
+                      ControlPoint controlPoint,
+                      int index);
 }

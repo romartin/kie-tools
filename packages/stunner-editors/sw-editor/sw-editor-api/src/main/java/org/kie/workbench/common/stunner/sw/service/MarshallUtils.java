@@ -32,6 +32,7 @@ import org.kie.workbench.common.stunner.core.graph.Node;
 import org.kie.workbench.common.stunner.core.graph.command.GraphCommandExecutionContext;
 import org.kie.workbench.common.stunner.core.graph.command.impl.AddChildNodeCommand;
 import org.kie.workbench.common.stunner.core.graph.content.Bounds;
+import org.kie.workbench.common.stunner.core.graph.content.view.ControlPoint;
 import org.kie.workbench.common.stunner.core.graph.content.view.MagnetConnection;
 import org.kie.workbench.common.stunner.core.graph.content.view.Point2D;
 import org.kie.workbench.common.stunner.core.graph.content.view.View;
@@ -96,15 +97,22 @@ public class MarshallUtils {
         return edge;
     }
 
-    public Node createNodeAt(String uuid, Object bean, Point2D location, CompositeCommand.Builder builder) {
-        Node node = createNode(uuid, bean, location.getX(), location.getY());
+    public Node createNode(String uuid, Object bean, CompositeCommand.Builder builder) {
+        Node node = createNode(uuid, bean);
         builder.addCommand(commands.addNode(node));
-        builder.addCommand(commands.updateElementPosition(node, location));
         return node;
     }
 
+    public void updateNodePosition(Node node, Point2D location, CompositeCommand.Builder builder) {
+        builder.addCommand(commands.updateElementPosition(node, location));
+    }
+
+    public void addControlPoint(String uuid, Point2D location, int index,  CompositeCommand.Builder builder) {
+        builder.addCommand(commands.addControlPoint(new EdgeImpl<>(uuid), new ControlPoint(location), index));
+    }
+
     public Node createChildNodeAt(String uuid, Object bean, Point2D location, Node parent, CompositeCommand.Builder builder) {
-        Node node = createNode(uuid, bean, location.getX(), location.getY());
+        Node node = createNode(uuid, bean);
         AddChildNodeCommand addChildNodeCommand = new AddChildNodeCommand(parent, node, location);
         builder.addCommand(addChildNodeCommand);
         return node;
@@ -112,9 +120,9 @@ public class MarshallUtils {
 
     @SuppressWarnings("all")
     // TODO: Refactor / remove this - use NodeFactory'ies instead.
-    private Node createNode(String uuid, Object bean, double x, double y) {
+    private Node createNode(String uuid, Object bean) {
         final Node node = new NodeImpl(uuid);
-        final Bounds bounds = definitionUtils.buildBounds(bean, x, y);
+        final Bounds bounds = definitionUtils.buildBounds(bean, 0d, 0d);
         final View content = new ViewImpl<>(bean, bounds);
         node.setContent(content);
         appendLabels(node.getLabels(),

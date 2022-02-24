@@ -23,6 +23,7 @@ import javax.inject.Inject;
 
 import elemental2.core.Global;
 import elemental2.core.JsArray;
+import elemental2.promise.Promise;
 import jsinterop.base.Js;
 import org.kie.workbench.common.stunner.core.api.FactoryManager;
 import org.kie.workbench.common.stunner.core.command.impl.CompositeCommand;
@@ -40,6 +41,7 @@ import org.kie.workbench.common.stunner.core.graph.processing.index.GraphIndexBu
 import org.kie.workbench.common.stunner.core.graph.processing.index.Index;
 import org.kie.workbench.common.stunner.core.rule.RuleViolation;
 import org.kie.workbench.common.stunner.core.util.DefinitionUtils;
+import org.kie.workbench.common.stunner.sw.autolayout.AutoLayout;
 import org.kie.workbench.common.stunner.sw.definition.ActionNode;
 import org.kie.workbench.common.stunner.sw.definition.ActionTransition;
 import org.kie.workbench.common.stunner.sw.definition.CallFunctionAction;
@@ -66,6 +68,7 @@ import org.kie.workbench.common.stunner.sw.spec.CNCFEventState;
 import org.kie.workbench.common.stunner.sw.spec.CNCFOnEvent;
 import org.kie.workbench.common.stunner.sw.spec.CNCFState;
 import org.kie.workbench.common.stunner.sw.spec.CNCFWorkflow;
+import org.uberfire.client.promise.Promises;
 
 @ApplicationScoped
 public class Marshaller {
@@ -82,16 +85,19 @@ public class Marshaller {
     private final FactoryManager factoryManager;
     private final GraphIndexBuilder indexBuilder;
     private final MarshallUtils utils;
+    private final Promises promises;
 
     @Inject
     public Marshaller(DefinitionUtils definitionUtils,
                       FactoryManager factoryManager,
                       GraphIndexBuilder indexBuilder,
-                      MarshallUtils utils) {
+                      MarshallUtils utils,
+                      Promises promises) {
         this.definitionUtils = definitionUtils;
         this.factoryManager = factoryManager;
         this.indexBuilder = indexBuilder;
         this.utils = utils;
+        this.promises = promises;
     }
 
     private MarshallerContext context;
@@ -171,7 +177,7 @@ public class Marshaller {
     // *************************** UNMARSHALLING ***************************************************
 
     @SuppressWarnings("all")
-    public Graph unmarshall(Metadata metadata, String raw) {
+    public Promise<Graph> unmarshall(Metadata metadata, String raw) {
         final Object root = Global.JSON.parse(raw);
         final CNCFWorkflow workflow = Js.uncheckedCast(root);
 
@@ -190,7 +196,7 @@ public class Marshaller {
         w.setName(workflow.name);
         String wUUID = context.getUUID(WORKFLOW_UUID);
         // TODO: Use Factory instead?
-        Node<View<Workflow>, Edge> wNode = utils.createNodeAt(wUUID, w, new Point2D(0, 0), storageCommands);
+        Node<View<Workflow>, Edge> wNode = utils.createNode(wUUID, w, storageCommands);
         wNode.getContent().setBounds(Bounds.create(0, 0, 950, 950));
 
         // Start state.
@@ -235,7 +241,8 @@ public class Marshaller {
         // TODO: Check errors...
         all.execute(context);
 
-        return graph;
+        //Apply ELK calculated layout
+        return AutoLayout.applyLayout(graph, utils, promises, context, wUUID);
     }
 
     @SuppressWarnings("all")

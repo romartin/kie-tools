@@ -26,6 +26,7 @@ import org.kie.workbench.common.stunner.core.client.command.CanvasCommand;
 import org.kie.workbench.common.stunner.core.graph.Edge;
 import org.kie.workbench.common.stunner.core.graph.Node;
 import org.kie.workbench.common.stunner.core.graph.content.view.Connection;
+import org.kie.workbench.common.stunner.core.graph.content.view.ControlPoint;
 import org.kie.workbench.common.stunner.core.graph.content.view.Point2D;
 import org.kie.workbench.common.stunner.core.graph.content.view.View;
 import org.kie.workbench.common.stunner.core.graph.content.view.ViewConnector;
@@ -69,5 +70,12 @@ public class CanvasCommands implements Commands<CanvasCommand<AbstractCanvasHand
         return new SetConnectionTargetNodeCommand(targetNode,
                                                   (Edge<? extends ViewConnector<?>, Node>) edge,
                                                   connection);
+    }
+
+    @Override
+    public CanvasCommand<AbstractCanvasHandler>  addControlPoint(Edge edge , ControlPoint controlPoint, int index) {
+        return new org.kie.workbench.common.stunner.core.client.canvas.command.AddControlPointCommand(edge,
+                                                                                                      controlPoint,
+                                                                                                      index);
     }
 }

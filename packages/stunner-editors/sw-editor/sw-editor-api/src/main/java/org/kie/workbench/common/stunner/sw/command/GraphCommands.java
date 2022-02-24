@@ -19,7 +19,9 @@ package org.kie.workbench.common.stunner.sw.command;
 import org.kie.workbench.common.stunner.core.graph.Edge;
 import org.kie.workbench.common.stunner.core.graph.Node;
 import org.kie.workbench.common.stunner.core.graph.command.GraphCommand;
+import org.kie.workbench.common.stunner.core.graph.command.impl.AddControlPointCommand;
 import org.kie.workbench.common.stunner.core.graph.content.view.Connection;
+import org.kie.workbench.common.stunner.core.graph.content.view.ControlPoint;
 import org.kie.workbench.common.stunner.core.graph.content.view.Point2D;
 import org.kie.workbench.common.stunner.core.graph.content.view.View;
 
@@ -41,6 +43,13 @@ public class GraphCommands implements Commands<GraphCommand> {
         return new org.kie.workbench.common.stunner.core.graph.command.impl.AddConnectorCommand(source,
                                                                                                 candidate,
                                                                                                 connection);
+    }
+
+    @Override
+    public GraphCommand addControlPoint(Edge edge, ControlPoint controlPoint, int index) {
+        return new AddControlPointCommand(edge.getUUID(),
+                                          controlPoint,
+                                          index);
     }
 
     @Override

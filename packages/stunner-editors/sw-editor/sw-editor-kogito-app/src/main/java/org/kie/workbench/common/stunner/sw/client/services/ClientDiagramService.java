@@ -21,17 +21,18 @@ import java.util.Objects;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
+import elemental2.promise.IThenable;
 import elemental2.promise.Promise;
 import org.kie.workbench.common.stunner.core.api.DefinitionManager;
 import org.kie.workbench.common.stunner.core.api.FactoryManager;
 import org.kie.workbench.common.stunner.core.client.api.ShapeManager;
+import org.kie.workbench.common.stunner.core.client.service.ClientRuntimeError;
 import org.kie.workbench.common.stunner.core.client.service.ServiceCallback;
 import org.kie.workbench.common.stunner.core.definition.adapter.binding.BindableAdapterUtils;
 import org.kie.workbench.common.stunner.core.diagram.Diagram;
 import org.kie.workbench.common.stunner.core.diagram.Metadata;
 import org.kie.workbench.common.stunner.core.diagram.MetadataImpl;
 import org.kie.workbench.common.stunner.core.graph.Graph;
-import org.kie.workbench.common.stunner.core.graph.content.definition.DefinitionSet;
 import org.kie.workbench.common.stunner.sw.Definitions;
 import org.kie.workbench.common.stunner.sw.factory.DiagramFactory;
 import org.kie.workbench.common.stunner.sw.service.Marshaller;
@@ -83,17 +84,13 @@ public class ClientDiagramService {
     private void doTransform(final String fileName,
                              final String xml,
                              final ServiceCallback<Diagram> callback) {
-        Diagram diagram = doTransform(fileName, xml);
-        callback.onSuccess(diagram);
-    }
-
-    private Diagram doTransform(final String fileName,
-                                final String xml) {
 
         if (Objects.isNull(xml) || xml.isEmpty()) {
-            return createNewDiagram(fileName);
+            Diagram newDiagram = createNewDiagram(fileName);
+            callback.onSuccess(newDiagram);
+        } else {
+            parse(fileName, xml, callback);
         }
-        return parse(fileName, xml);
     }
 
     public Promise<String> transform(final Diagram diagram) {
@@ -117,20 +114,35 @@ public class ClientDiagramService {
     }
 
     @SuppressWarnings("all")
-    private Diagram parse(final String fileName, final String raw) {
+    private void parse(final String fileName,
+                       final String raw,
+                       ServiceCallback<Diagram> serviceCallback) {
         final Metadata metadata = createMetadata();
-        final Graph<DefinitionSet, ?> graph = unmarshall(metadata, raw);
-        final String title = "SW Test Diagram";
-        metadata.setTitle(title);
-        final Diagram diagram = diagramFactory.build(title,
-                                                     metadata,
-                                                     graph);
-        updateClientMetadata(diagram);
-        return diagram;
+        final Promise<Graph> promise = unmarshall(metadata, raw);
+        promise.then(new IThenable.ThenOnFulfilledCallbackFn<Graph, Object>() {
+            @Override
+            public IThenable<Object> onInvoke(Graph graph) {
+                final String title = "SW Test Diagram";
+                metadata.setTitle(title);
+                final Diagram diagram = diagramFactory.build(title,
+                                                             metadata,
+                                                             graph);
+                updateClientMetadata(diagram);
+
+                serviceCallback.onSuccess(diagram);
+                return null;
+            }
+        }, new IThenable.ThenOnRejectedCallbackFn<Object>() {
+            @Override
+            public IThenable<Object> onInvoke(Object o) {
+                serviceCallback.onError(new ClientRuntimeError((Throwable) o));
+                return null;
+            }
+        });
     }
 
-    private Graph unmarshall(final Metadata metadata,
-                             final String raw) {
+    private Promise<Graph> unmarshall(final Metadata metadata,
+                                      final String raw) {
         return marshaller.unmarshall(metadata, raw);
     }
 
