@@ -28,9 +28,12 @@ import org.kie.workbench.common.stunner.client.widgets.editor.StunnerEditor;
 import org.kie.workbench.common.stunner.client.widgets.presenters.session.SessionPresenter;
 import org.kie.workbench.common.stunner.core.client.service.ClientRuntimeError;
 import org.kie.workbench.common.stunner.core.client.service.ServiceCallback;
+import org.kie.workbench.common.stunner.core.client.session.impl.EditorSession;
 import org.kie.workbench.common.stunner.core.client.util.WindowJSType;
 import org.kie.workbench.common.stunner.core.diagram.Diagram;
 import org.kie.workbench.common.stunner.core.diagram.Metadata;
+import org.kie.workbench.common.stunner.sw.client.editor.popup.ContainerEditor;
+import org.kie.workbench.common.stunner.sw.client.editor.popup.ContainerViewer;
 import org.kie.workbench.common.stunner.sw.client.js.JsDiagramEditor;
 import org.kie.workbench.common.stunner.sw.client.js.JsWindow;
 import org.kie.workbench.common.stunner.sw.client.jsonpatch.PatchHandler;
@@ -87,9 +90,31 @@ public class DiagramEditor {
     }
 
     @Inject
-    private Marshaller j2clMarshaller;
+    private Marshaller marshaller;
+    @Inject
+    private EditorUtils editorUtils;
+    @Inject
+    private ContainerViewer viewer;
+    @Inject
+    private ContainerEditor editor;
 
+    @SuppressWarnings("all")
     public Promise<String> getPreview() {
+        EditorSession session = (EditorSession) stunnerEditor.getSession();
+
+        if (false) {
+            Diagram diagram = null;
+            // diagram = viewerUtils.createExampleDiagram();
+            diagram = editorUtils.loadOnEvents(session);
+
+            if (null != diagram) {
+                // viewer.open(diagram, 450, 300);
+                editor.open(diagram, 450, 300);
+            }
+        } else {
+            editorUtils.drawOnEventsFromSelection(session);
+        }
+
         return promises.resolve("");
     }
 

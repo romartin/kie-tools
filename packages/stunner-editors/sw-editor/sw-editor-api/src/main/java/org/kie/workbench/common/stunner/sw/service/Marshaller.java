@@ -239,26 +239,54 @@ public class Marshaller {
     }
 
     @SuppressWarnings("all")
-    private void parseEventState(CNCFState stateRaw,
-                                 Node node,
-                                 Node parent,
-                                 Point2D location,
-                                 CompositeCommand.Builder storageCommands,
-                                 CompositeCommand.Builder connectionCommands) {
+    public void parseEventState(CNCFState stateRaw,
+                                Node eventStateNode,
+                                Node parent,
+                                Point2D location,
+                                CompositeCommand.Builder storageCommands,
+                                CompositeCommand.Builder connectionCommands) {
         CNCFEventState eventStateRaw = Js.uncheckedCast(stateRaw);
-        EventState state = ((View<EventState>) node.getContent()).getDefinition();
-        state.setExclusive(eventStateRaw.exclusive);
         CNCFOnEvent[] onEvents = eventStateRaw.onEvents;
+        if (null != eventStateNode) {
+            EventState state = ((View<EventState>) eventStateNode.getContent()).getDefinition();
+            state.setExclusive(eventStateRaw.exclusive);
+            String onEventsRaw = Global.JSON.stringify(onEvents);
+            ((EventState) state).setOnEvents(onEventsRaw);
+        }
+        if (false) {
+            parseOnEvents(onEvents,
+                          eventStateNode,
+                          parent,
+                          location,
+                          storageCommands,
+                          connectionCommands);
+        }
+    }
+
+    @SuppressWarnings("all")
+    public String parseOnEvents(CNCFOnEvent[] onEvents,
+                                Node eventStateNode,
+                                Node parent,
+                                Point2D location,
+                                CompositeCommand.Builder storageCommands,
+                                CompositeCommand.Builder connectionCommands) {
         if (null != onEvents && onEvents.length > 0) {
             // OnEvents Node.
             String onEventsNodeUUID = MarshallerContext.generateUUID();
             OnEvents onEventsBean = new OnEvents();
-            final Node onEventsNode = utils.createChildNodeAt(onEventsNodeUUID, onEventsBean, location, parent, storageCommands);
+            Node onEventsNode = null;
+            if (null != parent) {
+                onEventsNode = utils.createChildNodeAt(onEventsNodeUUID, onEventsBean, location, parent, storageCommands);
+            } else {
+                onEventsNode = utils.createNodeAt(onEventsNodeUUID, onEventsBean, location, storageCommands);
+            }
 
-            // Transition to OnEvents Node.
-            final EventTransition onEventsTransition = new EventTransition();
-            onEventsTransition.setName("OnEvents");
-            Edge onEventsEdge = parseTransitionByTargetUUID(onEventsTransition, node, onEventsNodeUUID, storageCommands, connectionCommands);
+            if (null != eventStateNode) {
+                // Transition to OnEvents Node.
+                final EventTransition onEventsTransition = new EventTransition();
+                onEventsTransition.setName("OnEvents");
+                Edge onEventsEdge = parseTransitionByTargetUUID(onEventsTransition, eventStateNode, onEventsNodeUUID, storageCommands, connectionCommands);
+            }
 
             double x = 50;
             double y = 50;
@@ -301,12 +329,15 @@ public class Marshaller {
 
                 // Transition to Actions Node.
                 final ActionTransition at = new ActionTransition();
-                at.setName("Call " + actionName);
+                // at.setName("Call " + actionName);
                 Edge actionsEdge = parseTransitionByTargetUUID(at, eventNode, actionNodeUUID, storageCommands, connectionCommands);
 
                 y += 100;
             }
+
+            return onEventsNodeUUID;
         }
+        return null;
     }
 
     @SuppressWarnings("all")

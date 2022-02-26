@@ -106,7 +106,7 @@ public abstract class AbstractElementBuilderControl extends AbstractCanvasHandle
         if (null != parent) {
             final Set<String> parentLabels = parent.getLabels();
 
-            // Check docking rules, in case parent is not root.
+            // TODO: Check docking rules, in case parent is not root. But this also fails with other parents.
             String rootUUID = getRootUUID();
             boolean isParentRoot = null != rootUUID && rootUUID.equals(parent.getUUID());
             if (!isParentRoot) {

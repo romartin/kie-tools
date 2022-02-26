@@ -17,8 +17,13 @@
 package org.kie.workbench.common.stunner.sw.client.shapes;
 
 import org.kie.workbench.common.stunner.client.lienzo.shape.impl.ShapeStateDefaultHandler;
+import org.kie.workbench.common.stunner.core.client.shape.MutationContext;
 import org.kie.workbench.common.stunner.core.client.shape.ShapeState;
+import org.kie.workbench.common.stunner.core.client.shape.common.DashArray;
 import org.kie.workbench.common.stunner.core.client.shape.impl.ConnectorShape;
+import org.kie.workbench.common.stunner.core.graph.Edge;
+import org.kie.workbench.common.stunner.core.graph.Node;
+import org.kie.workbench.common.stunner.core.graph.content.view.ViewConnector;
 
 public class TransitionShape<W>
         extends ConnectorShape<W, TransitionShapeDef<W>, TransitionView> {
@@ -32,6 +37,15 @@ public class TransitionShape<W>
                       .setRenderType(ShapeStateDefaultHandler.RenderType.STROKE)
                       .setBorderShape(() -> view)
                       .setBackgroundShape(() -> view));
+    }
+
+    @Override
+    protected void applyCustomProperties(Edge<ViewConnector<W>, Node> element, MutationContext mutationContext) {
+        super.applyCustomProperties(element, mutationContext);
+        DashArray dashArray = getShapeDefinition().getDashArray(getDefinition(element));
+        if (null != dashArray) {
+            getShapeView().setDashArray(dashArray);
+        }
     }
 
     @Override

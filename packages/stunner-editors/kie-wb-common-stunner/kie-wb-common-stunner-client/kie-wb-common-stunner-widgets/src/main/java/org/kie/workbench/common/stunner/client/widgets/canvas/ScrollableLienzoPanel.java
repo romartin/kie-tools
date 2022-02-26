@@ -18,13 +18,13 @@ package org.kie.workbench.common.stunner.client.widgets.canvas;
 
 import javax.annotation.PostConstruct;
 import javax.enterprise.context.Dependent;
-import javax.enterprise.inject.Typed;
+import javax.enterprise.inject.Default;
 import javax.inject.Inject;
 
 import com.ait.lienzo.client.widget.panel.impl.ScrollablePanel;
 
 @Dependent
-@Typed(ScrollableLienzoPanel.class)
+@Default
 public class ScrollableLienzoPanel
         extends DelegateLienzoPanel<StunnerLienzoBoundsPanel> {
 

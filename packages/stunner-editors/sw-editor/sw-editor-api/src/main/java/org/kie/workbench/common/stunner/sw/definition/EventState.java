@@ -31,11 +31,21 @@ public class EventState extends State {
     @Property
     public boolean exclusive;
 
+    public String onEvents;
+
     public boolean isExclusive() {
         return exclusive;
     }
 
     public void setExclusive(boolean exclusive) {
         this.exclusive = exclusive;
+    }
+
+    public String getOnEvents() {
+        return onEvents;
+    }
+
+    public void setOnEvents(String onEvents) {
+        this.onEvents = onEvents;
     }
 }

@@ -150,6 +150,10 @@ public class DefaultDiagramEditor
         viewer.clear();
     }
 
+    public DiagramViewer<Diagram, AbstractCanvasHandler> getViewer() {
+        return viewer;
+    }
+
     @Override
     public void destroy() {
         // Destroy control instances.
