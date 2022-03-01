@@ -40,10 +40,14 @@ import org.kie.workbench.common.stunner.sw.definition.End;
 import org.kie.workbench.common.stunner.sw.definition.EventRef;
 import org.kie.workbench.common.stunner.sw.definition.EventState;
 import org.kie.workbench.common.stunner.sw.definition.InjectState;
+import org.kie.workbench.common.stunner.sw.definition.JsDefinition1;
+import org.kie.workbench.common.stunner.sw.definition.JsDefinition2;
 import org.kie.workbench.common.stunner.sw.definition.OnEvents;
 import org.kie.workbench.common.stunner.sw.definition.Start;
 import org.kie.workbench.common.stunner.sw.definition.SwitchState;
 import org.kie.workbench.common.stunner.sw.definition.Workflow;
+
+import static org.kie.workbench.common.stunner.sw.jsadapter.JsDefinitionAdapter.isJsDefinition;
 
 public class AnyStateShapeDef<W> implements ShapeViewDef<W, SVGShapeView>,
                                             SVGShapeViewDef<W, ShapeViewFactory> {
@@ -61,7 +65,9 @@ public class AnyStateShapeDef<W> implements ShapeViewDef<W, SVGShapeView>,
                     .put(OnEvents.class, ShapeViewFactory::container)
                     .put(EventRef.class, ShapeViewFactory::event)
                     .put(CallFunctionAction.class, ShapeViewFactory::action)
-                    .put(CallSubflowAction.class, ShapeViewFactory::action);
+                    .put(CallSubflowAction.class, ShapeViewFactory::action)
+                    .put(JsDefinition1.class, ShapeViewFactory::action)
+                    .put(JsDefinition2.class, ShapeViewFactory::action);
 
     // TODO: Refactor this, no need for storing state...
     public static final Map<Class<?>, Glyph> GLYPHS =
@@ -77,10 +83,15 @@ public class AnyStateShapeDef<W> implements ShapeViewDef<W, SVGShapeView>,
                     .put(EventRef.class, GlyphFactory.EVENT)
                     .put(CallFunctionAction.class, GlyphFactory.CALL_FUNCTION)
                     .put(CallSubflowAction.class, GlyphFactory.CALL_SUBFLOW)
+                    .put(JsDefinition1.class, GlyphFactory.CALL_FUNCTION)
+                    .put(JsDefinition2.class, GlyphFactory.CALL_SUBFLOW)
                     .build();
 
     @Override
     public SVGShapeView<?> newViewInstance(ShapeViewFactory factory, W instance) {
+        if (isJsDefinition(instance)) {
+            return factory.action().build(false);
+        }
         return VIEW_RESOURCES.getResource(factory, instance).build(false);
     }
 

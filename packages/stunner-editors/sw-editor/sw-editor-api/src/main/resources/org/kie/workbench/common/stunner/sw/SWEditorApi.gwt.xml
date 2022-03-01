@@ -28,6 +28,7 @@
   <source path="command"/>
   <source path="definition"/>
   <source path="factory"/>
+  <source path="jsadapter"/>
   <source path="service"/>
   <source path="spec"/>
   <source path="autolayout"/>

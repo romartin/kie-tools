@@ -33,6 +33,8 @@ import org.kie.workbench.common.stunner.sw.definition.EventRef;
 import org.kie.workbench.common.stunner.sw.definition.EventState;
 import org.kie.workbench.common.stunner.sw.definition.EventTransition;
 import org.kie.workbench.common.stunner.sw.definition.InjectState;
+import org.kie.workbench.common.stunner.sw.definition.JsDefinition1;
+import org.kie.workbench.common.stunner.sw.definition.JsDefinition2;
 import org.kie.workbench.common.stunner.sw.definition.OnEvents;
 import org.kie.workbench.common.stunner.sw.definition.Start;
 import org.kie.workbench.common.stunner.sw.definition.StartTransition;
@@ -54,6 +56,8 @@ import org.kie.workbench.common.stunner.sw.definition.Workflow;
                 EventState.class,
                 OnEvents.class,
                 EventRef.class,
+                JsDefinition1.class,
+                JsDefinition2.class,
                 CallFunctionAction.class,
                 CallSubflowAction.class,
                 StartTransition.class,

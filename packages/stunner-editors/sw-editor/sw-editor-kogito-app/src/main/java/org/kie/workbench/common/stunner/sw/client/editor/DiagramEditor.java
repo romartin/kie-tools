@@ -15,22 +15,32 @@
  */
 package org.kie.workbench.common.stunner.sw.client.editor;
 
+import java.util.Optional;
+
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
 import com.ait.lienzo.client.core.types.JsCanvas;
 import com.ait.lienzo.client.widget.panel.LienzoBoundsPanel;
 import com.google.gwt.user.client.ui.IsWidget;
+import elemental2.dom.DomGlobal;
 import elemental2.promise.Promise;
 import org.kie.workbench.common.stunner.client.lienzo.canvas.LienzoCanvas;
 import org.kie.workbench.common.stunner.client.lienzo.canvas.LienzoPanel;
 import org.kie.workbench.common.stunner.client.widgets.editor.StunnerEditor;
 import org.kie.workbench.common.stunner.client.widgets.presenters.session.SessionPresenter;
+import org.kie.workbench.common.stunner.core.api.DefinitionManager;
+import org.kie.workbench.common.stunner.core.client.api.SessionManager;
 import org.kie.workbench.common.stunner.core.client.service.ClientRuntimeError;
 import org.kie.workbench.common.stunner.core.client.service.ServiceCallback;
+import org.kie.workbench.common.stunner.core.client.session.impl.EditorSession;
 import org.kie.workbench.common.stunner.core.client.util.WindowJSType;
+import org.kie.workbench.common.stunner.core.definition.adapter.DefinitionId;
+import org.kie.workbench.common.stunner.core.definition.property.PropertyMetaTypes;
 import org.kie.workbench.common.stunner.core.diagram.Diagram;
 import org.kie.workbench.common.stunner.core.diagram.Metadata;
+import org.kie.workbench.common.stunner.core.graph.Node;
+import org.kie.workbench.common.stunner.core.graph.content.view.View;
 import org.kie.workbench.common.stunner.sw.client.js.JsDiagramEditor;
 import org.kie.workbench.common.stunner.sw.client.js.JsWindow;
 import org.kie.workbench.common.stunner.sw.client.jsonpatch.PatchHandler;
@@ -89,7 +99,26 @@ public class DiagramEditor {
     @Inject
     private Marshaller j2clMarshaller;
 
+    @Inject
+    private SessionManager sessionManager;
+
+    @Inject
+    private DefinitionManager definitionManager;
+
     public Promise<String> getPreview() {
+        EditorSession session = sessionManager.getCurrentSession();
+        String selectedUUID = session.getSelectionControl().getSelectedItems().iterator().next();
+        if (null != selectedUUID) {
+            Node node = session.getCanvasHandler().getGraphIndex().getNode(selectedUUID);
+            View<?> content = (View<?>) node.getContent();
+            Object definition = content.getDefinition();
+            DefinitionId defId = definitionManager.adapters().forDefinition().getId(definition);
+            DomGlobal.console.log(defId.value());
+            String namePropertyField = definitionManager.adapters().forDefinition().getMetaPropertyField(definition, PropertyMetaTypes.NAME);
+            Optional<?> name = definitionManager.adapters().forDefinition().getProperty(definition, namePropertyField);
+            Object nameValue = definitionManager.adapters().forProperty().getValue(name.get());
+            DomGlobal.console.log(nameValue);
+        }
         return promises.resolve("");
     }
 

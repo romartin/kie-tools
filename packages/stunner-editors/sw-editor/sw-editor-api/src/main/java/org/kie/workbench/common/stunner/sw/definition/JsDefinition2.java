@@ -14,19 +14,28 @@
  * limitations under the License.
  */
 
-package org.kie.workbench.common.stunner.sw.spec;
+package org.kie.workbench.common.stunner.sw.definition;
 
 import jsinterop.annotations.JsType;
-import org.kie.workbench.common.stunner.sw.definition.JsDefinition;
+import org.jboss.errai.databinding.client.api.Bindable;
+import org.kie.workbench.common.stunner.core.definition.annotation.Definition;
+import org.kie.workbench.common.stunner.core.definition.annotation.Property;
+import org.kie.workbench.common.stunner.core.definition.annotation.morph.Morph;
 
+@Bindable
+@Definition
+@Morph(base = JsDefinition.class)
 @JsType
-public class CNCFWorkflow {
+public class JsDefinition2 extends JsDefinition {
 
-    public String id;
-    public String name;
-    public String start;
-    public CNCFEvent[] events;
-    public CNCFState[] states;
-    public JsDefinition jsDefinitionTest1;
-    public JsDefinition jsDefinitionTest2;
+    @Property
+    public String var2;
+
+    public String getVar2() {
+        return var2;
+    }
+
+    public void setVar2(String var2) {
+        this.var2 = var2;
+    }
 }

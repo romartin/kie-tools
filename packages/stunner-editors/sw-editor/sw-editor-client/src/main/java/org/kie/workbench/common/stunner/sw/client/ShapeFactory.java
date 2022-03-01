@@ -27,6 +27,7 @@ import org.kie.workbench.common.stunner.core.definition.shape.Glyph;
 import org.kie.workbench.common.stunner.core.definition.shape.ShapeViewDef;
 import org.kie.workbench.common.stunner.svg.client.shape.def.SVGShapeDef;
 import org.kie.workbench.common.stunner.svg.client.shape.factory.SVGShapeFactory;
+import org.kie.workbench.common.stunner.sw.client.resources.GlyphFactory;
 import org.kie.workbench.common.stunner.sw.client.shapes.AnyStateShapeDef;
 import org.kie.workbench.common.stunner.sw.client.shapes.TransitionShape;
 import org.kie.workbench.common.stunner.sw.client.shapes.TransitionShapeDef;
@@ -40,6 +41,8 @@ import org.kie.workbench.common.stunner.sw.definition.EventRef;
 import org.kie.workbench.common.stunner.sw.definition.EventState;
 import org.kie.workbench.common.stunner.sw.definition.EventTransition;
 import org.kie.workbench.common.stunner.sw.definition.InjectState;
+import org.kie.workbench.common.stunner.sw.definition.JsDefinition1;
+import org.kie.workbench.common.stunner.sw.definition.JsDefinition2;
 import org.kie.workbench.common.stunner.sw.definition.OnEvents;
 import org.kie.workbench.common.stunner.sw.definition.Start;
 import org.kie.workbench.common.stunner.sw.definition.StartTransition;
@@ -48,6 +51,7 @@ import org.kie.workbench.common.stunner.sw.definition.Transition;
 import org.kie.workbench.common.stunner.sw.definition.Workflow;
 
 import static org.kie.workbench.common.stunner.core.definition.adapter.binding.BindableAdapterUtils.getDefinitionId;
+import static org.kie.workbench.common.stunner.sw.jsadapter.JsDefinitionAdapter.isJsDefinition;
 
 @ApplicationScoped
 public class ShapeFactory
@@ -70,6 +74,8 @@ public class ShapeFactory
         put(ErrorTransition.class, new TransitionShapeDef());
         put(EventTransition.class, new TransitionShapeDef());
         put(ActionTransition.class, new TransitionShapeDef());
+        put(JsDefinition1.class, new AnyStateShapeDef());
+        put(JsDefinition2.class, new AnyStateShapeDef());
     }};
 
     private final SVGShapeFactory svgShapeFactory;
@@ -82,6 +88,9 @@ public class ShapeFactory
     @Override
     @SuppressWarnings("all")
     public Shape newShape(Object instance) {
+        if (isJsDefinition(instance)) {
+            return svgShapeFactory.newShape(instance, new AnyStateShapeDef());
+        }
         ShapeViewDef def = typeViewDefinitions.get(instance.getClass());
         if (def instanceof TransitionShapeDef) {
             return new TransitionShape((TransitionShapeDef) def, new TransitionView());
@@ -93,6 +102,12 @@ public class ShapeFactory
     @Override
     @SuppressWarnings("all")
     public Glyph getGlyph(String definitionId) {
+        if (false) {
+            if ((definitionId.equals(JsDefinition1.class.getName())) ||
+                    (definitionId.equals(JsDefinition2.class.getName()))) {
+                return GlyphFactory.CALL_SUBFLOW;
+            }
+        }
         Map.Entry<Class<?>, ShapeViewDef> typeDefs = typeViewDefinitions.entrySet().stream()
                 .filter(e -> getDefinitionId(e.getKey()).equals(definitionId))
                 .findAny()

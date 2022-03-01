@@ -118,12 +118,15 @@ public class AutoLayout {
                 }
 
                 //final Bound bound = getBound(node);
-                final BaseNode baseNode = (BaseNode) ((View<?>) node.getContent()).getDefinition();
-                elkRoot[0].addNode(new ELKNode(node.getUUID(),
-                                               baseNode.getWidth(),
-                                               baseNode.getHeight()));
+                Object def = ((View<?>) node.getContent()).getDefinition();
+                if (def instanceof BaseNode) {
+                    final BaseNode baseNode = (BaseNode) ((View<?>) node.getContent()).getDefinition();
+                    elkRoot[0].addNode(new ELKNode(node.getUUID(),
+                                                   baseNode.getWidth(),
+                                                   baseNode.getHeight()));
 
-                addProcessedNode(node);
+                    addProcessedNode(node);
+                }
             }
 
             //Containment
@@ -139,16 +142,19 @@ public class AutoLayout {
                     addNode(parent);
                 }
 
-                final ELKNode elkParent = elkRoot[0].getChild(parent.getUUID());
-                //final Bound bound = getBound(node);
-                final BaseNode baseNode = (BaseNode) ((View<?>) node.getContent()).getDefinition();
-                elkParent.addNode(new ELKNode(node.getUUID(), baseNode.getWidth(), baseNode.getHeight()));
+                Object def = ((View<?>) node.getContent()).getDefinition();
+                if (def instanceof BaseNode) {
+                    final ELKNode elkParent = elkRoot[0].getChild(parent.getUUID());
+                    //final Bound bound = getBound(node);
+                    final BaseNode baseNode = (BaseNode) ((View<?>) node.getContent()).getDefinition();
+                    elkParent.addNode(new ELKNode(node.getUUID(), baseNode.getWidth(), baseNode.getHeight()));
 
-                //Set horizontal layout for containers
-                elkParent.setLayoutOptions(ELKUtils.getContainerLeftToRightDownLayoutOptionsObject());
+                    //Set horizontal layout for containers
+                    elkParent.setLayoutOptions(ELKUtils.getContainerLeftToRightDownLayoutOptionsObject());
 
-                addNodeParentReference(node, parent);
-                addProcessedNode(node);
+                    addNodeParentReference(node, parent);
+                    addProcessedNode(node);
+                }
             }
 
             private void addProcessedNode(Node<View, Edge> node) {

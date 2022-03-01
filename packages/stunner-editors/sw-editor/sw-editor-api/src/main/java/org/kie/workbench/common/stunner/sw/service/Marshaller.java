@@ -52,6 +52,9 @@ import org.kie.workbench.common.stunner.sw.definition.EventRef;
 import org.kie.workbench.common.stunner.sw.definition.EventState;
 import org.kie.workbench.common.stunner.sw.definition.EventTransition;
 import org.kie.workbench.common.stunner.sw.definition.InjectState;
+import org.kie.workbench.common.stunner.sw.definition.JsDefinition;
+import org.kie.workbench.common.stunner.sw.definition.JsDefinition1;
+import org.kie.workbench.common.stunner.sw.definition.JsDefinition2;
 import org.kie.workbench.common.stunner.sw.definition.OnEvents;
 import org.kie.workbench.common.stunner.sw.definition.Start;
 import org.kie.workbench.common.stunner.sw.definition.StartTransition;
@@ -226,6 +229,18 @@ public class Marshaller {
             context.uuidIndexes.add(stateNode.getUUID());
         }
 
+        // TODO JsDefinitionTest
+        if (null != workflow.jsDefinitionTest1) {
+            Point2D lll = new Point2D(300, 100);
+            Node jsDefNode = unmarshallJsDefinition(workflow.jsDefinitionTest1, wNode, lll, storageCommands);
+            workflow.jsDefinitionTest1 = (JsDefinition) ((View) jsDefNode.getContent()).getDefinition();
+        }
+        if (null != workflow.jsDefinitionTest2) {
+            Point2D lll = new Point2D(300, 300);
+            Node jsDefNode = unmarshallJsDefinition(workflow.jsDefinitionTest2, wNode, lll, storageCommands);
+            workflow.jsDefinitionTest2 = (JsDefinition) ((View) jsDefNode.getContent()).getDefinition();
+        }
+
         // Graph building.
         final GraphImpl<Object> graph = GraphImpl.build(workflow.id);
         final CompositeCommand<GraphCommandExecutionContext, RuleViolation> all =
@@ -241,9 +256,66 @@ public class Marshaller {
         // TODO: Check errors...
         all.execute(context);
 
+        // TODO
+        if (true) {
+            return promises.resolve(graph);
+        }
+
         //Apply ELK calculated layout
         return AutoLayout.applyLayout(graph, utils, promises, context, wUUID);
     }
+
+    private Node unmarshallJsDefinition(JsDefinition jsDefinition,
+                                        Node parent,
+                                        Point2D location,
+                                        CompositeCommand.Builder storageCommands) {
+        String uuid = context.getUUID(jsDefinition.id);
+        Node node = null;
+        if (false) {
+            node = utils.createChildNodeAt(uuid, jsDefinition, location, parent, storageCommands);
+            return node;
+        }
+        if ("type1".equals(jsDefinition.type)) {
+            jsDefinition = parse(JsDefinition1.class, jsDefinition);
+            node = utils.createChildNodeAt(uuid, jsDefinition, location, parent, storageCommands);
+        } else if ("type2".equals(jsDefinition.type)) {
+            jsDefinition = parse(JsDefinition2.class, jsDefinition);
+            node = utils.createChildNodeAt(uuid, jsDefinition, location, parent, storageCommands);
+        }
+        return node;
+    }
+
+    public <T> T parse(Class<? extends T> type, T jso) {
+        JsDefinition instance = factoryManager.newDefinition(type.getName());
+        instance = merge(instance, jso);
+        return (T) instance;
+    }
+
+    public static native <R> R merge(Object o1, Object o2) /*-{
+        if (typeof Object.assign != 'function') {
+            Object.assign = function (target) {
+                'use strict';
+                if (target == null) {
+                    throw new TypeError('Cannot convert undefined or null to object');
+                }
+
+                target = Object(target);
+                for (var index = 1; index < arguments.length; index++) {
+                    var source = arguments[index];
+                    if (source != null) {
+                        for (var key in source) {
+                            if (Object.prototype.hasOwnProperty.call(source, key)) {
+                                target[key] = source[key];
+                            }
+                        }
+                    }
+                }
+                return target;
+            };
+        }
+//        return Object.assign({}, o1, o2);
+        return Object.assign(o1, o2);
+    }-*/;
 
     @SuppressWarnings("all")
     private void parseEventState(CNCFState stateRaw,

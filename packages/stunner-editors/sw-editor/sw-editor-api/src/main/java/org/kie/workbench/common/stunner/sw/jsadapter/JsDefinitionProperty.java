@@ -14,19 +14,23 @@
  * limitations under the License.
  */
 
-package org.kie.workbench.common.stunner.sw.spec;
+package org.kie.workbench.common.stunner.sw.jsadapter;
 
-import jsinterop.annotations.JsType;
-import org.kie.workbench.common.stunner.sw.definition.JsDefinition;
+public class JsDefinitionProperty {
 
-@JsType
-public class CNCFWorkflow {
+    private final Object pojo;
+    private final String field;
 
-    public String id;
-    public String name;
-    public String start;
-    public CNCFEvent[] events;
-    public CNCFState[] states;
-    public JsDefinition jsDefinitionTest1;
-    public JsDefinition jsDefinitionTest2;
+    public JsDefinitionProperty(Object pojo, String field) {
+        this.pojo = pojo;
+        this.field = field;
+    }
+
+    public Object getPojo() {
+        return pojo;
+    }
+
+    public String getField() {
+        return field;
+    }
 }
