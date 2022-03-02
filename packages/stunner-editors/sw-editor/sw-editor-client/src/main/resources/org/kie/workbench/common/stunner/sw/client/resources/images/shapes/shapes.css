@@ -118,16 +118,20 @@
 
 .event_border {
   opacity: 1;
-  fill: #0000ff;
+  fill: #0a3f94;
 }
 
+.event_icon {
+  opacity: 1;
+  fill: #0758d9;
+}
 /*
     ******************
     Action.
     ******************
  */
 .action_background {
-  fill: #ff0000;
+  fill: #ffd479;
 }
 
 .action_border {

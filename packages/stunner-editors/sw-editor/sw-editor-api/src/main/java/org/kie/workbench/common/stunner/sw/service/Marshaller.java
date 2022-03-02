@@ -264,7 +264,7 @@ public class Marshaller {
 
             // Transition to OnEvents Node.
             final EventTransition onEventsTransition = new EventTransition();
-            onEventsTransition.setName("OnEvents");
+            //onEventsTransition.setName("OnEvents");
             Edge onEventsEdge = parseTransitionByTargetUUID(onEventsTransition, node, onEventsNodeUUID, storageCommands, connectionCommands);
 
             double x = 50;
@@ -308,7 +308,7 @@ public class Marshaller {
 
                 // Transition to Actions Node.
                 final ActionTransition at = new ActionTransition();
-                at.setName("Call " + actionName);
+                //at.setName("Call " + actionName);
                 Edge actionsEdge = parseTransitionByTargetUUID(at, eventNode, actionNodeUUID, storageCommands, connectionCommands);
 
                 y += 100;
@@ -346,7 +346,7 @@ public class Marshaller {
         // Parse end.
         if (stateRaw.end) {
             final Transition tend = new Transition();
-            tend.setName(name + " to End");
+            //tend.setName(name + " to End");
             Edge tendEdge = parseTransitionByTargetName(tend, stateNode, STATE_END, storageCommands, connectionCommands);
         }
 
@@ -354,7 +354,7 @@ public class Marshaller {
         String transition = stateRaw.transition;
         if (isValidString(transition)) {
             final Transition t = new Transition();
-            t.setName(name + " to " + transition);
+            //t.setName(name + " to " + transition);
             Edge edge = parseTransitionByTargetName(t, stateNode, transition, storageCommands, connectionCommands);
         }
 
@@ -365,7 +365,7 @@ public class Marshaller {
                 CNCFError onError = onErrors[i];
                 if (null != onError) {
                     final ErrorTransition t = new ErrorTransition();
-                    t.setErrorRef(onError.errorRef);
+                    //t.setErrorRef(onError.errorRef);
                     if (onError.end) {
                         Edge edge = parseTransitionByTargetName(t, stateNode, STATE_END, storageCommands, connectionCommands);
                     } else if (isValidString(onError.transition)) {

@@ -27,7 +27,8 @@ import org.kie.workbench.common.stunner.core.definition.shape.Glyph;
 import org.kie.workbench.common.stunner.core.definition.shape.ShapeViewDef;
 import org.kie.workbench.common.stunner.svg.client.shape.def.SVGShapeDef;
 import org.kie.workbench.common.stunner.svg.client.shape.factory.SVGShapeFactory;
-import org.kie.workbench.common.stunner.sw.client.shapes.AnyStateShapeDef;
+import org.kie.workbench.common.stunner.sw.client.shapes.AnyCircleShapeDef;
+import org.kie.workbench.common.stunner.sw.client.shapes.AnyRectangleShapeDef;
 import org.kie.workbench.common.stunner.sw.client.shapes.TransitionShape;
 import org.kie.workbench.common.stunner.sw.client.shapes.TransitionShapeDef;
 import org.kie.workbench.common.stunner.sw.client.shapes.TransitionView;
@@ -55,16 +56,16 @@ public class ShapeFactory
 
     // TODO: Refactor this, no need for storing state...
     private static final Map<Class<?>, ShapeViewDef> typeViewDefinitions = new HashMap<Class<?>, ShapeViewDef>() {{
-        put(Workflow.class, new AnyStateShapeDef());
-        put(Start.class, new AnyStateShapeDef());
-        put(End.class, new AnyStateShapeDef());
-        put(OnEvents.class, new AnyStateShapeDef());
-        put(EventRef.class, new AnyStateShapeDef());
-        put(CallFunctionAction.class, new AnyStateShapeDef());
-        put(CallSubflowAction.class, new AnyStateShapeDef());
-        put(InjectState.class, new AnyStateShapeDef());
-        put(SwitchState.class, new AnyStateShapeDef());
-        put(EventState.class, new AnyStateShapeDef());
+        put(Workflow.class, new AnyRectangleShapeDef());
+        put(Start.class, new AnyCircleShapeDef());
+        put(End.class, new AnyCircleShapeDef());
+        put(OnEvents.class, new AnyRectangleShapeDef());
+        put(EventRef.class, new AnyCircleShapeDef());
+        put(CallFunctionAction.class, new AnyRectangleShapeDef());
+        put(CallSubflowAction.class, new AnyRectangleShapeDef());
+        put(InjectState.class, new AnyRectangleShapeDef());
+        put(SwitchState.class, new AnyRectangleShapeDef());
+        put(EventState.class, new AnyRectangleShapeDef());
         put(Transition.class, new TransitionShapeDef());
         put(StartTransition.class, new TransitionShapeDef());
         put(ErrorTransition.class, new TransitionShapeDef());

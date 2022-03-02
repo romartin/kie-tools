@@ -19,6 +19,7 @@ package org.kie.workbench.common.stunner.sw.client.shapes;
 import java.util.Optional;
 import java.util.function.BiConsumer;
 
+import org.kie.workbench.common.stunner.core.client.shape.common.DashArray;
 import org.kie.workbench.common.stunner.core.client.shape.view.ShapeView;
 import org.kie.workbench.common.stunner.core.client.shape.view.handler.FontHandler;
 import org.kie.workbench.common.stunner.core.client.shape.view.handler.ViewAttributesHandler;
@@ -33,7 +34,7 @@ import org.kie.workbench.common.stunner.sw.definition.StartTransition;
 import org.kie.workbench.common.stunner.sw.definition.Transition;
 
 import static org.kie.workbench.common.stunner.core.definition.adapter.binding.BindableAdapterUtils.getDefinitionId;
-import static org.kie.workbench.common.stunner.sw.client.shapes.AnyStateShapeDef.TITLE_HANDLER;
+import static org.kie.workbench.common.stunner.sw.client.shapes.AnyRectangleShapeDef.TITLE_HANDLER;
 
 public class TransitionShapeDef<W>
         implements ShapeViewDef<W, TransitionView> {
@@ -72,6 +73,12 @@ public class TransitionShapeDef<W>
                                    .strokeColor(c -> FONT_STROKE_COLOR)
                                    .strokeSize(c -> STROKE_SIZE)
                                    .build()::handle);
+    }
+
+    private static final DashArray DASH_ARRAY = DashArray.create(2, 6);
+
+    public DashArray getDashArray(Object bean) {
+        return bean instanceof ActionTransition ? DASH_ARRAY : null;
     }
 
     @Override
@@ -171,7 +178,7 @@ public class TransitionShapeDef<W>
             return "#00FF00";
         }
         if (type == Type.ACTION) {
-            return "#00FF00";
+            return "#646464";
         }
         return "#000000";
     }

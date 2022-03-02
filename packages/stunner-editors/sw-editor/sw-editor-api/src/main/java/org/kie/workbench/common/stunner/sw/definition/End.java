@@ -33,9 +33,9 @@ public class End implements BaseNode {
 
     public static final String LABEL_END = "end";
     @JsIgnore
-    public static final double BB_WIDTH = 56d;
+    public static final double BB_WIDTH = 20d;
     @JsIgnore
-    public static final double BB_HEIGHT = 56d;
+    public static final double BB_HEIGHT = 20d;
 
     @Category
     public static final transient String category = Categories.END;
