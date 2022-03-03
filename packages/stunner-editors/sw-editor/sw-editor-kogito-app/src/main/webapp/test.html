@@ -316,9 +316,10 @@
     <div style="display: inline; float: left; padding: 25px">
       <label for="selectExample">Examples:&nbsp;</label>
       <select id="selectExample">
-        <option value="Basic" selected>basic</option>
-        <option value="Errors">errors</option>
-        <option value="Events">events</option>
+        <option value="Basic" selected>Basic</option>
+        <option value="Errors">Errors</option>
+        <option value="Events">Events</option>
+        <option value="ErrorsAndEvents">Errors And Events</option>
       </select>
       <input type="button" onclick="loadText()" value="Load JSON Content" style="display: block; margin-bottom: 5px" />
       <textarea id="jsonRawContent" rows="50" cols="50" style="font-size: larger"></textarea>
@@ -375,22 +376,22 @@
           '   "name": "Hello State",\n' +
           '   "type": "inject",\n' +
           '   "end": false,\n' +
-          '   "transition": "NewState",\n' +
+          '   "transition": "State1",\n' +
           '   "onErrors": [\n' +
           "    {\n" +
           '     "errorRef": "Some Error",\n' +
           '     "end": false,\n' +
-          '     "transition": "e1"\n' +
+          '     "transition": "Error1"\n' +
           "    }\n" +
           "   ]\n" +
           "  },\n" +
           "  {\n" +
-          '   "name": "e1",\n' +
+          '   "name": "Error1",\n' +
           '   "type": "inject",\n' +
           '   "end": true\n' +
           "  },\n" +
           "  {\n" +
-          '   "name": "NewState",\n' +
+          '   "name": "State1",\n' +
           '   "type": "inject",\n' +
           '   "end": true\n' +
           "  }\n" +
@@ -407,12 +408,12 @@
           '      "type": "event",\n' +
           '      "onEvents": [\n' +
           "        {\n" +
-          '          "eventRefs": [\n' +
-          '            "EventDef1"\n' +
+          '          "eventRefs": [' +
+          '            "Event1"' +
           "          ],\n" +
           '          "actions": [\n' +
           "            {\n" +
-          '              "functionRef": "FunctionOnEventDef1"\n' +
+          '              "functionRef": "Function1"\n' +
           "            }\n" +
           "          ]\n" +
           "        }\n" +
@@ -422,16 +423,77 @@
           "  ],\n" +
           '  "events": [\n' +
           "    {\n" +
-          '      "name": "EventDef1",\n' +
+          '      "name": "Event1",\n' +
           '      "type": "EventDef1Type",\n' +
           '      "source": "EventDef1Source"\n' +
           "    }\n" +
           "  ],\n" +
           '  "functions": [\n' +
           "    {\n" +
-          '      "name": "FunctionOnEventDef1",\n' +
+          '      "name": "Function1",\n' +
           '      "operation": "openapiservicedef.json#someFunction",\n' +
           '      "type": "rest"\n' +
+          "    }\n" +
+          "  ]\n" +
+          "}",
+        "{\n" +
+          '  "id": "helloworld",\n' +
+          '  "version": "1.0",\n' +
+          '  "specVersion": "0.8",\n' +
+          '  "name": "Hello World Workflow",\n' +
+          '  "description": "Inject Hello World",\n' +
+          '  "start": "Initial State",\n' +
+          '  "states": [\n' +
+          "    {\n" +
+          '      "name": "Initial State",\n' +
+          '      "type": "inject",\n' +
+          '      "end": false,\n' +
+          '      "transition": "State1",\n' +
+          '      "onErrors": [\n' +
+          "        {\n" +
+          '          "errorRef": "SomeError1",\n' +
+          '          "end": false,\n' +
+          '          "transition": "ErrorState1"\n' +
+          "        },\n" +
+          "        {\n" +
+          '          "errorRef": "SomeError2",\n' +
+          '          "end": false,\n' +
+          '          "transition": "ErrorState2"\n' +
+          "        }\n" +
+          "      ]\n" +
+          "    },\n" +
+          "    {\n" +
+          '      "name": "ErrorState1",\n' +
+          '      "type": "inject",\n' +
+          '      "end": true\n' +
+          "    },\n" +
+          "    {\n" +
+          '      "name": "ErrorState2",\n' +
+          '      "type": "inject",\n' +
+          '      "end": true\n' +
+          "    },\n" +
+          "    {\n" +
+          '      "name": "State1",\n' +
+          '      "type": "inject",\n' +
+          '      "end": false,\n' +
+          '      "transition": "EventState1"\n' +
+          "    },\n" +
+          "    {\n" +
+          '      "name": "EventState1",\n' +
+          '      "type": "event",\n' +
+          '      "onEvents": [\n' +
+          "        {\n" +
+          '          "eventRefs": [\n' +
+          '            "Event1"\n' +
+          "          ],\n" +
+          '          "actions": [\n' +
+          "            {\n" +
+          '              "functionRef": "Function1"\n' +
+          "            }\n" +
+          "          ]\n" +
+          "        }\n" +
+          "      ],\n" +
+          '      "end": true\n' +
           "    }\n" +
           "  ]\n" +
           "}",
