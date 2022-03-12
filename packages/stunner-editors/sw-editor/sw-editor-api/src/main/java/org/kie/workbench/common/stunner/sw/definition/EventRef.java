@@ -31,19 +31,16 @@ import org.kie.workbench.common.stunner.core.definition.property.PropertyMetaTyp
 @Bindable
 @Definition
 @JsType
-public class EventRef implements BaseNode {
+public class EventRef {
 
     public static final String LABEL_EVENT = "event";
 
-    @JsIgnore
-    public static final double BB_WIDTH = 56d;
-    @JsIgnore
-    public static final double BB_HEIGHT = 56d;
-
     @Category
+    @JsIgnore
     public static final transient String category = Categories.EVENTS;
 
     @Labels
+    @JsIgnore
     private final Set<String> labels = new Sets.Builder<String>()
             .add(Workflow.LABEL_ROOT_NODE)
             .add(LABEL_EVENT)
@@ -84,17 +81,5 @@ public class EventRef implements BaseNode {
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    @Override
-    @JsIgnore
-    public double getWidth() {
-        return BB_WIDTH;
-    }
-
-    @Override
-    @JsIgnore
-    public double getHeight() {
-        return BB_HEIGHT;
     }
 }

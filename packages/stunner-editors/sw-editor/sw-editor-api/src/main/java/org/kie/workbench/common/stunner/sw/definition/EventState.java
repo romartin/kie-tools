@@ -16,6 +16,7 @@
 
 package org.kie.workbench.common.stunner.sw.definition;
 
+import jsinterop.annotations.JsIgnore;
 import jsinterop.annotations.JsType;
 import org.jboss.errai.databinding.client.api.Bindable;
 import org.kie.workbench.common.stunner.core.definition.annotation.Definition;
@@ -28,8 +29,17 @@ import org.kie.workbench.common.stunner.core.definition.annotation.morph.Morph;
 @JsType
 public class EventState extends State {
 
+    @JsIgnore
+    public static final String TYPE_EVENT = "event";
+
     @Property
     public boolean exclusive;
+
+    public OnEvent[] onEvents;
+
+    public EventState() {
+        this.type = TYPE_EVENT;
+    }
 
     public boolean isExclusive() {
         return exclusive;
@@ -37,5 +47,13 @@ public class EventState extends State {
 
     public void setExclusive(boolean exclusive) {
         this.exclusive = exclusive;
+    }
+
+    public OnEvent[] getOnEvents() {
+        return onEvents;
+    }
+
+    public void setOnEvents(OnEvent[] onEvents) {
+        this.onEvents = onEvents;
     }
 }

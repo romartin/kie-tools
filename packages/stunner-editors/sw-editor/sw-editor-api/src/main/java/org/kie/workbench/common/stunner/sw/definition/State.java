@@ -33,18 +33,16 @@ import org.kie.workbench.common.stunner.core.definition.property.PropertyMetaTyp
 @Definition
 @MorphBase(defaultType = InjectState.class)
 @JsType
-public class State implements BaseNode {
+public class State {
 
     public static final String LABEL_STATE = "state";
-    @JsIgnore
-    public static final double BB_WIDTH = 154d;
-    @JsIgnore
-    public static final double BB_HEIGHT = 102d;
 
     @Category
+    @JsIgnore
     public static final transient String category = Categories.STATES;
 
     @Labels
+    @JsIgnore
     private final Set<String> labels = new Sets.Builder<String>()
             .add(Workflow.LABEL_ROOT_NODE)
             .add(LABEL_STATE)
@@ -53,7 +51,16 @@ public class State implements BaseNode {
     @Property(meta = PropertyMetaTypes.NAME)
     public String name;
 
+    public String type;
+
+    public String transition;
+
+    public boolean end;
+
+    public ErrorTransition[] onErrors;
+
     public State() {
+        this.name = "State";
     }
 
     public void setName(String name) {
@@ -64,23 +71,43 @@ public class State implements BaseNode {
         return name;
     }
 
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    public String getTransition() {
+        return transition;
+    }
+
+    public void setTransition(String transition) {
+        this.transition = transition;
+    }
+
+    public boolean isEnd() {
+        return end;
+    }
+
+    public void setEnd(boolean end) {
+        this.end = end;
+    }
+
+    public ErrorTransition[] getOnErrors() {
+        return onErrors;
+    }
+
+    public void setOnErrors(ErrorTransition[] onErrors) {
+        this.onErrors = onErrors;
+    }
+
     public Set<String> getLabels() {
         return labels;
     }
 
     public String getCategory() {
         return category;
-    }
-
-    @Override
-    @JsIgnore
-    public double getWidth() {
-        return BB_WIDTH;
-    }
-
-    @Override
-    @JsIgnore
-    public double getHeight() {
-        return BB_HEIGHT;
     }
 }

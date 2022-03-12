@@ -14,15 +14,14 @@
  * limitations under the License.
  */
 
-package org.kie.workbench.common.stunner.sw.client.jsonpatch;
+package org.kie.workbench.common.stunner.sw.definition;
 
 import jsinterop.annotations.JsType;
 
 @JsType
-public class Patch {
+public class Event {
 
-    public String op;
-    public String path;
-    public String from;
-    public Object value;
+    public String name;
+    public String source;
+    public String type;
 }

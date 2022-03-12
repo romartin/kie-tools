@@ -18,6 +18,7 @@ package org.kie.workbench.common.stunner.sw.definition;
 
 import java.util.Set;
 
+import jsinterop.annotations.JsIgnore;
 import jsinterop.annotations.JsType;
 import org.jboss.errai.databinding.client.api.Bindable;
 import org.kie.soup.commons.util.Sets;
@@ -32,11 +33,11 @@ import org.kie.workbench.common.stunner.core.rule.annotation.EdgeOccurrences;
 
 @Bindable
 @Definition(graphFactory = EdgeFactory.class)
-@CanConnect(startRole = State.LABEL_STATE, endRole = OnEvents.LABEL_ONEVENTS)
+@CanConnect(startRole = State.LABEL_STATE, endRole = OnEvent.LABEL_ONEVENTS)
 @EdgeOccurrences(role = State.LABEL_STATE, type = EdgeOccurrences.EdgeType.INCOMING, max = 0)
 @EdgeOccurrences(role = State.LABEL_STATE, type = EdgeOccurrences.EdgeType.OUTGOING, max = -1)
-@EdgeOccurrences(role = OnEvents.LABEL_ONEVENTS, type = EdgeOccurrences.EdgeType.INCOMING, max = -1)
-@EdgeOccurrences(role = OnEvents.LABEL_ONEVENTS, type = EdgeOccurrences.EdgeType.OUTGOING, max = 0)
+@EdgeOccurrences(role = OnEvent.LABEL_ONEVENTS, type = EdgeOccurrences.EdgeType.INCOMING, max = -1)
+@EdgeOccurrences(role = OnEvent.LABEL_ONEVENTS, type = EdgeOccurrences.EdgeType.OUTGOING, max = 0)
 @EdgeOccurrences(role = Start.LABEL_START, type = EdgeOccurrences.EdgeType.INCOMING, max = 0)
 @EdgeOccurrences(role = Start.LABEL_START, type = EdgeOccurrences.EdgeType.OUTGOING, max = 0)
 @EdgeOccurrences(role = End.LABEL_END, type = EdgeOccurrences.EdgeType.OUTGOING, max = 0)
@@ -46,9 +47,11 @@ public class EventTransition {
     public static final String LABEL_TRANSITION_EVENT = "transition_event";
 
     @Category
+    @JsIgnore
     public static final transient String category = Categories.TRANSITIONS;
 
     @Labels
+    @JsIgnore
     private final Set<String> labels = new Sets.Builder<String>()
             .add(LABEL_TRANSITION_EVENT)
             .build();

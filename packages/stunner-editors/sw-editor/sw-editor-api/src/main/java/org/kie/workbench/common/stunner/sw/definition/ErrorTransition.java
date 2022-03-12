@@ -18,6 +18,7 @@ package org.kie.workbench.common.stunner.sw.definition;
 
 import java.util.Set;
 
+import jsinterop.annotations.JsIgnore;
 import jsinterop.annotations.JsType;
 import org.jboss.errai.databinding.client.api.Bindable;
 import org.kie.soup.commons.util.Sets;
@@ -45,9 +46,11 @@ public class ErrorTransition {
     public static final String LABEL_TRANSITION_ERROR = "transition_error";
 
     @Category
+    @JsIgnore
     public static final transient String category = Categories.TRANSITIONS;
 
     @Labels
+    @JsIgnore
     private final Set<String> labels = new Sets.Builder<String>()
             .add(Transition.LABEL_TRANSITION)
             .add(LABEL_TRANSITION_ERROR)
@@ -55,6 +58,10 @@ public class ErrorTransition {
 
     @Property(meta = PropertyMetaTypes.NAME)
     public String errorRef;
+
+    public String transition;
+
+    public boolean end;
 
     public ErrorTransition() {
     }
@@ -65,6 +72,22 @@ public class ErrorTransition {
 
     public void setErrorRef(String errorRef) {
         this.errorRef = errorRef;
+    }
+
+    public String getTransition() {
+        return transition;
+    }
+
+    public void setTransition(String transition) {
+        this.transition = transition;
+    }
+
+    public boolean isEnd() {
+        return end;
+    }
+
+    public void setEnd(boolean end) {
+        this.end = end;
     }
 
     public Set<String> getLabels() {

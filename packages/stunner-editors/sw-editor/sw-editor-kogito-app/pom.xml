@@ -371,42 +371,6 @@
       </exclusions>
     </dependency>
 
-    <!-- CNCF SW Java. -->
-    <dependency>
-      <groupId>io.serverlessworkflow</groupId>
-      <artifactId>serverlessworkflow-api</artifactId>
-      <version>5.0.0-SNAPSHOT</version>
-      <scope>test</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>io.serverlessworkflow</groupId>
-      <artifactId>serverlessworkflow-spi</artifactId>
-      <version>5.0.0-SNAPSHOT</version>
-      <scope>test</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>io.serverlessworkflow</groupId>
-      <artifactId>serverlessworkflow-validation</artifactId>
-      <version>5.0.0-SNAPSHOT</version>
-      <scope>test</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>io.serverlessworkflow</groupId>
-      <artifactId>serverlessworkflow-diagram</artifactId>
-      <version>5.0.0-SNAPSHOT</version>
-      <scope>test</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>io.serverlessworkflow</groupId>
-      <artifactId>serverlessworkflow-util</artifactId>
-      <version>5.0.0-SNAPSHOT</version>
-      <scope>test</scope>
-    </dependency>
-
   </dependencies>
 
   <build>

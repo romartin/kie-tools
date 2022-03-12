@@ -26,6 +26,7 @@ import org.kie.workbench.common.stunner.core.graph.Graph;
 import org.kie.workbench.common.stunner.core.graph.content.definition.DefinitionSet;
 import org.kie.workbench.common.stunner.sw.Definitions;
 
+// TODO: Really need for this?
 @ApplicationScoped
 public class DiagramFactory extends BindableDiagramFactory<Metadata, Diagram<Graph, Metadata>> {
 

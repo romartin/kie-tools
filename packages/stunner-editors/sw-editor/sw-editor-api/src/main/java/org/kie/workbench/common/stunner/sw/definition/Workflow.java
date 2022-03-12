@@ -18,6 +18,7 @@ package org.kie.workbench.common.stunner.sw.definition;
 
 import java.util.Set;
 
+import jsinterop.annotations.JsIgnore;
 import jsinterop.annotations.JsType;
 import org.jboss.errai.databinding.client.api.Bindable;
 import org.kie.soup.commons.util.Sets;
@@ -39,9 +40,11 @@ public class Workflow {
     public static final String LABEL_ROOT_NODE = "rootNode";
 
     @Category
+    @JsIgnore
     public static final transient String category = Categories.STATES;
 
     @Labels
+    @JsIgnore
     private final Set<String> labels = new Sets.Builder<String>()
             .add(LABEL_WORKFLOW)
             .build();
@@ -51,6 +54,12 @@ public class Workflow {
 
     @Property(meta = PropertyMetaTypes.NAME)
     public String name;
+
+    public String start;
+
+    public Event[] events;
+
+    public State[] states;
 
     public Workflow() {
     }
@@ -69,6 +78,30 @@ public class Workflow {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getStart() {
+        return start;
+    }
+
+    public void setStart(String start) {
+        this.start = start;
+    }
+
+    public Event[] getEvents() {
+        return events;
+    }
+
+    public void setEvents(Event[] events) {
+        this.events = events;
+    }
+
+    public State[] getStates() {
+        return states;
+    }
+
+    public void setStates(State[] states) {
+        this.states = states;
     }
 
     public Set<String> getLabels() {

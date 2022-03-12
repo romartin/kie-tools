@@ -34,7 +34,7 @@ import org.kie.workbench.common.stunner.sw.definition.StartTransition;
 import org.kie.workbench.common.stunner.sw.definition.Transition;
 
 import static org.kie.workbench.common.stunner.core.definition.adapter.binding.BindableAdapterUtils.getDefinitionId;
-import static org.kie.workbench.common.stunner.sw.client.shapes.AnyRectangleShapeDef.TITLE_HANDLER;
+import static org.kie.workbench.common.stunner.sw.client.shapes.AnyStateShapeDef.TITLE_HANDLER;
 
 public class TransitionShapeDef<W>
         implements ShapeViewDef<W, TransitionView> {

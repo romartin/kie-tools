@@ -29,18 +29,16 @@ import org.kie.workbench.common.stunner.core.definition.annotation.definition.La
 @Bindable
 @Definition
 @JsType
-public class End implements BaseNode {
+public class End {
 
     public static final String LABEL_END = "end";
-    @JsIgnore
-    public static final double BB_WIDTH = 20d;
-    @JsIgnore
-    public static final double BB_HEIGHT = 20d;
 
     @Category
+    @JsIgnore
     public static final transient String category = Categories.END;
 
     @Labels
+    @JsIgnore
     private final Set<String> labels = new Sets.Builder<String>()
             .add(Workflow.LABEL_ROOT_NODE)
             .add(LABEL_END)
@@ -55,17 +53,5 @@ public class End implements BaseNode {
 
     public String getCategory() {
         return category;
-    }
-
-    @Override
-    @JsIgnore
-    public double getWidth() {
-        return BB_WIDTH;
-    }
-
-    @Override
-    @JsIgnore
-    public double getHeight() {
-        return BB_HEIGHT;
     }
 }

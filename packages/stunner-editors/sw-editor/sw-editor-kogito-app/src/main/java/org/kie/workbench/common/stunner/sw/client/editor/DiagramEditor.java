@@ -31,11 +31,8 @@ import org.kie.workbench.common.stunner.core.client.service.ServiceCallback;
 import org.kie.workbench.common.stunner.core.client.util.WindowJSType;
 import org.kie.workbench.common.stunner.core.diagram.Diagram;
 import org.kie.workbench.common.stunner.core.diagram.Metadata;
-import org.kie.workbench.common.stunner.sw.client.js.JsDiagramEditor;
-import org.kie.workbench.common.stunner.sw.client.js.JsWindow;
-import org.kie.workbench.common.stunner.sw.client.jsonpatch.PatchHandler;
 import org.kie.workbench.common.stunner.sw.client.services.ClientDiagramService;
-import org.kie.workbench.common.stunner.sw.service.Marshaller;
+import org.kie.workbench.common.stunner.sw.client.services.IncrementalMarshaller;
 import org.uberfire.backend.vfs.Path;
 import org.uberfire.backend.vfs.PathFactory;
 import org.uberfire.client.promise.Promises;
@@ -50,17 +47,17 @@ public class DiagramEditor {
     private final Promises promises;
     private final StunnerEditor stunnerEditor;
     private final ClientDiagramService diagramService;
-    private final PatchHandler patchHandler;
+    private final IncrementalMarshaller incrementalMarshaller;
 
     @Inject
     public DiagramEditor(Promises promises,
                          StunnerEditor stunnerEditor,
                          ClientDiagramService diagramService,
-                         PatchHandler patchHandler) {
+                         IncrementalMarshaller incrementalMarshaller) {
         this.promises = promises;
         this.stunnerEditor = stunnerEditor;
         this.diagramService = diagramService;
-        this.patchHandler = patchHandler;
+        this.incrementalMarshaller = incrementalMarshaller;
     }
 
     public void onStartup(final PlaceRequest place) {
@@ -82,19 +79,17 @@ public class DiagramEditor {
         return stunnerEditor.getView();
     }
 
-    public Promise<String> getContent() {
-        return promises.resolve("{}");
-    }
-
-    @Inject
-    private Marshaller j2clMarshaller;
-
     public Promise<String> getPreview() {
+        // TODO
         return promises.resolve("");
     }
 
     public Promise validate() {
         return Promise.resolve(new Notification[0]);
+    }
+
+    public Promise<String> getContent() {
+        return diagramService.transform(stunnerEditor.getDiagram());
     }
 
     public Promise<Void> setContent(final String path, final String value) {
@@ -137,7 +132,7 @@ public class DiagramEditor {
         String title = metadata.getTitle();
         Path path = PathFactory.newPath(title, "/" + title + ".sw");
         metadata.setPath(path);
-        patchHandler.run();
+        incrementalMarshaller.run(diagramService.getMarshaller());
         initJsTypes();
     }
 
@@ -148,9 +143,6 @@ public class DiagramEditor {
             LienzoBoundsPanel lienzoPanel = panel.getView();
             JsCanvas jsCanvas = new JsCanvas(lienzoPanel, lienzoPanel.getLayer());
             WindowJSType.linkCanvasJS(jsCanvas);
-            JsDiagramEditor jsSWDiagramEditor = new JsDiagramEditor();
-            jsSWDiagramEditor.session = stunnerEditor.getSession();
-            JsWindow.linkEditor(jsSWDiagramEditor);
         }
     }
 }

@@ -25,10 +25,12 @@ import org.kie.workbench.common.stunner.core.client.shape.TextWrapperStrategy;
 import org.kie.workbench.common.stunner.core.client.shape.view.HasTitle;
 import org.kie.workbench.common.stunner.core.client.shape.view.ShapeView;
 import org.kie.workbench.common.stunner.core.client.shape.view.handler.FontHandler;
+import org.kie.workbench.common.stunner.core.client.shape.view.handler.SizeHandler;
 import org.kie.workbench.common.stunner.core.client.shape.view.handler.TitleHandler;
 import org.kie.workbench.common.stunner.core.client.shape.view.handler.ViewAttributesHandler;
 import org.kie.workbench.common.stunner.core.definition.shape.Glyph;
 import org.kie.workbench.common.stunner.core.definition.shape.ShapeViewDef;
+import org.kie.workbench.common.stunner.core.graph.content.view.View;
 import org.kie.workbench.common.stunner.svg.client.shape.def.SVGShapeViewDef;
 import org.kie.workbench.common.stunner.svg.client.shape.factory.SVGShapeViewResources;
 import org.kie.workbench.common.stunner.svg.client.shape.view.SVGShapeView;
@@ -40,13 +42,31 @@ import org.kie.workbench.common.stunner.sw.definition.End;
 import org.kie.workbench.common.stunner.sw.definition.EventRef;
 import org.kie.workbench.common.stunner.sw.definition.EventState;
 import org.kie.workbench.common.stunner.sw.definition.InjectState;
-import org.kie.workbench.common.stunner.sw.definition.OnEvents;
+import org.kie.workbench.common.stunner.sw.definition.OnEvent;
 import org.kie.workbench.common.stunner.sw.definition.Start;
 import org.kie.workbench.common.stunner.sw.definition.SwitchState;
 import org.kie.workbench.common.stunner.sw.definition.Workflow;
 
 public class AnyStateShapeDef<W> implements ShapeViewDef<W, SVGShapeView>,
                                             SVGShapeViewDef<W, ShapeViewFactory> {
+
+    public static final TitleHandler<ShapeView> TITLE_HANDLER = new TitleHandler<>();
+    private final ViewAttributesHandler<W, SVGShapeView> viewHandler;
+    private final FontHandler<W, SVGShapeView> fontHandler;
+
+    private final boolean isRectangularShape;
+
+    public AnyStateShapeDef() {
+        this(true);
+    }
+
+    public AnyStateShapeDef(boolean isRectangularShape) {
+        this.isRectangularShape = isRectangularShape;
+        viewHandler =
+                new ViewAttributesHandler.Builder<W, SVGShapeView>().build();
+        fontHandler =
+                new DefaultFontHandlerBuilder<W, SVGShapeView>(isRectangularShape).build();
+    }
 
     // TODO: Refactor this, no need for storing state...
     public static final SVGShapeViewResources<Object, ShapeViewFactory> VIEW_RESOURCES =
@@ -58,7 +78,7 @@ public class AnyStateShapeDef<W> implements ShapeViewDef<W, SVGShapeView>,
                     .put(Workflow.class, ShapeViewFactory::container)
                     .put(Start.class, ShapeViewFactory::startState)
                     .put(End.class, ShapeViewFactory::endState)
-                    .put(OnEvents.class, ShapeViewFactory::container)
+                    .put(OnEvent.class, ShapeViewFactory::container)
                     .put(EventRef.class, ShapeViewFactory::event)
                     .put(CallFunctionAction.class, ShapeViewFactory::action)
                     .put(CallSubflowAction.class, ShapeViewFactory::action);
@@ -73,7 +93,7 @@ public class AnyStateShapeDef<W> implements ShapeViewDef<W, SVGShapeView>,
                     .put(Workflow.class, GlyphFactory.TRANSITION)
                     .put(Start.class, GlyphFactory.START)
                     .put(End.class, GlyphFactory.END)
-                    .put(OnEvents.class, GlyphFactory.EVENTS)
+                    .put(OnEvent.class, GlyphFactory.EVENTS)
                     .put(EventRef.class, GlyphFactory.EVENT)
                     .put(CallFunctionAction.class, GlyphFactory.CALL_FUNCTION)
                     .put(CallSubflowAction.class, GlyphFactory.CALL_SUBFLOW)
@@ -92,12 +112,12 @@ public class AnyStateShapeDef<W> implements ShapeViewDef<W, SVGShapeView>,
 
     @Override
     public BiConsumer<W, SVGShapeView> viewHandler() {
-        return VIEW_HANDLER::handle;
+        return viewHandler::handle;
     }
 
     @Override
     public Optional<BiConsumer<W, SVGShapeView>> fontHandler() {
-        return Optional.of(FONT_HANDLER::handle);
+        return Optional.of(fontHandler::handle);
     }
 
     @Override
@@ -110,24 +130,52 @@ public class AnyStateShapeDef<W> implements ShapeViewDef<W, SVGShapeView>,
         return ShapeViewFactory.class;
     }
 
-    public static final TitleHandler<ShapeView> TITLE_HANDLER = new TitleHandler<>();
-
-    private final ViewAttributesHandler<W, SVGShapeView> VIEW_HANDLER =
-            new ViewAttributesHandler.Builder<W, SVGShapeView>().build();
-
-    private final FontHandler<W, SVGShapeView> FONT_HANDLER =
-            new DefaultFontHandlerBuilder<W, SVGShapeView>().build();
+    @Override
+    public Optional<BiConsumer<View<W>, SVGShapeView>> sizeHandler() {
+        if (isRectangularShape) {
+            return Optional.empty();
+        }
+        SizeHandler theSizeHandler = new SizeHandler.Builder<>()
+                .radius(o -> 23d)
+                .build();
+        return Optional.of((BiConsumer<View<W>, SVGShapeView>) theSizeHandler::handle);
+    }
 
     private static class DefaultFontHandlerBuilder<W, V extends ShapeView>
             extends FontHandler.Builder<W, V> {
 
-        public DefaultFontHandlerBuilder() {
+        public DefaultFontHandlerBuilder(boolean isRectangularShape) {
+            if (isRectangularShape) {
+                initDefaultForRectangularShapes();
+            } else {
+                initDefaultForCircularShapes();
+            }
+        }
+
+        private void initDefaultForRectangularShapes() {
             this.verticalAlignment(bean -> HasTitle.VerticalAlignment.MIDDLE)
                     .horizontalAlignment(bean -> HasTitle.HorizontalAlignment.CENTER)
                     .referencePosition(bean -> HasTitle.ReferencePosition.INSIDE)
                     .orientation(bean -> HasTitle.Orientation.HORIZONTAL)
                     .textSizeConstraints(bean -> new HasTitle.Size(100, 100, HasTitle.Size.SizeType.PERCENTAGE))
                     .textWrapperStrategy(bean -> TextWrapperStrategy.TRUNCATE_WITH_LINE_BREAK);
+        }
+
+        private void initDefaultForCircularShapes() {
+            this.verticalAlignment(bean -> HasTitle.VerticalAlignment.BOTTOM)
+                    .horizontalAlignment(bean -> HasTitle.HorizontalAlignment.CENTER)
+                    .referencePosition(bean -> HasTitle.ReferencePosition.OUTSIDE)
+                    .orientation(bean -> HasTitle.Orientation.HORIZONTAL)
+                    .textSizeConstraints(bean -> new HasTitle.Size(100, 100, HasTitle.Size.SizeType.PERCENTAGE))
+                    .textWrapperStrategy(bean -> TextWrapperStrategy.TRUNCATE_WITH_LINE_BREAK);
+        }
+
+        // TODO: If this method not present, why not text algin on bottom works?
+        public static Double getStrokeAlpha(Double strokeWidth) {
+            return Optional.ofNullable(strokeWidth)
+                    .filter(value -> value > 0)
+                    .map(value -> 1.0)
+                    .orElse(0.0);
         }
     }
 }

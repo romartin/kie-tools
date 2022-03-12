@@ -33,18 +33,16 @@ import org.kie.workbench.common.stunner.core.definition.property.PropertyMetaTyp
 @Definition
 @MorphBase(defaultType = CallFunctionAction.class)
 @JsType
-public class ActionNode implements BaseNode {
+public class ActionNode {
 
     public static final String LABEL_ACTION = "action";
-    @JsIgnore
-    public static final double BB_WIDTH = 154d;
-    @JsIgnore
-    public static final double BB_HEIGHT = 51d;
 
     @Category
+    @JsIgnore
     public static final transient String category = Categories.ACTIONS;
 
     @Labels
+    @JsIgnore
     private final Set<String> labels = new Sets.Builder<String>()
             .add(Workflow.LABEL_ROOT_NODE)
             .add(LABEL_ACTION)
@@ -55,6 +53,12 @@ public class ActionNode implements BaseNode {
 
     @Property(meta = PropertyMetaTypes.NAME)
     public String name;
+
+    public String functionRef;
+
+    public String eventRef;
+
+    public String subFlowRef;
 
     public ActionNode() {
     }
@@ -75,23 +79,35 @@ public class ActionNode implements BaseNode {
         this.id = id;
     }
 
+    public String getFunctionRef() {
+        return functionRef;
+    }
+
+    public void setFunctionRef(String functionRef) {
+        this.functionRef = functionRef;
+    }
+
+    public String getEventRef() {
+        return eventRef;
+    }
+
+    public void setEventRef(String eventRef) {
+        this.eventRef = eventRef;
+    }
+
+    public String getSubFlowRef() {
+        return subFlowRef;
+    }
+
+    public void setSubFlowRef(String subFlowRef) {
+        this.subFlowRef = subFlowRef;
+    }
+
     public Set<String> getLabels() {
         return labels;
     }
 
     public String getCategory() {
         return category;
-    }
-
-    @Override
-    @JsIgnore
-    public double getWidth() {
-        return BB_WIDTH;
-    }
-
-    @Override
-    @JsIgnore
-    public double getHeight() {
-        return BB_HEIGHT;
     }
 }

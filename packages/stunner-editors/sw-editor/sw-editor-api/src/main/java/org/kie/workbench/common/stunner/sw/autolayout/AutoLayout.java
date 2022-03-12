@@ -28,8 +28,12 @@ import org.kie.workbench.common.stunner.core.graph.Graph;
 import org.kie.workbench.common.stunner.core.graph.Node;
 import org.kie.workbench.common.stunner.core.graph.command.DirectGraphCommandExecutionContext;
 import org.kie.workbench.common.stunner.core.graph.command.GraphCommandExecutionContext;
+import org.kie.workbench.common.stunner.core.graph.command.impl.AddControlPointCommand;
+import org.kie.workbench.common.stunner.core.graph.command.impl.UpdateElementPositionCommand;
+import org.kie.workbench.common.stunner.core.graph.content.Bounds;
 import org.kie.workbench.common.stunner.core.graph.content.definition.DefinitionSet;
 import org.kie.workbench.common.stunner.core.graph.content.relationship.Child;
+import org.kie.workbench.common.stunner.core.graph.content.view.ControlPoint;
 import org.kie.workbench.common.stunner.core.graph.content.view.Point2D;
 import org.kie.workbench.common.stunner.core.graph.content.view.View;
 import org.kie.workbench.common.stunner.core.graph.processing.traverse.content.ChildrenTraverseCallback;
@@ -42,15 +46,12 @@ import org.kie.workbench.common.stunner.sw.autolayout.elkjs.ELKEdge;
 import org.kie.workbench.common.stunner.sw.autolayout.elkjs.ELKNode;
 import org.kie.workbench.common.stunner.sw.autolayout.elkjs.ELKUtils;
 import org.kie.workbench.common.stunner.sw.autolayout.elkjs.ELKWrapper;
-import org.kie.workbench.common.stunner.sw.definition.BaseNode;
-import org.kie.workbench.common.stunner.sw.service.MarshallUtils;
 import org.uberfire.client.promise.Promises;
 
 public class AutoLayout {
 
     @SuppressWarnings("all")
     public static Promise<Graph> applyLayout(final Graph graph,
-                                             final MarshallUtils utils,
                                              final Promises promises,
                                              final DirectGraphCommandExecutionContext context,
                                              final String rootUUID) {
@@ -67,10 +68,10 @@ public class AutoLayout {
                     final CompositeCommand.Builder layoutCommands = new CompositeCommand.Builder();
 
                     //Apply ELKNodes layout values into graph structure
-                    updateNodesPosition(elkRoot, graph, layoutCommands, utils);
+                    updateNodesPosition(elkRoot, graph, layoutCommands);
 
                     //Create ELKBendPoints in graph structure
-                    createControlPoints(elkRoot, layoutCommands, utils);
+                    createControlPoints(elkRoot, layoutCommands);
 
                     final CompositeCommand<GraphCommandExecutionContext, RuleViolation> all =
                             new CompositeCommand.Builder<>()
@@ -111,17 +112,16 @@ public class AutoLayout {
                 return true;
             }
 
-            private void addNode(final Node node) {
+            private void addNode(final Node<View, Edge> node) {
                 //skip in case the node was already processed
                 if (processedNodes.containsKey(node.getUUID())) {
                     return;
                 }
 
-                //final Bound bound = getBound(node);
-                final BaseNode baseNode = (BaseNode) ((View<?>) node.getContent()).getDefinition();
+                Bounds bounds = node.getContent().getBounds();
                 elkRoot[0].addNode(new ELKNode(node.getUUID(),
-                                               baseNode.getWidth(),
-                                               baseNode.getHeight()));
+                                               bounds.getWidth(),
+                                               bounds.getHeight()));
 
                 addProcessedNode(node);
             }
@@ -141,8 +141,8 @@ public class AutoLayout {
 
                 final ELKNode elkParent = elkRoot[0].getChild(parent.getUUID());
                 //final Bound bound = getBound(node);
-                final BaseNode baseNode = (BaseNode) ((View<?>) node.getContent()).getDefinition();
-                elkParent.addNode(new ELKNode(node.getUUID(), baseNode.getWidth(), baseNode.getHeight()));
+                Bounds bounds = node.getContent().getBounds();
+                elkParent.addNode(new ELKNode(node.getUUID(), bounds.getWidth(), bounds.getHeight()));
 
                 //Set horizontal layout for containers
                 elkParent.setLayoutOptions(ELKUtils.getContainerLeftToRightDownLayoutOptionsObject());
@@ -239,31 +239,28 @@ public class AutoLayout {
     @SuppressWarnings("all")
     private static void updateNodesPosition(final ELKNode elkRoot,
                                             final Graph graph,
-                                            final CompositeCommand.Builder layoutCommands,
-                                            final MarshallUtils utils) {
+                                            final CompositeCommand.Builder layoutCommands) {
         for (ELKNode elkNode : elkRoot.getChildren().asList()) {
-            utils.updateNodePosition(graph.getNode(elkNode.getId()),
-                                     new Point2D(elkNode.getX(), elkNode.getY()),
-                                     layoutCommands);
+            layoutCommands.addCommand(new UpdateElementPositionCommand(graph.getNode(elkNode.getId()),
+                                                                       new Point2D(elkNode.getX(), elkNode.getY())));
             if (elkNode.getChildren().length > 0) {
-                updateNodesPosition(elkNode, graph, layoutCommands, utils);
+                updateNodesPosition(elkNode, graph, layoutCommands);
             }
         }
     }
 
     @SuppressWarnings("all")
     private static void createControlPoints(final ELKNode elkNode,
-                                            final CompositeCommand.Builder layoutCommands,
-                                            final MarshallUtils utils) {
+                                            final CompositeCommand.Builder layoutCommands) {
         for (ELKEdge elkEdge : elkNode.getEdges().asList()) {
             int index = -1;
             for (Point2D point : elkEdge.getBendPoints().asList()) {
-                utils.addControlPoint(elkEdge.getId(), point, ++index, layoutCommands);
+                layoutCommands.addCommand(new AddControlPointCommand(elkEdge.getId(), new ControlPoint(point), ++index));
             }
         }
 
         for (ELKNode elkClildNode : elkNode.getChildren().asList()) {
-            createControlPoints(elkClildNode, layoutCommands, utils);
+            createControlPoints(elkClildNode, layoutCommands);
         }
     }
 }
