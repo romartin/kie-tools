@@ -47,6 +47,12 @@ public class PatchHandler {
     @SuppressWarnings("all")
     private void applyPatchForCommand(AbstractCanvasHandler canvasHandler,
                                       Command<AbstractCanvasHandler, CanvasViolation> command) {
+
+        // TODO
+        if (true) {
+            return;
+        }
+
         Patch[] patches = new Patch[0];
         try {
             patches = builder.build(canvasHandler, command);
@@ -54,10 +60,23 @@ public class PatchHandler {
             DomGlobal.console.error("ERROR building JSON patch: " + (null == e.getCause() ? e.getMessage() : e.getCause().getMessage()));
             patches = new Patch[0];
         }
-        if (null != patches && patches.length > 0) {
-            String raw = Marshaller.stringify(patches);
-            DomGlobal.console.log("-> " + raw);
-            JsWindow.onJsonChanged(raw);
+
+        String raw = null;
+        try {
+            if (null != patches && patches.length > 0) {
+                raw = Marshaller.stringify(patches);
+                DomGlobal.console.log("-> " + raw);
+            }
+        } catch (Exception e) {
+            DomGlobal.console.error("ERROR stringyfing JSON for patch [" + patches[0].toString() + "]: " + (null == e.getCause() ? e.getMessage() : e.getCause().getMessage()));
+        }
+
+        try {
+            if (null != raw) {
+                JsWindow.onJsonChanged(raw);
+            }
+        } catch (Exception e) {
+            DomGlobal.console.error("ERROR applying JSON Patch [" + raw + "]: " + (null == e.getCause() ? e.getMessage() : e.getCause().getMessage()));
         }
     }
 }

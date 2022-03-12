@@ -22,15 +22,15 @@ import java.util.List;
 import java.util.Map;
 
 import org.kie.workbench.common.stunner.core.util.UUID;
-import org.kie.workbench.common.stunner.sw.spec.CNCFWorkflow;
+import org.kie.workbench.common.stunner.sw.definition.Workflow;
 
 public class MarshallerContext {
 
-    public CNCFWorkflow workflow;
+    public Workflow workflow;
     public Map<String, String> nameToIdBindings;
     public List<String> uuidIndexes;
 
-    public MarshallerContext(CNCFWorkflow workflow) {
+    public MarshallerContext(Workflow workflow) {
         int size = workflow.states.length + 3;
         this.workflow = workflow;
         this.nameToIdBindings = new HashMap<>(size);

@@ -42,9 +42,11 @@ public class ActionNode implements BaseNode {
     public static final double BB_HEIGHT = 51d;
 
     @Category
+    @JsIgnore
     public static final transient String category = Categories.ACTIONS;
 
     @Labels
+    @JsIgnore
     private final Set<String> labels = new Sets.Builder<String>()
             .add(Workflow.LABEL_ROOT_NODE)
             .add(LABEL_ACTION)
@@ -55,6 +57,12 @@ public class ActionNode implements BaseNode {
 
     @Property(meta = PropertyMetaTypes.NAME)
     public String name;
+
+    public String functionRef;
+
+    public String eventRef;
+
+    public String subFlowRef;
 
     public ActionNode() {
     }
@@ -73,6 +81,30 @@ public class ActionNode implements BaseNode {
 
     public void setId(String id) {
         this.id = id;
+    }
+
+    public String getFunctionRef() {
+        return functionRef;
+    }
+
+    public void setFunctionRef(String functionRef) {
+        this.functionRef = functionRef;
+    }
+
+    public String getEventRef() {
+        return eventRef;
+    }
+
+    public void setEventRef(String eventRef) {
+        this.eventRef = eventRef;
+    }
+
+    public String getSubFlowRef() {
+        return subFlowRef;
+    }
+
+    public void setSubFlowRef(String subFlowRef) {
+        this.subFlowRef = subFlowRef;
     }
 
     public Set<String> getLabels() {

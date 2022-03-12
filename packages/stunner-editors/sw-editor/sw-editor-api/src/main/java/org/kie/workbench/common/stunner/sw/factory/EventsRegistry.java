@@ -24,13 +24,13 @@ import java.util.stream.Collectors;
 import javax.annotation.PreDestroy;
 import javax.enterprise.context.ApplicationScoped;
 
-import org.kie.workbench.common.stunner.sw.spec.CNCFEvent;
+import org.kie.workbench.common.stunner.sw.definition.Event;
 
 // TODO: Really need for this?
 @ApplicationScoped
-public class EventsRegistry implements TypeByNameRegistry<CNCFEvent> {
+public class EventsRegistry implements TypeByNameRegistry<Event> {
 
-    private final Map<String, CNCFEvent> definitions;
+    private final Map<String, Event> definitions;
 
     public EventsRegistry() {
         this.definitions = new HashMap<>();
@@ -38,22 +38,22 @@ public class EventsRegistry implements TypeByNameRegistry<CNCFEvent> {
 
     @Override
     @SuppressWarnings("all")
-    public Collection<CNCFEvent> items() {
+    public Collection<Event> items() {
         // It is done for GWT/Errai compatibility since HashMap$Values do not
         // have empty constructor. Do not simplify!
         return definitions.values().stream().collect(Collectors.toList());
     }
 
     @Override
-    public CNCFEvent get(final String name) {
+    public Event get(final String name) {
         return definitions.get(name);
     }
 
-    public void register(final CNCFEvent def) {
+    public void register(final Event def) {
         definitions.put(def.name, def);
     }
 
-    public CNCFEvent remove(final String name) {
+    public Event remove(final String name) {
         return definitions.remove(name);
     }
 

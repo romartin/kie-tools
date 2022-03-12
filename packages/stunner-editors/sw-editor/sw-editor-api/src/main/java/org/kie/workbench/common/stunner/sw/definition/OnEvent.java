@@ -23,7 +23,6 @@ import jsinterop.annotations.JsType;
 import org.jboss.errai.databinding.client.api.Bindable;
 import org.kie.soup.commons.util.Sets;
 import org.kie.workbench.common.stunner.core.definition.annotation.Definition;
-import org.kie.workbench.common.stunner.core.definition.annotation.Property;
 import org.kie.workbench.common.stunner.core.definition.annotation.definition.Category;
 import org.kie.workbench.common.stunner.core.definition.annotation.definition.Labels;
 import org.kie.workbench.common.stunner.core.rule.annotation.CanContain;
@@ -32,7 +31,7 @@ import org.kie.workbench.common.stunner.core.rule.annotation.CanContain;
 @Definition
 @CanContain(roles = {EventRef.LABEL_EVENT, ActionNode.LABEL_ACTION})
 @JsType
-public class OnEvents implements BaseNode {
+public class OnEvent implements BaseNode {
 
     public static final String LABEL_ONEVENTS = "on_events";
 
@@ -42,18 +41,21 @@ public class OnEvents implements BaseNode {
     public static final double BB_HEIGHT = 56d;
 
     @Category
+    @JsIgnore
     public static final transient String category = Categories.EVENTS;
 
     @Labels
+    @JsIgnore
     private final Set<String> labels = new Sets.Builder<String>()
             .add(Workflow.LABEL_ROOT_NODE)
             .add(LABEL_ONEVENTS)
             .build();
 
-    @Property
-    public String actionMode;
+    public String[] eventRefs;
 
-    public OnEvents() {
+    public ActionNode[] actions;
+
+    public OnEvent() {
     }
 
     public Set<String> getLabels() {
@@ -64,12 +66,20 @@ public class OnEvents implements BaseNode {
         return category;
     }
 
-    public String getActionMode() {
-        return actionMode;
+    public String[] getEventRefs() {
+        return eventRefs;
     }
 
-    public void setActionMode(String actionMode) {
-        this.actionMode = actionMode;
+    public void setEventRefs(String[] eventRefs) {
+        this.eventRefs = eventRefs;
+    }
+
+    public ActionNode[] getActions() {
+        return actions;
+    }
+
+    public void setActions(ActionNode[] actions) {
+        this.actions = actions;
     }
 
     @Override

@@ -35,10 +35,8 @@ import org.kie.workbench.common.stunner.core.diagram.MetadataImpl;
 import org.kie.workbench.common.stunner.core.graph.Graph;
 import org.kie.workbench.common.stunner.sw.Definitions;
 import org.kie.workbench.common.stunner.sw.factory.DiagramFactory;
-import org.kie.workbench.common.stunner.sw.service.Marshaller;
+import org.kie.workbench.common.stunner.sw.service.marshaller.NativeMarshaller;
 import org.uberfire.client.promise.Promises;
-
-import static org.kie.workbench.common.stunner.sw.service.Marshaller.WORKFLOW_UUID;
 
 @ApplicationScoped
 public class ClientDiagramService {
@@ -48,7 +46,8 @@ public class ClientDiagramService {
     private final DiagramFactory diagramFactory;
     private final ShapeManager shapeManager;
     private final Promises promises;
-    private final Marshaller marshaller;
+    // private final Marshaller marshaller;
+    private final NativeMarshaller marshaller;
 
     //CDI proxy
     protected ClientDiagramService() {
@@ -61,7 +60,7 @@ public class ClientDiagramService {
                                 final DiagramFactory diagramFactory,
                                 final ShapeManager shapeManager,
                                 final Promises promises,
-                                final Marshaller marshaller) {
+                                final NativeMarshaller marshaller) {
         this.definitionManager = definitionManager;
         this.factoryManager = factoryManager;
         this.diagramFactory = diagramFactory;
@@ -94,7 +93,7 @@ public class ClientDiagramService {
     }
 
     public Promise<String> transform(final Diagram diagram) {
-        return promises.resolve("{}");
+        return marshaller.marshall(diagram.getGraph());
     }
 
     private Diagram createNewDiagram(String fileName) {
@@ -143,7 +142,7 @@ public class ClientDiagramService {
 
     private Promise<Graph> unmarshall(final Metadata metadata,
                                       final String raw) {
-        return marshaller.unmarshall(metadata, raw);
+        return marshaller.unmarshall(raw);
     }
 
     private Metadata createMetadata() {
@@ -154,7 +153,7 @@ public class ClientDiagramService {
 
     private void updateClientMetadata(final Diagram diagram) {
         final Metadata metadata = diagram.getMetadata();
-        String rootUUID = marshaller.getContext().getUUID(WORKFLOW_UUID);
+        String rootUUID = marshaller.getWorkflowRootUUID();
         metadata.setCanvasRootUUID(rootUUID);
         if (isEmpty(metadata.getShapeSetId())) {
             final String sId = shapeManager.getDefaultShapeSet(metadata.getDefinitionSetId()).getId();

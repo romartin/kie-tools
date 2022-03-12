@@ -22,8 +22,8 @@ import javax.inject.Inject;
 import org.kie.workbench.common.stunner.core.definition.adapter.binding.BindableAdapterUtils;
 import org.kie.workbench.common.stunner.core.definition.builder.Builder;
 import org.kie.workbench.common.stunner.core.factory.definition.DefinitionFactory;
+import org.kie.workbench.common.stunner.sw.definition.Event;
 import org.kie.workbench.common.stunner.sw.definition.EventRef;
-import org.kie.workbench.common.stunner.sw.spec.CNCFEvent;
 
 // TODO: Really need for this?
 @ApplicationScoped
@@ -61,7 +61,7 @@ public class EventFactory
 
     @SuppressWarnings("all")
     public EventRef buildItem(final String name) {
-        final CNCFEvent eventDef = getRegistry().get(name);
+        final Event eventDef = getRegistry().get(name);
 
         return new EventBuilder(eventDef).build();
     }
@@ -72,9 +72,9 @@ public class EventFactory
 
     public static class EventBuilder implements Builder<EventRef> {
 
-        private final CNCFEvent eventDef;
+        private final Event eventDef;
 
-        public EventBuilder(final CNCFEvent eventDef) {
+        public EventBuilder(final Event eventDef) {
             this.eventDef = eventDef;
         }
 

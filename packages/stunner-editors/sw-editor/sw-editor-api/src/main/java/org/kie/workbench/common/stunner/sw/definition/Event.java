@@ -14,13 +14,14 @@
  * limitations under the License.
  */
 
-package org.kie.workbench.common.stunner.sw.spec;
+package org.kie.workbench.common.stunner.sw.definition;
 
 import jsinterop.annotations.JsType;
 
 @JsType
-public class CNCFOnEvent {
+public class Event {
 
-    public String[] eventRefs;
-    public CNCFAction[] actions;
+    public String name;
+    public String source;
+    public String type;
 }

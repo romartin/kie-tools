@@ -44,7 +44,6 @@ import org.kie.workbench.common.stunner.sw.definition.State;
 import org.kie.workbench.common.stunner.sw.definition.Workflow;
 import org.kie.workbench.common.stunner.sw.service.Marshaller;
 import org.kie.workbench.common.stunner.sw.service.MarshallerContext;
-import org.kie.workbench.common.stunner.sw.spec.CNCFState;
 
 @ApplicationScoped
 public class PatchBuilder {
@@ -140,7 +139,7 @@ public class PatchBuilder {
             return new Patch[0];
         }
         int count = getStatesCount();
-        CNCFState jsCandidate = marshaller.marshall(candidate);
+        State jsCandidate = marshaller.marshall(candidate);
         Patch patch = PatchFactory.add("/states/" + count, jsCandidate);
         getMarshallerContext().addStateIndex(candidate.getUUID());
         return new Patch[]{patch};
@@ -152,7 +151,7 @@ public class PatchBuilder {
         if (stateIndex < 0) {
             return new Patch[0];
         }
-        CNCFState jsCandidate = marshaller.marshall(candidate);
+        State jsCandidate = marshaller.marshall(candidate);
         Patch patch = PatchFactory.replace("/states/" + stateIndex, jsCandidate);
         return new Patch[]{patch};
     }

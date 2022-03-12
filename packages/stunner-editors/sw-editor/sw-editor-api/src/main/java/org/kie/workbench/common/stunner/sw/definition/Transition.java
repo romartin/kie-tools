@@ -18,6 +18,7 @@ package org.kie.workbench.common.stunner.sw.definition;
 
 import java.util.Set;
 
+import jsinterop.annotations.JsIgnore;
 import jsinterop.annotations.JsType;
 import org.jboss.errai.databinding.client.api.Bindable;
 import org.kie.soup.commons.util.Sets;
@@ -45,15 +46,19 @@ public class Transition {
     public static final String LABEL_TRANSITION = "transition";
 
     @Category
+    @JsIgnore
     public static final transient String category = Categories.TRANSITIONS;
 
     @Labels
+    @JsIgnore
     private final Set<String> labels = new Sets.Builder<String>()
             .add(LABEL_TRANSITION)
             .build();
 
     @Property(meta = PropertyMetaTypes.NAME)
     public String name;
+
+    public String to;
 
     public Transition() {
     }
@@ -64,6 +69,14 @@ public class Transition {
 
     public String getName() {
         return name;
+    }
+
+    public String getTo() {
+        return to;
+    }
+
+    public void setTo(String to) {
+        this.to = to;
     }
 
     public Set<String> getLabels() {

@@ -32,15 +32,18 @@ import org.kie.workbench.common.stunner.core.definition.annotation.definition.La
 public class End implements BaseNode {
 
     public static final String LABEL_END = "end";
+
     @JsIgnore
     public static final double BB_WIDTH = 56d;
     @JsIgnore
     public static final double BB_HEIGHT = 56d;
 
     @Category
+    @JsIgnore
     public static final transient String category = Categories.END;
 
     @Labels
+    @JsIgnore
     private final Set<String> labels = new Sets.Builder<String>()
             .add(Workflow.LABEL_ROOT_NODE)
             .add(LABEL_END)

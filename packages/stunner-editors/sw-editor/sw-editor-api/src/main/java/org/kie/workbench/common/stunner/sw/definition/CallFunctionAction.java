@@ -19,7 +19,6 @@ package org.kie.workbench.common.stunner.sw.definition;
 import jsinterop.annotations.JsType;
 import org.jboss.errai.databinding.client.api.Bindable;
 import org.kie.workbench.common.stunner.core.definition.annotation.Definition;
-import org.kie.workbench.common.stunner.core.definition.annotation.Property;
 import org.kie.workbench.common.stunner.core.definition.annotation.morph.Morph;
 
 @Bindable
@@ -28,14 +27,4 @@ import org.kie.workbench.common.stunner.core.definition.annotation.morph.Morph;
 @JsType
 public class CallFunctionAction extends ActionNode {
 
-    @Property
-    public String functionRef;
-
-    public String getFunctionRef() {
-        return functionRef;
-    }
-
-    public void setFunctionRef(String functionRef) {
-        this.functionRef = functionRef;
-    }
 }

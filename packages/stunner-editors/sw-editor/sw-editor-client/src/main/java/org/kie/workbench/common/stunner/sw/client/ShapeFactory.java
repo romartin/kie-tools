@@ -40,7 +40,7 @@ import org.kie.workbench.common.stunner.sw.definition.EventRef;
 import org.kie.workbench.common.stunner.sw.definition.EventState;
 import org.kie.workbench.common.stunner.sw.definition.EventTransition;
 import org.kie.workbench.common.stunner.sw.definition.InjectState;
-import org.kie.workbench.common.stunner.sw.definition.OnEvents;
+import org.kie.workbench.common.stunner.sw.definition.OnEvent;
 import org.kie.workbench.common.stunner.sw.definition.Start;
 import org.kie.workbench.common.stunner.sw.definition.StartTransition;
 import org.kie.workbench.common.stunner.sw.definition.SwitchState;
@@ -58,7 +58,7 @@ public class ShapeFactory
         put(Workflow.class, new AnyStateShapeDef());
         put(Start.class, new AnyStateShapeDef());
         put(End.class, new AnyStateShapeDef());
-        put(OnEvents.class, new AnyStateShapeDef());
+        put(OnEvent.class, new AnyStateShapeDef());
         put(EventRef.class, new AnyStateShapeDef());
         put(CallFunctionAction.class, new AnyStateShapeDef());
         put(CallSubflowAction.class, new AnyStateShapeDef());

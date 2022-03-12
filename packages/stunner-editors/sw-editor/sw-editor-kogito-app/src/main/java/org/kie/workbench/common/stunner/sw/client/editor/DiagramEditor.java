@@ -15,27 +15,38 @@
  */
 package org.kie.workbench.common.stunner.sw.client.editor;
 
+import java.util.Collection;
+
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
 import com.ait.lienzo.client.core.types.JsCanvas;
 import com.ait.lienzo.client.widget.panel.LienzoBoundsPanel;
 import com.google.gwt.user.client.ui.IsWidget;
+import elemental2.core.Global;
+import elemental2.dom.DomGlobal;
 import elemental2.promise.Promise;
 import org.kie.workbench.common.stunner.client.lienzo.canvas.LienzoCanvas;
 import org.kie.workbench.common.stunner.client.lienzo.canvas.LienzoPanel;
 import org.kie.workbench.common.stunner.client.widgets.editor.StunnerEditor;
 import org.kie.workbench.common.stunner.client.widgets.presenters.session.SessionPresenter;
+import org.kie.workbench.common.stunner.core.client.api.SessionManager;
 import org.kie.workbench.common.stunner.core.client.service.ClientRuntimeError;
 import org.kie.workbench.common.stunner.core.client.service.ServiceCallback;
+import org.kie.workbench.common.stunner.core.client.session.impl.EditorSession;
 import org.kie.workbench.common.stunner.core.client.util.WindowJSType;
 import org.kie.workbench.common.stunner.core.diagram.Diagram;
 import org.kie.workbench.common.stunner.core.diagram.Metadata;
+import org.kie.workbench.common.stunner.core.graph.Element;
+import org.kie.workbench.common.stunner.core.graph.Node;
+import org.kie.workbench.common.stunner.core.graph.content.view.View;
 import org.kie.workbench.common.stunner.sw.client.js.JsDiagramEditor;
 import org.kie.workbench.common.stunner.sw.client.js.JsWindow;
 import org.kie.workbench.common.stunner.sw.client.jsonpatch.PatchHandler;
 import org.kie.workbench.common.stunner.sw.client.services.ClientDiagramService;
+import org.kie.workbench.common.stunner.sw.definition.State;
 import org.kie.workbench.common.stunner.sw.service.Marshaller;
+import org.kie.workbench.common.stunner.sw.service.marshaller.NativeMarshaller;
 import org.uberfire.backend.vfs.Path;
 import org.uberfire.backend.vfs.PathFactory;
 import org.uberfire.client.promise.Promises;
@@ -82,19 +93,69 @@ public class DiagramEditor {
         return stunnerEditor.getView();
     }
 
-    public Promise<String> getContent() {
-        return promises.resolve("{}");
-    }
-
     @Inject
     private Marshaller j2clMarshaller;
+    @Inject
+    private SessionManager sessionManager;
+
+    private Node getSelectedNode() {
+        EditorSession session = sessionManager.getCurrentSession();
+        Collection<String> selectedItems = session.getSelectionControl().getSelectedItems();
+        if (!selectedItems.isEmpty()) {
+            String selectedUUID = selectedItems.iterator().next();
+            Element selectedElement = session.getCanvasHandler().getGraphIndex().getNode(selectedUUID);
+            return (Node) selectedElement;
+        }
+        return null;
+    }
+
+    private Object getBean(Node selectedNode) {
+        if (null != selectedNode) {
+            Object definition = ((View) selectedNode.getContent()).getDefinition();
+            return definition;
+        }
+        return null;
+    }
+
+    private void stringifySelectedNode() {
+        Node node = getSelectedNode();
+        if (null != node) {
+            State stateRaw = j2clMarshaller.marshall(node);
+            String raw = Marshaller.stringify(stateRaw);
+            // Object bean = getBean(node);
+            // String raw = Marshaller.stringify(bean);
+            DomGlobal.console.log(raw);
+        }
+    }
+
+    private void logSelectedNode() {
+        Node node = getSelectedNode();
+        if (null != node) {
+            DomGlobal.console.log(node.getUUID());
+        }
+    }
+
+    private void logGetContent() {
+        Promise<String> marshallResult = diagramService.transform(stunnerEditor.getDiagram());
+        marshallResult.then(raw -> {
+            DomGlobal.console.log(NativeMarshaller.parse(raw));
+            return null;
+        });
+    }
 
     public Promise<String> getPreview() {
+        // stringifySelectedNode();
+        // logSelectedNode();
+        logGetContent();
         return promises.resolve("");
     }
 
     public Promise validate() {
         return Promise.resolve(new Notification[0]);
+    }
+
+    public Promise<String> getContent() {
+        return diagramService.transform(stunnerEditor.getDiagram());
     }
 
     public Promise<Void> setContent(final String path, final String value) {

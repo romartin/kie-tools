@@ -38,9 +38,11 @@ public class Start implements BaseNode {
     public static final double BB_HEIGHT = 56d;
 
     @Category
+    @JsIgnore
     public static final transient String category = Categories.START;
 
     @Labels
+    @JsIgnore
     private final Set<String> labels = new Sets.Builder<String>()
             .add(Workflow.LABEL_ROOT_NODE)
             .add(LABEL_START)

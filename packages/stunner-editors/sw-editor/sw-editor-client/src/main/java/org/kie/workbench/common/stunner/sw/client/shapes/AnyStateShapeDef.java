@@ -40,7 +40,7 @@ import org.kie.workbench.common.stunner.sw.definition.End;
 import org.kie.workbench.common.stunner.sw.definition.EventRef;
 import org.kie.workbench.common.stunner.sw.definition.EventState;
 import org.kie.workbench.common.stunner.sw.definition.InjectState;
-import org.kie.workbench.common.stunner.sw.definition.OnEvents;
+import org.kie.workbench.common.stunner.sw.definition.OnEvent;
 import org.kie.workbench.common.stunner.sw.definition.Start;
 import org.kie.workbench.common.stunner.sw.definition.SwitchState;
 import org.kie.workbench.common.stunner.sw.definition.Workflow;
@@ -58,7 +58,7 @@ public class AnyStateShapeDef<W> implements ShapeViewDef<W, SVGShapeView>,
                     .put(Workflow.class, ShapeViewFactory::container)
                     .put(Start.class, ShapeViewFactory::startState)
                     .put(End.class, ShapeViewFactory::endState)
-                    .put(OnEvents.class, ShapeViewFactory::container)
+                    .put(OnEvent.class, ShapeViewFactory::container)
                     .put(EventRef.class, ShapeViewFactory::event)
                     .put(CallFunctionAction.class, ShapeViewFactory::action)
                     .put(CallSubflowAction.class, ShapeViewFactory::action);
@@ -73,7 +73,7 @@ public class AnyStateShapeDef<W> implements ShapeViewDef<W, SVGShapeView>,
                     .put(Workflow.class, GlyphFactory.TRANSITION)
                     .put(Start.class, GlyphFactory.START)
                     .put(End.class, GlyphFactory.END)
-                    .put(OnEvents.class, GlyphFactory.EVENTS)
+                    .put(OnEvent.class, GlyphFactory.EVENTS)
                     .put(EventRef.class, GlyphFactory.EVENT)
                     .put(CallFunctionAction.class, GlyphFactory.CALL_FUNCTION)
                     .put(CallSubflowAction.class, GlyphFactory.CALL_SUBFLOW)

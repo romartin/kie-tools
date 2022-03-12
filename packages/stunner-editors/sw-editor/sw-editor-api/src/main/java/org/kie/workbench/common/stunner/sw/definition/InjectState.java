@@ -16,6 +16,7 @@
 
 package org.kie.workbench.common.stunner.sw.definition;
 
+import jsinterop.annotations.JsIgnore;
 import jsinterop.annotations.JsType;
 import org.jboss.errai.databinding.client.api.Bindable;
 import org.kie.workbench.common.stunner.core.definition.annotation.Definition;
@@ -28,8 +29,15 @@ import org.kie.workbench.common.stunner.core.definition.annotation.morph.Morph;
 @JsType
 public class InjectState extends State {
 
+    @JsIgnore
+    public static final String TYPE_INJECT = "inject";
+
     @Property
     public String data;
+
+    public InjectState() {
+        this.type = TYPE_INJECT;
+    }
 
     public String getData() {
         return data;
