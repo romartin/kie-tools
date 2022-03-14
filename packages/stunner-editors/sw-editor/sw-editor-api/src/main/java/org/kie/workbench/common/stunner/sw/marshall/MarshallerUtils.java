@@ -14,25 +14,41 @@
  * limitations under the License.
  */
 
-package org.kie.workbench.common.stunner.sw.service.parser;
-
-import javax.enterprise.context.ApplicationScoped;
-import javax.inject.Inject;
+package org.kie.workbench.common.stunner.sw.marshall;
 
 import jsinterop.base.Js;
 import jsinterop.base.JsPropertyMap;
 import org.kie.workbench.common.stunner.core.api.DefinitionManager;
 import org.kie.workbench.common.stunner.core.api.FactoryManager;
+import org.kie.workbench.common.stunner.core.graph.Element;
+import org.kie.workbench.common.stunner.core.graph.Node;
+import org.kie.workbench.common.stunner.core.graph.content.definition.Definition;
+import org.kie.workbench.common.stunner.core.graph.content.view.View;
+import org.kie.workbench.common.stunner.sw.definition.State;
 
-@ApplicationScoped
-public class ParserUtils {
+public class MarshallerUtils {
 
-    @Inject
-    private DefinitionManager definitionManager;
-    @Inject
-    private FactoryManager factoryManager;
+    @SuppressWarnings("all")
+    public static String getStateNodeName(Node node) {
+        if (null != node) {
+            Object definition = ((View) node.getContent()).getDefinition();
+            if (definition instanceof State) {
+                String name = ((State) definition).getName();
+                return name;
+            }
+        }
+        return null;
+    }
 
-    public <T> T parse(Class<? extends T> type, T jso) {
+    public static <T> T getElementDefinition(Element node) {
+        return null != node ? (T) ((Definition) node.getContent()).getDefinition() : null;
+    }
+
+    public static boolean isValidString(String s) {
+        return null != s && s.trim().length() > 0;
+    }
+
+    public static <T> T parse(FactoryManager factoryManager, Class<? extends T> type, T jso) {
         T instance = factoryManager.newDefinition(type.getName());
         // TODO: Check stunner vs native approach here...
         //instance = stunnerMerge(instance, jso);
@@ -40,7 +56,7 @@ public class ParserUtils {
         return (T) instance;
     }
 
-    private <T> T stunnerMerge(Object instance, Object jso) {
+    private static <T> T stunnerMerge(DefinitionManager definitionManager, Object instance, Object jso) {
         JsPropertyMap<Object> instanceMap = Js.asPropertyMap(instance);
         JsPropertyMap<Object> jsoMap = Js.asPropertyMap(jso);
         String[] propertyFields = definitionManager.adapters().forDefinition().getPropertyFields(instance);

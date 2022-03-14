@@ -42,8 +42,8 @@ import org.kie.workbench.common.stunner.core.rule.RuleViolation;
 import org.kie.workbench.common.stunner.sw.definition.StartTransition;
 import org.kie.workbench.common.stunner.sw.definition.State;
 import org.kie.workbench.common.stunner.sw.definition.Workflow;
-import org.kie.workbench.common.stunner.sw.service.Marshaller;
-import org.kie.workbench.common.stunner.sw.service.MarshallerContext;
+import org.kie.workbench.common.stunner.sw.marshall.Context;
+import org.kie.workbench.common.stunner.sw.marshall.Marshaller;
 
 @ApplicationScoped
 public class PatchBuilder {
@@ -114,7 +114,7 @@ public class PatchBuilder {
         if (stateIndex >= 0) {
             Patch patch = PatchFactory.remove("/states/" + stateIndex);
             patches.push(patch);
-            getMarshallerContext().removeStateIndex(candidate.getUUID());
+            // TODO getMarshallerContext().removeStateIndex(candidate.getUUID());
         }
         List<Command<GraphCommandExecutionContext, RuleViolation>> graphCommands = command.getGraphCommands();
         graphCommands.stream()
@@ -138,11 +138,13 @@ public class PatchBuilder {
         if (Marshaller.isStartState(candidate) || Marshaller.isEndState(candidate)) {
             return new Patch[0];
         }
-        int count = getStatesCount();
+        // TODO
+        /*int count = getStatesCount();
         State jsCandidate = marshaller.marshall(candidate);
         Patch patch = PatchFactory.add("/states/" + count, jsCandidate);
         getMarshallerContext().addStateIndex(candidate.getUUID());
-        return new Patch[]{patch};
+        return new Patch[]{patch};*/
+        return new Patch[0];
     }
 
     @SuppressWarnings("all")
@@ -151,9 +153,11 @@ public class PatchBuilder {
         if (stateIndex < 0) {
             return new Patch[0];
         }
-        State jsCandidate = marshaller.marshall(candidate);
+        // TODO
+        /*State jsCandidate = marshaller.marshall(candidate);
         Patch patch = PatchFactory.replace("/states/" + stateIndex, jsCandidate);
-        return new Patch[]{patch};
+        return new Patch[]{patch};*/
+        return new Patch[0];
     }
 
     @SuppressWarnings("all")
@@ -259,14 +263,16 @@ public class PatchBuilder {
 
     @SuppressWarnings("all")
     private int getStateIndex(Node node) {
-        return getMarshallerContext().getStateIndex(node.getUUID());
+        // TODO return getMarshallerContext().getStateIndex(node.getUUID());
+        return 0;
     }
 
     private int getStatesCount() {
-        return getMarshallerContext().getStatesCount();
+        // TODO return getMarshallerContext().getStatesCount();
+        return 0;
     }
 
-    private MarshallerContext getMarshallerContext() {
+    private Context getMarshallerContext() {
         return marshaller.getContext();
     }
 

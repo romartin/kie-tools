@@ -14,12 +14,13 @@
  * limitations under the License.
  */
 
-package org.kie.workbench.common.stunner.sw.service.parser;
+package org.kie.workbench.common.stunner.sw.marshall;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
 import jsinterop.base.Js;
+import org.kie.workbench.common.stunner.core.api.FactoryManager;
 import org.kie.workbench.common.stunner.sw.definition.ActionNode;
 import org.kie.workbench.common.stunner.sw.definition.CallFunctionAction;
 import org.kie.workbench.common.stunner.sw.definition.CallSubflowAction;
@@ -35,13 +36,13 @@ import org.kie.workbench.common.stunner.sw.definition.Workflow;
 //  - Merging this stuff directly into NativeMarshaller?
 //  Otherwise : Merging object via Property Adapters? Auto-generating? Native JS Adapters?
 @ApplicationScoped
-public class WorkflowNativeParser {
+public class Parser {
 
     @Inject
-    private ParserUtils utils;
+    private FactoryManager factoryManager;
 
     public Workflow parse(Workflow jso) {
-        Workflow workflow = utils.parse(Workflow.class, jso);
+        Workflow workflow = parse(Workflow.class, jso);
         State[] states = jso.states;
         workflow.states = new State[states.length];
         for (int i = 0; i < states.length; i++) {
@@ -56,11 +57,11 @@ public class WorkflowNativeParser {
     private State parseState(State jso) {
         State state = null;
         if (InjectState.TYPE_INJECT.equals(jso.type)) {
-            state = utils.parse(InjectState.class, jso);
+            state = parse(InjectState.class, jso);
         } else if (EventState.TYPE_EVENT.equals(jso.type)) {
             state = parseEventState(jso);
         } else if (SwitchState.TYPE_SWITCH.equals(jso.type)) {
-            state = utils.parse(SwitchState.class, jso);
+            state = parse(SwitchState.class, jso);
         }
 
         if (null != state) {
@@ -79,7 +80,7 @@ public class WorkflowNativeParser {
     }
 
     private EventState parseEventState(State jso) {
-        EventState state = (EventState) utils.parse(EventState.class, jso);
+        EventState state = (EventState) parse(EventState.class, jso);
         OnEvent[] onEvents = Js.uncheckedCast(Js.asPropertyMap(jso).get("onEvents"));
         if (null != onEvents) {
             state.onEvents = new OnEvent[onEvents.length];
@@ -93,7 +94,7 @@ public class WorkflowNativeParser {
     }
 
     private OnEvent parseOnEvent(OnEvent jso) {
-        OnEvent onEvent = utils.parse(OnEvent.class, jso);
+        OnEvent onEvent = parse(OnEvent.class, jso);
         ActionNode[] actions = Js.uncheckedCast(Js.asPropertyMap(jso).get("actions"));
         if (null != actions) {
             onEvent.actions = new ActionNode[actions.length];
@@ -109,17 +110,21 @@ public class WorkflowNativeParser {
     private ActionNode parseAction(ActionNode jso) {
         ActionNode action = null;
         if (null != jso.functionRef) {
-            action = utils.parse(CallFunctionAction.class, jso);
+            action = parse(CallFunctionAction.class, jso);
             action.setName(jso.functionRef);
         } else if (null != jso.subFlowRef) {
-            action = utils.parse(CallSubflowAction.class, jso);
+            action = parse(CallSubflowAction.class, jso);
             action.setName(jso.subFlowRef);
         }
         return action;
     }
 
     private ErrorTransition parseErrorTransition(ErrorTransition jso) {
-        ErrorTransition et = utils.parse(ErrorTransition.class, jso);
+        ErrorTransition et = parse(ErrorTransition.class, jso);
         return et;
+    }
+
+    private <T> T parse(Class<? extends T> type, T jso) {
+        return MarshallerUtils.parse(factoryManager, type, jso);
     }
 }

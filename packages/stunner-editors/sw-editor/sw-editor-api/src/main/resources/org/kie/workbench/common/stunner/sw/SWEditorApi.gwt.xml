@@ -25,12 +25,11 @@
   <inherits name="org.kie.soup.commons.KIESoupCommons"/>
   <inherits name="com.google.gwt.resources.Resources" />
 
+  <source path="autolayout"/>
   <source path="command"/>
   <source path="definition"/>
   <source path="factory"/>
-  <source path="service"/>
-  <source path="spec"/>
-  <source path="autolayout"/>
+  <source path="marshall"/>
   <source path="" includes="SWEditor.java"/>
   <source path="" includes="Definitions.java"/>
 

@@ -25,7 +25,7 @@ import org.kie.workbench.common.stunner.core.client.command.CanvasViolation;
 import org.kie.workbench.common.stunner.core.command.Command;
 import org.kie.workbench.common.stunner.sw.client.js.JsWindow;
 import org.kie.workbench.common.stunner.sw.client.services.CommandRegistryListener;
-import org.kie.workbench.common.stunner.sw.service.Marshaller;
+import org.kie.workbench.common.stunner.sw.marshall.Marshaller;
 
 @ApplicationScoped
 public class PatchHandler {
@@ -47,12 +47,6 @@ public class PatchHandler {
     @SuppressWarnings("all")
     private void applyPatchForCommand(AbstractCanvasHandler canvasHandler,
                                       Command<AbstractCanvasHandler, CanvasViolation> command) {
-
-        // TODO
-        if (true) {
-            return;
-        }
-
         Patch[] patches = new Patch[0];
         try {
             patches = builder.build(canvasHandler, command);

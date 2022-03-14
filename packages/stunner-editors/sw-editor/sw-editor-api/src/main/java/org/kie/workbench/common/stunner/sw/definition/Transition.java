@@ -58,6 +58,7 @@ public class Transition {
     @Property(meta = PropertyMetaTypes.NAME)
     public String name;
 
+    @JsIgnore
     public String to;
 
     public Transition() {

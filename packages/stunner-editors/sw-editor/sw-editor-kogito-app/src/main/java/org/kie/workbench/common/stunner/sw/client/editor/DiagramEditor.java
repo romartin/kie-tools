@@ -23,7 +23,6 @@ import javax.inject.Inject;
 import com.ait.lienzo.client.core.types.JsCanvas;
 import com.ait.lienzo.client.widget.panel.LienzoBoundsPanel;
 import com.google.gwt.user.client.ui.IsWidget;
-import elemental2.core.Global;
 import elemental2.dom.DomGlobal;
 import elemental2.promise.Promise;
 import org.kie.workbench.common.stunner.client.lienzo.canvas.LienzoCanvas;
@@ -42,11 +41,9 @@ import org.kie.workbench.common.stunner.core.graph.Node;
 import org.kie.workbench.common.stunner.core.graph.content.view.View;
 import org.kie.workbench.common.stunner.sw.client.js.JsDiagramEditor;
 import org.kie.workbench.common.stunner.sw.client.js.JsWindow;
-import org.kie.workbench.common.stunner.sw.client.jsonpatch.PatchHandler;
 import org.kie.workbench.common.stunner.sw.client.services.ClientDiagramService;
-import org.kie.workbench.common.stunner.sw.definition.State;
-import org.kie.workbench.common.stunner.sw.service.Marshaller;
-import org.kie.workbench.common.stunner.sw.service.marshaller.NativeMarshaller;
+import org.kie.workbench.common.stunner.sw.client.services.IncrementalMarshaller;
+import org.kie.workbench.common.stunner.sw.marshall.Marshaller;
 import org.uberfire.backend.vfs.Path;
 import org.uberfire.backend.vfs.PathFactory;
 import org.uberfire.client.promise.Promises;
@@ -61,17 +58,17 @@ public class DiagramEditor {
     private final Promises promises;
     private final StunnerEditor stunnerEditor;
     private final ClientDiagramService diagramService;
-    private final PatchHandler patchHandler;
+    private final IncrementalMarshaller incrementalMarshaller;
 
     @Inject
     public DiagramEditor(Promises promises,
                          StunnerEditor stunnerEditor,
                          ClientDiagramService diagramService,
-                         PatchHandler patchHandler) {
+                         IncrementalMarshaller incrementalMarshaller) {
         this.promises = promises;
         this.stunnerEditor = stunnerEditor;
         this.diagramService = diagramService;
-        this.patchHandler = patchHandler;
+        this.incrementalMarshaller = incrementalMarshaller;
     }
 
     public void onStartup(final PlaceRequest place) {
@@ -94,8 +91,6 @@ public class DiagramEditor {
     }
 
     @Inject
-    private Marshaller j2clMarshaller;
-    @Inject
     private SessionManager sessionManager;
 
     private Node getSelectedNode() {
@@ -117,17 +112,6 @@ public class DiagramEditor {
         return null;
     }
 
-    private void stringifySelectedNode() {
-        Node node = getSelectedNode();
-        if (null != node) {
-            State stateRaw = j2clMarshaller.marshall(node);
-            String raw = Marshaller.stringify(stateRaw);
-            // Object bean = getBean(node);
-            // String raw = Marshaller.stringify(bean);
-            DomGlobal.console.log(raw);
-        }
-    }
-
     private void logSelectedNode() {
         Node node = getSelectedNode();
         if (null != node) {
@@ -138,13 +122,13 @@ public class DiagramEditor {
     private void logGetContent() {
         Promise<String> marshallResult = diagramService.transform(stunnerEditor.getDiagram());
         marshallResult.then(raw -> {
-            DomGlobal.console.log(NativeMarshaller.parse(raw));
+            DomGlobal.console.log(raw);
+            DomGlobal.console.log(Marshaller.parse(raw));
             return null;
         });
     }
 
     public Promise<String> getPreview() {
-        // stringifySelectedNode();
         // logSelectedNode();
         logGetContent();
         return promises.resolve("");
@@ -198,7 +182,7 @@ public class DiagramEditor {
         String title = metadata.getTitle();
         Path path = PathFactory.newPath(title, "/" + title + ".sw");
         metadata.setPath(path);
-        patchHandler.run();
+        incrementalMarshaller.run(diagramService.getMarshaller());
         initJsTypes();
     }
 

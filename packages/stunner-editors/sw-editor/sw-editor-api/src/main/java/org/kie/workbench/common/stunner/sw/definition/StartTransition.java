@@ -50,6 +50,7 @@ public class StartTransition {
             .add(LABEL_TRANSITION_START)
             .build();
 
+    @JsIgnore
     public String transition;
 
     public StartTransition() {
