@@ -20,28 +20,27 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
 import elemental2.core.Global;
+import elemental2.promise.IThenable;
 import elemental2.promise.Promise;
 import jsinterop.base.Js;
 import org.kie.workbench.common.stunner.core.api.DefinitionManager;
 import org.kie.workbench.common.stunner.core.api.FactoryManager;
-import org.kie.workbench.common.stunner.core.command.impl.CompositeCommand;
 import org.kie.workbench.common.stunner.core.graph.Edge;
 import org.kie.workbench.common.stunner.core.graph.Graph;
 import org.kie.workbench.common.stunner.core.graph.Node;
 import org.kie.workbench.common.stunner.core.graph.command.DirectGraphCommandExecutionContext;
-import org.kie.workbench.common.stunner.core.graph.command.GraphCommandExecutionContext;
 import org.kie.workbench.common.stunner.core.graph.content.definition.Definition;
 import org.kie.workbench.common.stunner.core.graph.content.view.View;
 import org.kie.workbench.common.stunner.core.graph.content.view.ViewConnector;
 import org.kie.workbench.common.stunner.core.graph.impl.GraphImpl;
 import org.kie.workbench.common.stunner.core.graph.processing.index.Index;
 import org.kie.workbench.common.stunner.core.graph.processing.index.map.MapIndexBuilder;
-import org.kie.workbench.common.stunner.core.rule.RuleViolation;
-import org.kie.workbench.common.stunner.sw.autolayout.AutoLayout;
+import org.kie.workbench.common.stunner.sw.autolayout.NodeLayoutTemp;
 import org.kie.workbench.common.stunner.sw.definition.End;
 import org.kie.workbench.common.stunner.sw.definition.ErrorTransition;
 import org.kie.workbench.common.stunner.sw.definition.EventState;
 import org.kie.workbench.common.stunner.sw.definition.InjectState;
+import org.kie.workbench.common.stunner.sw.definition.OnEvent;
 import org.kie.workbench.common.stunner.sw.definition.Start;
 import org.kie.workbench.common.stunner.sw.definition.StartTransition;
 import org.kie.workbench.common.stunner.sw.definition.SwitchState;
@@ -51,6 +50,7 @@ import org.uberfire.client.promise.Promises;
 
 import static org.kie.workbench.common.stunner.sw.marshall.StateMarshalling.EVENT_STATE_MARSHALLER;
 import static org.kie.workbench.common.stunner.sw.marshall.StateMarshalling.EVENT_STATE_UNMARSHALLER;
+import static org.kie.workbench.common.stunner.sw.marshall.StateMarshalling.ONEVENTS_UNMARSHALLER;
 import static org.kie.workbench.common.stunner.sw.marshall.StateMarshalling.STATE_MARSHALLER;
 import static org.kie.workbench.common.stunner.sw.marshall.StateMarshalling.STATE_UNMARSHALLER;
 import static org.kie.workbench.common.stunner.sw.marshall.TransitionMarshalling.ERROR_TRANSITION_MARSHALLER;
@@ -66,6 +66,7 @@ import static org.kie.workbench.common.stunner.sw.marshall.WorkflowMarshalling.W
 @ApplicationScoped
 public class Marshaller {
 
+    public static final boolean LOAD_DETAILS = false;
     public static final String WORKFLOW_UUID = "workflowRoot";
     public static final String STATE_START = "startState";
     public static final String STATE_END = "endState";
@@ -83,38 +84,40 @@ public class Marshaller {
     private Context context;
 
     @SuppressWarnings("all")
-    public Promise<Graph> unmarshall(String raw) {
+    public Promise<Graph> unmarshallGraph(String raw) {
         final Object root = parse(raw);
         final Workflow workflow = parser.parse(Js.uncheckedCast(root));
 
         // TODO: Use dedicated factory instead.
         final GraphImpl<Object> graph = GraphImpl.build(workflow.id);
-        context = new Context(graph);
-        final BuilderContext builderContext = new BuilderContext(context, factoryManager);
+        final Index index = new MapIndexBuilder().build(graph);
+        context = new Context(index);
+        final BuilderContext builderContext = new BuilderContext(context, definitionManager, factoryManager);
 
         // Workflow root node.
         unmarshallNode(builderContext, workflow);
-
-        // Graph building.
-        final Index index = new MapIndexBuilder().build(graph);
-        final DirectGraphCommandExecutionContext executionContext =
-                new DirectGraphCommandExecutionContext(definitionManager,
-                                                       factoryManager,
-                                                       index);
-        final CompositeCommand<GraphCommandExecutionContext, RuleViolation> commands = builderContext.commands();
-        commands.execute(executionContext);
+        final DirectGraphCommandExecutionContext executionContext = builderContext.execute();
 
         // Perform automatic layout.
-        return AutoLayout.applyLayout(graph, promises, executionContext, context.getWorkflowRootNode().getUUID());
+        final Promise<Node> layout = NodeLayoutTemp.applyLayout(graph, context.getWorkflowRootNode(), promises, executionContext);
+        return promises.create(new Promise.PromiseExecutorCallbackFn<Graph>() {
+            @Override
+            public void onInvoke(ResolveCallbackFn<Graph> success, RejectCallbackFn reject) {
+                layout.then(new IThenable.ThenOnFulfilledCallbackFn<Node, Object>() {
+                    @Override
+                    public IThenable<Object> onInvoke(Node node) {
+                        success.onInvoke(graph);
+                        return null;
+                    }
+                });
+            }
+        });
     }
 
     @SuppressWarnings("all")
-    public Promise<String> marshall(Graph graph) {
+    public Promise<String> marshallGraph(Graph graph) {
         // Marshall from the workflow root node.
-        Workflow workflow = marshallNode(context, context.getWorkflowRootNode());
-        // Stringify the workflow js type.
-        String raw = stringify(workflow);
-        return promises.resolve(raw);
+        return marshallNode(context.getWorkflowRootNode());
     }
 
     public Context getContext() {
@@ -141,6 +144,14 @@ public class Marshaller {
     }
 
     /* +++++++++++++++++ UN-MARSHALLING +++++++++++++++++ */
+
+    @SuppressWarnings("all")
+    public Promise<Node> unmarshallNode(Object bean) {
+        final BuilderContext builderContext = new BuilderContext(context, definitionManager, factoryManager);
+        Node node = unmarshallNode(builderContext, bean);
+        DirectGraphCommandExecutionContext executionContext = builderContext.execute();
+        return NodeLayoutTemp.applyLayout(context.getGraph(), node, promises, executionContext);
+    }
 
     @FunctionalInterface
     public interface NodeUnmarshaller<T> {
@@ -173,6 +184,8 @@ public class Marshaller {
             return (NodeUnmarshaller<T>) STATE_UNMARSHALLER;
         } else if (SwitchState.class.equals(type)) {
             return (NodeUnmarshaller<T>) STATE_UNMARSHALLER;
+        } else if (OnEvent[].class.equals(type)) {
+            return (NodeUnmarshaller<T>) ONEVENTS_UNMARSHALLER;
         }
         throw new UnsupportedOperationException("No NodeUnmarshaller found for " + type.getName());
     }
@@ -194,6 +207,13 @@ public class Marshaller {
 
 
     /* +++++++++++++++++ MARSHALLING +++++++++++++++++ */
+
+    @SuppressWarnings("all")
+    public Promise<String> marshallNode(Node node) {
+        Object bean = marshallNode(context, node);
+        String raw = stringify(bean);
+        return promises.resolve(raw);
+    }
 
     @FunctionalInterface
     public interface NodeMarshaller<T> {

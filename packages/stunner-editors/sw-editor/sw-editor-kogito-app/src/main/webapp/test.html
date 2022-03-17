@@ -263,6 +263,10 @@
       };
 
       setText(examples[0]);
+
+      window.frames.editorFrame.contentWindow.onContentChanged = function (raw) {
+        setText(raw);
+      };
     </script>
   </body>
 </html>

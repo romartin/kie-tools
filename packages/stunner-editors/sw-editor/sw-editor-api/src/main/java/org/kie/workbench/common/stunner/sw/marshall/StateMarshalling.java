@@ -98,47 +98,54 @@ public interface StateMarshalling {
                 return state;
             };
 
+    NodeUnmarshaller<OnEvent[]> ONEVENTS_UNMARSHALLER =
+            (context, onEvents) -> {
+                // TODO: Only parsing a SINGLE (FIRST) onEvent def.
+                OnEvent onEvent = onEvents[0];
+                final Node onEventsNode = context.addNode(null, onEvent);
+
+                // Set actual context parent node.
+                Node parent = context.parentNode;
+                context.parentNode = onEventsNode;
+
+                String[] eventRefs = onEvent.getEventRefs();
+                ActionNode[] actions = onEvent.getActions();
+
+                // TODO: Only parsing a SINGLE (FIRST) event definition.
+                // Event Node.
+                String eventRef = eventRefs[0];
+                EventRef event = new EventRef();
+                event.setEventRef(eventRef);
+                event.setName(eventRef);
+                final Node eventNode = context.addNode(null, event);
+
+                // TODO: Only parsing a SINGLE (FIRST) action definition.
+                // Action Node.
+                ActionNode action = actions[0];
+                final Node actionNode = context.addNode(null, action);
+
+                // Transition to Actions Node.
+                final ActionTransition at = new ActionTransition();
+                // at.setName("Call " + action.getName());
+                Edge actionsEdge = context.addEdgeToTargetUUID(at, eventNode, actionNode.getUUID());
+
+                // Set the original parent.
+                context.parentNode = parent;
+
+                return onEventsNode;
+            };
+
     NodeUnmarshaller<EventState> EVENT_STATE_UNMARSHALLER =
             (context, state) -> {
                 Node stateNode = STATE_UNMARSHALLER.unmarshall(context, state);
-                OnEvent[] onEvents = state.getOnEvents();
-                if (null != onEvents && onEvents.length > 0) {
-                    // TODO: Only parsing a SINGLE (FIRST) onEvent def.
-                    OnEvent onEvent = onEvents[0];
-                    final Node onEventsNode = context.addNode(null, onEvent);
-
-                    // Set actual context parent node.
-                    Node parent = context.parentNode;
-                    context.parentNode = onEventsNode;
-
-                    // Transition to OnEvents Node.
-                    final EventTransition onEventsTransition = new EventTransition();
-                    // onEventsTransition.setName("OnEvents");
-                    Edge onEventsEdge = context.addEdgeToTargetUUID(onEventsTransition, stateNode, onEventsNode.getUUID());
-
-                    String[] eventRefs = onEvent.getEventRefs();
-                    ActionNode[] actions = onEvent.getActions();
-
-                    // TODO: Only parsing a SINGLE (FIRST) event definition.
-                    // Event Node.
-                    String eventRef = eventRefs[0];
-                    EventRef event = new EventRef();
-                    event.setEventRef(eventRef);
-                    event.setName(eventRef);
-                    final Node eventNode = context.addNode(null, event);
-
-                    // TODO: Only parsing a SINGLE (FIRST) action definition.
-                    // Action Node.
-                    ActionNode action = actions[0];
-                    final Node actionNode = context.addNode(null, action);
-
-                    // Transition to Actions Node.
-                    final ActionTransition at = new ActionTransition();
-                    // at.setName("Call " + action.getName());
-                    Edge actionsEdge = context.addEdgeToTargetUUID(at, eventNode, actionNode.getUUID());
-
-                    // Set the original parent.
-                    context.parentNode = parent;
+                if (Marshaller.LOAD_DETAILS) {
+                    OnEvent[] onEvents = state.getOnEvents();
+                    if (null != onEvents && onEvents.length > 0) {
+                        Node onEventsNode = ONEVENTS_UNMARSHALLER.unmarshall(context, onEvents);
+                        final EventTransition onEventsTransition = new EventTransition();
+                        // onEventsTransition.setName("OnEvents");
+                        Edge onEventsEdge = context.addEdgeToTargetUUID(onEventsTransition, stateNode, onEventsNode.getUUID());
+                    }
                 }
                 return stateNode;
             };

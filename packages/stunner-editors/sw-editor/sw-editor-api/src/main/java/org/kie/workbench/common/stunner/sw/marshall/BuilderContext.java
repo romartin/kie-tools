@@ -16,6 +16,7 @@
 
 package org.kie.workbench.common.stunner.sw.marshall;
 
+import org.kie.workbench.common.stunner.core.api.DefinitionManager;
 import org.kie.workbench.common.stunner.core.api.FactoryManager;
 import org.kie.workbench.common.stunner.core.command.CommandResult;
 import org.kie.workbench.common.stunner.core.command.impl.CompositeCommand;
@@ -23,6 +24,7 @@ import org.kie.workbench.common.stunner.core.factory.graph.EdgeFactory;
 import org.kie.workbench.common.stunner.core.factory.graph.NodeFactory;
 import org.kie.workbench.common.stunner.core.graph.Edge;
 import org.kie.workbench.common.stunner.core.graph.Node;
+import org.kie.workbench.common.stunner.core.graph.command.DirectGraphCommandExecutionContext;
 import org.kie.workbench.common.stunner.core.graph.command.GraphCommandExecutionContext;
 import org.kie.workbench.common.stunner.core.graph.command.impl.AddChildNodeCommand;
 import org.kie.workbench.common.stunner.core.graph.command.impl.AddConnectorCommand;
@@ -47,6 +49,7 @@ import org.kie.workbench.common.stunner.sw.definition.SwitchState;
 public class BuilderContext {
 
     private final Context context;
+    private final DefinitionManager definitionManager;
     private final FactoryManager factoryManager;
 
     Node parentNode;
@@ -54,8 +57,9 @@ public class BuilderContext {
     private CompositeCommand.Builder storageCommands;
     private CompositeCommand.Builder connectionCommands;
 
-    public BuilderContext(Context context, FactoryManager factoryManager) {
+    public BuilderContext(Context context, DefinitionManager definitionManager, FactoryManager factoryManager) {
         this.context = context;
+        this.definitionManager = definitionManager;
         this.factoryManager = factoryManager;
         this.parentNode = null;
         this.sourceNode = null;
@@ -129,11 +133,22 @@ public class BuilderContext {
         return tEdge;
     }
 
-    public CompositeCommand<GraphCommandExecutionContext, RuleViolation> commands() {
-        return new CompositeCommand.Builder<>()
-                .addCommand(storageCommands.build())
-                .addCommand(connectionCommands.build())
-                .build();
+    @SuppressWarnings("all")
+    public DirectGraphCommandExecutionContext execute() {
+        DirectGraphCommandExecutionContext executionContext =
+                new DirectGraphCommandExecutionContext(definitionManager,
+                                                       factoryManager,
+                                                       context.graphIndex);
+        CompositeCommand<GraphCommandExecutionContext, RuleViolation> commands =
+                new CompositeCommand.Builder<>()
+                        .addCommand(storageCommands.build())
+                        .addCommand(connectionCommands.build())
+                        .build();
+
+        // TODO: Handle errors? if any (no rules execution context)?
+        commands.execute(executionContext);
+
+        return executionContext;
     }
 
     Context getContext() {
@@ -146,7 +161,6 @@ public class BuilderContext {
         final double[] beanSize = getBeanSize(node.getContent().getDefinition());
         bounds.setLowerRight(new Bound(upperLeft.getX() + beanSize[0], upperLeft.getY() + beanSize[1]));
     }
-
 
     // TODO: Those size are just being "hardcoded" and matching actual svg declarations, for now.
     private static double[] getBeanSize(Object bean) {
@@ -163,6 +177,8 @@ public class BuilderContext {
             return new double[]{154d, 102d};
         } else if (SwitchState.class.equals(type)) {
             return new double[]{154d, 102d};
+        } else if (OnEvent[].class.equals(type)) {
+            return new double[]{450d, 150d};
         } else if (OnEvent.class.equals(type)) {
             return new double[]{56d, 56d};
         } else if (CallFunctionAction.class.equals(type)) {
@@ -172,5 +188,4 @@ public class BuilderContext {
         }
         return new double[]{0d, 0d};
     }
-
 }
