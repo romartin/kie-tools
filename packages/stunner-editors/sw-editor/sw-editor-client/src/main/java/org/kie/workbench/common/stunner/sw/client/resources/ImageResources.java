@@ -71,4 +71,7 @@ public interface ImageResources extends ClientBundleWithLookup {
 
     @Source("images/icons/transition-action.png")
     ImageResource transitionAction();
+
+    @Source("images/icons/transition.png")
+    ImageResource transitionCompensation();
 }

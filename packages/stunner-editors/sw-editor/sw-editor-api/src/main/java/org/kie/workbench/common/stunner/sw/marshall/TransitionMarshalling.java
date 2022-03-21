@@ -18,6 +18,7 @@ package org.kie.workbench.common.stunner.sw.marshall;
 
 import org.kie.workbench.common.stunner.core.graph.Edge;
 import org.kie.workbench.common.stunner.core.graph.Node;
+import org.kie.workbench.common.stunner.sw.definition.CompensationTransition;
 import org.kie.workbench.common.stunner.sw.definition.End;
 import org.kie.workbench.common.stunner.sw.definition.ErrorTransition;
 import org.kie.workbench.common.stunner.sw.definition.StartTransition;
@@ -65,6 +66,14 @@ public interface TransitionMarshalling {
                 return edge;
             };
 
+    EdgeUnmarshaller<CompensationTransition> COMPENSATION_TRANSITION_UNMARSHALLER =
+            (context, transition) -> {
+                transition.setName("Compensated By");
+                String to = transition.getTransition();
+                Edge edge = context.addEdgeToTargetName(transition, context.sourceNode, to);
+                return edge;
+            };
+
     EdgeMarshaller<Transition> TRANSITION_MARSHALLER =
             (context, edge) -> {
                 Node sourceNode = edge.getSourceNode();
@@ -83,6 +92,21 @@ public interface TransitionMarshalling {
                     }
                 }
                 // TODO: Update Transition.to ?
+                return edge;
+            };
+
+    EdgeMarshaller<CompensationTransition> COMPENSATION_TRANSITION_MARSHALLER =
+            (context, edge) -> {
+                Node sourceNode = edge.getSourceNode();
+                if (null != sourceNode) {
+                    Node targetNode = edge.getTargetNode();
+                    if (null != targetNode) {
+                        State sourceState = getElementDefinition(sourceNode);
+                        sourceState.transition = getStateNodeName(targetNode);
+                    }
+                }
+                // TODO: Update CompensationTransition.name ?
+                // TODO: Update CompensationTransition.transition ?
                 return edge;
             };
 

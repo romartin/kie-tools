@@ -27,6 +27,7 @@ import org.kie.workbench.common.stunner.core.rule.annotation.Occurrences;
 import org.kie.workbench.common.stunner.sw.definition.ActionTransition;
 import org.kie.workbench.common.stunner.sw.definition.CallFunctionAction;
 import org.kie.workbench.common.stunner.sw.definition.CallSubflowAction;
+import org.kie.workbench.common.stunner.sw.definition.CompensationTransition;
 import org.kie.workbench.common.stunner.sw.definition.End;
 import org.kie.workbench.common.stunner.sw.definition.ErrorTransition;
 import org.kie.workbench.common.stunner.sw.definition.EventRef;
@@ -62,6 +63,7 @@ import org.kie.workbench.common.stunner.sw.definition.Workflow;
                 ErrorTransition.class,
                 EventTransition.class,
                 ActionTransition.class,
+                CompensationTransition.class,
                 Transition.class
         },
         builder = Definitions.DefinitionsBuilder.class

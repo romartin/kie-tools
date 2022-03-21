@@ -55,6 +55,7 @@ import org.uberfire.client.promise.Promises;
 //  - Ability to specify the level of parent nodes to apply auto-layout
 //      - eg: support for collapse/expand child nodes (not necessary to apply layout when collapsed)
 //      - eg: once changing some node during authoring only apply layout for actual node's parent.
+//  - When node has several output edges - order by type? eg: [LEFT] compensation/s default transition error/s [RIGHT] ?
 public class NodeLayoutTemp {
 
     @SuppressWarnings("all")

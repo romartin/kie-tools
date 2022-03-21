@@ -22,8 +22,10 @@ import java.util.List;
 import org.kie.workbench.common.stunner.core.graph.Edge;
 import org.kie.workbench.common.stunner.core.graph.Node;
 import org.kie.workbench.common.stunner.core.graph.content.relationship.Dock;
+import org.kie.workbench.common.stunner.core.graph.content.view.ViewConnector;
 import org.kie.workbench.common.stunner.sw.definition.ActionNode;
 import org.kie.workbench.common.stunner.sw.definition.ActionTransition;
+import org.kie.workbench.common.stunner.sw.definition.CompensationTransition;
 import org.kie.workbench.common.stunner.sw.definition.ErrorTransition;
 import org.kie.workbench.common.stunner.sw.definition.EventRef;
 import org.kie.workbench.common.stunner.sw.definition.EventState;
@@ -85,6 +87,13 @@ public interface StateMarshalling {
                     context.dock(stateNode, eventTimeoutNode);
                 }
 
+                // Parse compensation transition.
+                if (isValidString(state.compensatedBy)) {
+                    CompensationTransition compensationTransition = new CompensationTransition();
+                    compensationTransition.setTransition(state.compensatedBy);
+                    Edge<ViewConnector<Object>, Node> compensationEdge = unmarshallEdge(context, compensationTransition);
+                }
+
                 context.sourceNode = null;
 
                 return stateNode;
@@ -93,14 +102,25 @@ public interface StateMarshalling {
     NodeMarshaller<State> STATE_MARSHALLER =
             (context, stateNode) -> {
                 State state = stateNode.getContent().getDefinition();
-                state.setEnd(false);
-                state.setTransition(null);
+
+                // TODO: Clear states here or on each marshaller?
+                state.transition = null;
+                state.end = false;
+                state.compensatedBy = null;
+                state.eventTimeout = null;
+
+                // Iterate and marshaller edges.
                 List<ErrorTransition> errors = new ArrayList<>();
                 List<Edge> outEdges = stateNode.getOutEdges();
                 for (Edge edge : outEdges) {
                     if (edge.getContent() instanceof Dock) {
                         Node timeoutNode = edge.getTargetNode();
-                        // TODO: Parse Timeout subtype.
+                        if (null != timeoutNode) {
+                            Object def = getElementDefinition(timeoutNode);
+                            if (def instanceof EventTimeout) {
+                                state.eventTimeout = ((EventTimeout) def).getEventTimeout();
+                            }
+                        }
                     } else {
                         Object def = getElementDefinition(edge);
                         if (def instanceof ErrorTransition) {

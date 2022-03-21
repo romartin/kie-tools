@@ -26,63 +26,52 @@ import org.kie.workbench.common.stunner.core.definition.annotation.Definition;
 import org.kie.workbench.common.stunner.core.definition.annotation.Property;
 import org.kie.workbench.common.stunner.core.definition.annotation.definition.Category;
 import org.kie.workbench.common.stunner.core.definition.annotation.definition.Labels;
-import org.kie.workbench.common.stunner.core.definition.annotation.morph.MorphBase;
 import org.kie.workbench.common.stunner.core.definition.property.PropertyMetaTypes;
-import org.kie.workbench.common.stunner.core.rule.annotation.CanDock;
+import org.kie.workbench.common.stunner.core.factory.graph.EdgeFactory;
+import org.kie.workbench.common.stunner.core.rule.annotation.CanConnect;
+import org.kie.workbench.common.stunner.core.rule.annotation.EdgeOccurrences;
 
 @Bindable
-@Definition
-@CanDock(roles = {Timeout.LABEL_TIMEOUT})
-@MorphBase(defaultType = InjectState.class)
+@Definition(graphFactory = EdgeFactory.class)
+@CanConnect(startRole = State.LABEL_STATE, endRole = State.LABEL_STATE)
+@EdgeOccurrences(role = State.LABEL_STATE, type = EdgeOccurrences.EdgeType.INCOMING, max = -1)
+@EdgeOccurrences(role = State.LABEL_STATE, type = EdgeOccurrences.EdgeType.OUTGOING, max = 1)
+@EdgeOccurrences(role = Start.LABEL_START, type = EdgeOccurrences.EdgeType.INCOMING, max = 0)
+@EdgeOccurrences(role = Start.LABEL_START, type = EdgeOccurrences.EdgeType.OUTGOING, max = 0)
+@EdgeOccurrences(role = End.LABEL_END, type = EdgeOccurrences.EdgeType.OUTGOING, max = 0)
+@EdgeOccurrences(role = End.LABEL_END, type = EdgeOccurrences.EdgeType.INCOMING, max = 0)
 @JsType
-public class State {
+public class CompensationTransition {
 
-    public static final String LABEL_STATE = "state";
+    public static final String LABEL_TRANSITION_COMPENSATION = "transition_compensation";
 
     @Category
     @JsIgnore
-    public static final transient String category = Categories.STATES;
+    public static final transient String category = Categories.TRANSITIONS;
 
     @Labels
     @JsIgnore
     private final Set<String> labels = new Sets.Builder<String>()
-            .add(Workflow.LABEL_ROOT_NODE)
-            .add(LABEL_STATE)
+            .add(Transition.LABEL_TRANSITION)
+            .add(LABEL_TRANSITION_COMPENSATION)
             .build();
 
     @Property(meta = PropertyMetaTypes.NAME)
+    @JsIgnore
     public String name;
 
-    public String type;
-
+    @JsIgnore
     public String transition;
 
-    public boolean end;
-
-    public ErrorTransition[] onErrors;
-
-    public String eventTimeout;
-
-    public String compensatedBy;
-
-    public State() {
-        this.name = "State";
-    }
-
-    public void setName(String name) {
-        this.name = name;
+    public CompensationTransition() {
     }
 
     public String getName() {
         return name;
     }
 
-    public String getType() {
-        return type;
-    }
-
-    public void setType(String type) {
-        this.type = type;
+    public void setName(String name) {
+        this.name = name;
     }
 
     public String getTransition() {
@@ -91,38 +80,6 @@ public class State {
 
     public void setTransition(String transition) {
         this.transition = transition;
-    }
-
-    public boolean isEnd() {
-        return end;
-    }
-
-    public void setEnd(boolean end) {
-        this.end = end;
-    }
-
-    public ErrorTransition[] getOnErrors() {
-        return onErrors;
-    }
-
-    public void setOnErrors(ErrorTransition[] onErrors) {
-        this.onErrors = onErrors;
-    }
-
-    public String getEventTimeout() {
-        return eventTimeout;
-    }
-
-    public void setEventTimeout(String eventTimeout) {
-        this.eventTimeout = eventTimeout;
-    }
-
-    public String getCompensatedBy() {
-        return compensatedBy;
-    }
-
-    public void setCompensatedBy(String compensatedBy) {
-        this.compensatedBy = compensatedBy;
     }
 
     public Set<String> getLabels() {

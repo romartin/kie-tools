@@ -28,6 +28,7 @@ import org.kie.workbench.common.stunner.core.definition.shape.ShapeDef;
 import org.kie.workbench.common.stunner.core.definition.shape.ShapeViewDef;
 import org.kie.workbench.common.stunner.sw.client.resources.GlyphFactory;
 import org.kie.workbench.common.stunner.sw.definition.ActionTransition;
+import org.kie.workbench.common.stunner.sw.definition.CompensationTransition;
 import org.kie.workbench.common.stunner.sw.definition.ErrorTransition;
 import org.kie.workbench.common.stunner.sw.definition.EventTransition;
 import org.kie.workbench.common.stunner.sw.definition.StartTransition;
@@ -44,7 +45,8 @@ public class TransitionShapeDef<W>
         START,
         ERROR,
         EVENT,
-        ACTION
+        ACTION,
+        COMPENSATION
     }
 
     enum Direction {
@@ -102,6 +104,9 @@ public class TransitionShapeDef<W>
         if (type == Type.ACTION) {
             return GlyphFactory.TRANSITION_ACTION;
         }
+        if (type == Type.COMPENSATION) {
+            return GlyphFactory.TRANSITION_COMPENSATION;
+        }
         return GlyphFactory.TRANSITION;
     }
 
@@ -125,6 +130,7 @@ public class TransitionShapeDef<W>
     private static final String TYPE_ERROR = getDefinitionId(ErrorTransition.class);
     private static final String TYPE_EVENT = getDefinitionId(EventTransition.class);
     private static final String TYPE_ACTION = getDefinitionId(ActionTransition.class);
+    private static final String TYPE_COMPENSATION = getDefinitionId(CompensationTransition.class);
 
     public static Type getType(Object transition) {
         Type type = getTypeOrNull(transition);
@@ -162,6 +168,9 @@ public class TransitionShapeDef<W>
         }
         if (TYPE_ACTION.equals(id)) {
             return Type.ACTION;
+        }
+        if (TYPE_COMPENSATION.equals(id)) {
+            return Type.COMPENSATION;
         }
         return null;
     }

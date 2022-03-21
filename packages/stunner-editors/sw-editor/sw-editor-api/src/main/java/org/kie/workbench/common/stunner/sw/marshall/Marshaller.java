@@ -36,6 +36,7 @@ import org.kie.workbench.common.stunner.core.graph.impl.GraphImpl;
 import org.kie.workbench.common.stunner.core.graph.processing.index.Index;
 import org.kie.workbench.common.stunner.core.graph.processing.index.map.MapIndexBuilder;
 import org.kie.workbench.common.stunner.sw.autolayout.NodeLayoutTemp;
+import org.kie.workbench.common.stunner.sw.definition.CompensationTransition;
 import org.kie.workbench.common.stunner.sw.definition.End;
 import org.kie.workbench.common.stunner.sw.definition.ErrorTransition;
 import org.kie.workbench.common.stunner.sw.definition.EventState;
@@ -53,6 +54,8 @@ import static org.kie.workbench.common.stunner.sw.marshall.StateMarshalling.EVEN
 import static org.kie.workbench.common.stunner.sw.marshall.StateMarshalling.ONEVENTS_UNMARSHALLER;
 import static org.kie.workbench.common.stunner.sw.marshall.StateMarshalling.STATE_MARSHALLER;
 import static org.kie.workbench.common.stunner.sw.marshall.StateMarshalling.STATE_UNMARSHALLER;
+import static org.kie.workbench.common.stunner.sw.marshall.TransitionMarshalling.COMPENSATION_TRANSITION_MARSHALLER;
+import static org.kie.workbench.common.stunner.sw.marshall.TransitionMarshalling.COMPENSATION_TRANSITION_UNMARSHALLER;
 import static org.kie.workbench.common.stunner.sw.marshall.TransitionMarshalling.ERROR_TRANSITION_MARSHALLER;
 import static org.kie.workbench.common.stunner.sw.marshall.TransitionMarshalling.ERROR_TRANSITION_UNMARSHALLER;
 import static org.kie.workbench.common.stunner.sw.marshall.TransitionMarshalling.START_TRANSITION_MARSHALLER;
@@ -202,6 +205,9 @@ public class Marshaller {
         if (ErrorTransition.class.equals(type)) {
             return (EdgeUnmarshaller<T>) ERROR_TRANSITION_UNMARSHALLER;
         }
+        if (CompensationTransition.class.equals(type)) {
+            return (EdgeUnmarshaller<T>) COMPENSATION_TRANSITION_UNMARSHALLER;
+        }
         throw new UnsupportedOperationException("No EdgeUnmarshaller found for " + type.getName());
     }
 
@@ -274,6 +280,9 @@ public class Marshaller {
         }
         if (Transition.class.equals(type)) {
             return (EdgeMarshaller<T>) TRANSITION_MARSHALLER;
+        }
+        if (CompensationTransition.class.equals(type)) {
+            return (EdgeMarshaller<T>) COMPENSATION_TRANSITION_MARSHALLER;
         }
         if (ErrorTransition.class.equals(type)) {
             return (EdgeMarshaller<T>) ERROR_TRANSITION_MARSHALLER;

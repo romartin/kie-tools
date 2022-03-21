@@ -34,6 +34,7 @@ import org.kie.workbench.common.stunner.sw.client.shapes.TransitionView;
 import org.kie.workbench.common.stunner.sw.definition.ActionTransition;
 import org.kie.workbench.common.stunner.sw.definition.CallFunctionAction;
 import org.kie.workbench.common.stunner.sw.definition.CallSubflowAction;
+import org.kie.workbench.common.stunner.sw.definition.CompensationTransition;
 import org.kie.workbench.common.stunner.sw.definition.End;
 import org.kie.workbench.common.stunner.sw.definition.ErrorTransition;
 import org.kie.workbench.common.stunner.sw.definition.EventRef;
@@ -71,6 +72,7 @@ public class ShapeFactory
         put(ErrorTransition.class, new TransitionShapeDef());
         put(EventTransition.class, new TransitionShapeDef());
         put(ActionTransition.class, new TransitionShapeDef());
+        put(CompensationTransition.class, new TransitionShapeDef());
         put(EventTimeout.class, new AnyStateShapeDef(false));
     }};
 

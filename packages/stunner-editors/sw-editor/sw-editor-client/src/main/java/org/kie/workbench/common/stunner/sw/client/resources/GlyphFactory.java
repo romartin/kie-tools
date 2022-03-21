@@ -51,4 +51,6 @@ public interface GlyphFactory {
     ImageDataUriGlyph TRANSITION_EVENT = ImageDataUriGlyph.create(ImageResources.INSTANCE.transitionEvent().getSafeUri());
 
     ImageDataUriGlyph TRANSITION_ACTION = ImageDataUriGlyph.create(ImageResources.INSTANCE.transitionAction().getSafeUri());
+
+    ImageDataUriGlyph TRANSITION_COMPENSATION = ImageDataUriGlyph.create(ImageResources.INSTANCE.transitionCompensation().getSafeUri());
 }
