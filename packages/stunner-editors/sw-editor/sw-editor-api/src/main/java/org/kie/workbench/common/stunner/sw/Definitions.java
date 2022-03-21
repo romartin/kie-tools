@@ -31,6 +31,7 @@ import org.kie.workbench.common.stunner.sw.definition.End;
 import org.kie.workbench.common.stunner.sw.definition.ErrorTransition;
 import org.kie.workbench.common.stunner.sw.definition.EventRef;
 import org.kie.workbench.common.stunner.sw.definition.EventState;
+import org.kie.workbench.common.stunner.sw.definition.EventTimeout;
 import org.kie.workbench.common.stunner.sw.definition.EventTransition;
 import org.kie.workbench.common.stunner.sw.definition.InjectState;
 import org.kie.workbench.common.stunner.sw.definition.OnEvent;
@@ -56,6 +57,7 @@ import org.kie.workbench.common.stunner.sw.definition.Workflow;
                 EventRef.class,
                 CallFunctionAction.class,
                 CallSubflowAction.class,
+                EventTimeout.class,
                 StartTransition.class,
                 ErrorTransition.class,
                 EventTransition.class,

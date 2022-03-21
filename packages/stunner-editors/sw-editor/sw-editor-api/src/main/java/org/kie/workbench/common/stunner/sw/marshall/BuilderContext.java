@@ -29,6 +29,7 @@ import org.kie.workbench.common.stunner.core.graph.command.GraphCommandExecution
 import org.kie.workbench.common.stunner.core.graph.command.impl.AddChildNodeCommand;
 import org.kie.workbench.common.stunner.core.graph.command.impl.AddConnectorCommand;
 import org.kie.workbench.common.stunner.core.graph.command.impl.AddNodeCommand;
+import org.kie.workbench.common.stunner.core.graph.command.impl.DockNodeCommand;
 import org.kie.workbench.common.stunner.core.graph.command.impl.SetConnectionTargetNodeCommand;
 import org.kie.workbench.common.stunner.core.graph.content.Bound;
 import org.kie.workbench.common.stunner.core.graph.content.Bounds;
@@ -41,6 +42,7 @@ import org.kie.workbench.common.stunner.sw.definition.CallSubflowAction;
 import org.kie.workbench.common.stunner.sw.definition.End;
 import org.kie.workbench.common.stunner.sw.definition.EventRef;
 import org.kie.workbench.common.stunner.sw.definition.EventState;
+import org.kie.workbench.common.stunner.sw.definition.EventTimeout;
 import org.kie.workbench.common.stunner.sw.definition.InjectState;
 import org.kie.workbench.common.stunner.sw.definition.OnEvent;
 import org.kie.workbench.common.stunner.sw.definition.Start;
@@ -134,6 +136,11 @@ public class BuilderContext {
     }
 
     @SuppressWarnings("all")
+    public void dock(Node source, Node candidate) {
+        storageCommands.addCommand(new DockNodeCommand(source, candidate));
+    }
+
+    @SuppressWarnings("all")
     public DirectGraphCommandExecutionContext execute() {
         DirectGraphCommandExecutionContext executionContext =
                 new DirectGraphCommandExecutionContext(definitionManager,
@@ -185,7 +192,10 @@ public class BuilderContext {
             return new double[]{154d, 51d};
         } else if (CallSubflowAction.class.equals(type)) {
             return new double[]{154d, 51d};
+        } else if (EventTimeout.class.equals(type)) {
+            return new double[]{56d, 56d};
         }
+
         return new double[]{0d, 0d};
     }
 }

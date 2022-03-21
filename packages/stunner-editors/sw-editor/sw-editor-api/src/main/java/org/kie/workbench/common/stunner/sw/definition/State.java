@@ -28,9 +28,11 @@ import org.kie.workbench.common.stunner.core.definition.annotation.definition.Ca
 import org.kie.workbench.common.stunner.core.definition.annotation.definition.Labels;
 import org.kie.workbench.common.stunner.core.definition.annotation.morph.MorphBase;
 import org.kie.workbench.common.stunner.core.definition.property.PropertyMetaTypes;
+import org.kie.workbench.common.stunner.core.rule.annotation.CanDock;
 
 @Bindable
 @Definition
+@CanDock(roles = {Timeout.LABEL_TIMEOUT})
 @MorphBase(defaultType = InjectState.class)
 @JsType
 public class State {
@@ -58,6 +60,8 @@ public class State {
     public boolean end;
 
     public ErrorTransition[] onErrors;
+
+    public String eventTimeout;
 
     public State() {
         this.name = "State";
@@ -101,6 +105,14 @@ public class State {
 
     public void setOnErrors(ErrorTransition[] onErrors) {
         this.onErrors = onErrors;
+    }
+
+    public String getEventTimeout() {
+        return eventTimeout;
+    }
+
+    public void setEventTimeout(String eventTimeout) {
+        this.eventTimeout = eventTimeout;
     }
 
     public Set<String> getLabels() {

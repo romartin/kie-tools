@@ -48,7 +48,13 @@ import org.kie.workbench.common.stunner.sw.autolayout.elkjs.ELKUtils;
 import org.kie.workbench.common.stunner.sw.autolayout.elkjs.ELKWrapper;
 import org.uberfire.client.promise.Promises;
 
-// TODO: Drop this class, by applying this code into AutoLayout.
+// TODO:
+//  Drop this class, by applying this code into AutoLayout, considering the following cases:
+//  - Only works when parentNode (root) is set as the workflowRootNode, but not when loading the event state details.
+//  - Resize parentNode to fit children
+//  - Ability to specify the level of parent nodes to apply auto-layout
+//      - eg: support for collapse/expand child nodes (not necessary to apply layout when collapsed)
+//      - eg: once changing some node during authoring only apply layout for actual node's parent.
 public class NodeLayoutTemp {
 
     @SuppressWarnings("all")

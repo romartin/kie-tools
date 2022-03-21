@@ -40,6 +40,8 @@ public interface GlyphFactory {
 
     ImageDataUriGlyph CALL_SUBFLOW = ImageDataUriGlyph.create(ImageResources.INSTANCE.callSubflow().getSafeUri());
 
+    ImageDataUriGlyph EVENT_TIMEOUT = ImageDataUriGlyph.create(ImageResources.INSTANCE.eventTimeout().getSafeUri());
+
     ImageDataUriGlyph TRANSITION = ImageDataUriGlyph.create(ImageResources.INSTANCE.transition().getSafeUri());
 
     ImageDataUriGlyph TRANSITION_START = ImageDataUriGlyph.create(ImageResources.INSTANCE.transitionStart().getSafeUri());

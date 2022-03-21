@@ -21,11 +21,13 @@ import java.util.List;
 
 import org.kie.workbench.common.stunner.core.graph.Edge;
 import org.kie.workbench.common.stunner.core.graph.Node;
+import org.kie.workbench.common.stunner.core.graph.content.relationship.Dock;
 import org.kie.workbench.common.stunner.sw.definition.ActionNode;
 import org.kie.workbench.common.stunner.sw.definition.ActionTransition;
 import org.kie.workbench.common.stunner.sw.definition.ErrorTransition;
 import org.kie.workbench.common.stunner.sw.definition.EventRef;
 import org.kie.workbench.common.stunner.sw.definition.EventState;
+import org.kie.workbench.common.stunner.sw.definition.EventTimeout;
 import org.kie.workbench.common.stunner.sw.definition.EventTransition;
 import org.kie.workbench.common.stunner.sw.definition.OnEvent;
 import org.kie.workbench.common.stunner.sw.definition.State;
@@ -75,6 +77,14 @@ public interface StateMarshalling {
                     }
                 }
 
+                // Parse state timeouts.
+                if (isValidString(state.eventTimeout)) {
+                    EventTimeout eventTimeout = new EventTimeout();
+                    eventTimeout.setEventTimeout(state.eventTimeout);
+                    Node eventTimeoutNode = context.addNode(null, eventTimeout);
+                    context.dock(stateNode, eventTimeoutNode);
+                }
+
                 context.sourceNode = null;
 
                 return stateNode;
@@ -88,11 +98,16 @@ public interface StateMarshalling {
                 List<ErrorTransition> errors = new ArrayList<>();
                 List<Edge> outEdges = stateNode.getOutEdges();
                 for (Edge edge : outEdges) {
-                    Object def = getElementDefinition(edge);
-                    if (def instanceof ErrorTransition) {
-                        errors.add((ErrorTransition) def);
+                    if (edge.getContent() instanceof Dock) {
+                        Node timeoutNode = edge.getTargetNode();
+                        // TODO: Parse Timeout subtype.
+                    } else {
+                        Object def = getElementDefinition(edge);
+                        if (def instanceof ErrorTransition) {
+                            errors.add((ErrorTransition) def);
+                        }
+                        marshallEdge(context, edge);
                     }
-                    marshallEdge(context, edge);
                 }
                 state.onErrors = errors.isEmpty() ? null : errors.toArray(new ErrorTransition[errors.size()]);
                 return state;
