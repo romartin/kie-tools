@@ -187,7 +187,7 @@ public class TransitionShapeDef<W>
             return "#00FF00";
         }
         if (type == Type.ACTION) {
-            return "#646464";
+            return "#323232";
         }
         return "#000000";
     }

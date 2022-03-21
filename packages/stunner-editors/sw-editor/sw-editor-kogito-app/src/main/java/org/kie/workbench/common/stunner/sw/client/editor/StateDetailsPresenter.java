@@ -198,9 +198,10 @@ public class StateDetailsPresenter {
                                             boundingBox.getHeight() + (DECORATOR_PADDING * 2),
                                             5)
                 .setListening(false)
-                .setFillAlpha(0)
+                .setFillAlpha(0.2)
+                .setFillColor(ColorName.LIGHTGREY)
                 .setStrokeAlpha(1)
-                .setStrokeColor(ColorName.LIGHTGREY)
+                .setStrokeColor(ColorName.BLACK)
                 .setStrokeWidth(1.5)
                 .setDashArray(5);
 
