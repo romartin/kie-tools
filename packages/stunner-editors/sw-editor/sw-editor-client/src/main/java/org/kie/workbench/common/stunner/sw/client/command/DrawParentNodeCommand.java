@@ -30,12 +30,15 @@ import org.kie.workbench.common.stunner.core.client.canvas.command.AddCanvasChil
 import org.kie.workbench.common.stunner.core.client.canvas.command.AddCanvasConnectorCommand;
 import org.kie.workbench.common.stunner.core.client.canvas.command.AddCanvasDockedNodeCommand;
 import org.kie.workbench.common.stunner.core.client.canvas.command.AddCanvasNodeCommand;
+import org.kie.workbench.common.stunner.core.client.canvas.command.ResizeNodeCommand;
 import org.kie.workbench.common.stunner.core.client.command.CanvasViolation;
+import org.kie.workbench.common.stunner.core.client.shape.view.BoundingBox;
 import org.kie.workbench.common.stunner.core.command.CommandResult;
 import org.kie.workbench.common.stunner.core.command.impl.CompositeCommand;
 import org.kie.workbench.common.stunner.core.graph.Edge;
 import org.kie.workbench.common.stunner.core.graph.Graph;
 import org.kie.workbench.common.stunner.core.graph.Node;
+import org.kie.workbench.common.stunner.core.graph.content.Bounds;
 import org.kie.workbench.common.stunner.core.graph.content.relationship.Child;
 import org.kie.workbench.common.stunner.core.graph.content.relationship.Dock;
 import org.kie.workbench.common.stunner.core.graph.content.view.View;
@@ -118,6 +121,9 @@ public class DrawParentNodeCommand extends AbstractCanvasCommand {
                               }
 
                               private void addNode(final Node node) {
+                                  //Calculated parent size
+                                  final Bounds bounds = ((View) node.getContent()).getBounds();
+
                                   //skip in case the node was already processed
                                   if (processedNodes.containsKey(node.getUUID())) {
                                       return;
@@ -125,6 +131,15 @@ public class DrawParentNodeCommand extends AbstractCanvasCommand {
 
                                   commandBuilder.addCommand(new AddCanvasNodeCommand(node,
                                                                                      shapeSetId));
+
+                                  commandBuilder.addCommand(new ResizeNodeCommand(node,
+                                                                                  new BoundingBox(bounds.getX(),
+                                                                                                  bounds.getY(),
+                                                                                                  bounds.getWidth(),
+                                                                                                  bounds.getHeight()),
+                                                                                  (shape, point) -> {
+                                                                                      return null;
+                                                                                  }));
                                   addProcessedNode(node);
                               }
 

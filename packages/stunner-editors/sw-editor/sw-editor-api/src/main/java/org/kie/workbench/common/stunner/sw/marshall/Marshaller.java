@@ -102,7 +102,7 @@ public class Marshaller {
         final DirectGraphCommandExecutionContext executionContext = builderContext.execute();
 
         // Perform automatic layout.
-        final Promise<Node> layout = NodeLayoutTemp.applyLayout(graph, context.getWorkflowRootNode(), promises, executionContext);
+        final Promise<Node> layout = NodeLayoutTemp.applyLayout(graph, context.getWorkflowRootNode(), promises, executionContext, false);
         return promises.create(new Promise.PromiseExecutorCallbackFn<Graph>() {
             @Override
             public void onInvoke(ResolveCallbackFn<Graph> success, RejectCallbackFn reject) {
@@ -153,7 +153,7 @@ public class Marshaller {
         final BuilderContext builderContext = new BuilderContext(context, definitionManager, factoryManager);
         Node node = unmarshallNode(builderContext, bean);
         DirectGraphCommandExecutionContext executionContext = builderContext.execute();
-        return NodeLayoutTemp.applyLayout(context.getGraph(), node, promises, executionContext);
+        return NodeLayoutTemp.applyLayout(context.getGraph(), node, promises, executionContext, true);
     }
 
     @FunctionalInterface

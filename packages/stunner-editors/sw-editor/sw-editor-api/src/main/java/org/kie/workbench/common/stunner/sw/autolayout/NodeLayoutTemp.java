@@ -62,7 +62,8 @@ public class NodeLayoutTemp {
     public static Promise<Node> applyLayout(Graph graph,
                                             Node parentNode,
                                             Promises promises,
-                                            DirectGraphCommandExecutionContext context) {
+                                            DirectGraphCommandExecutionContext context,
+                                            boolean isSubset) {
         //TODO Temporary solution to inject ELK lib into canvas frame
         new ELKWrapper().injectScript();
 
@@ -70,13 +71,17 @@ public class NodeLayoutTemp {
         final Promise<Object> elkLayoutPromise = processELKLayout(graph,
                                                                   parentNode,
                                                                   ELKUtils.getCanvasTopDownLayoutOptionsObject(),
-                                                                  ELKUtils.getCanvasLeftToRightDownLayoutOptionsObject());
+                                                                  ELKUtils.getContainerLeftToRightDownLayoutOptionsObject(),
+                                                                  isSubset);
 
         //Apply ELK layout to graph
         return promises.create((resolve, reject) -> elkLayoutPromise
                 .then(elkGraph -> {
                     final ELKNode elkRoot = ELKUtils.parse(elkGraph);
                     final CompositeCommand.Builder layoutCommands = new CompositeCommand.Builder();
+
+                    //Update node sizes in the graph
+                    updateGraphNodeSizes(elkRoot, graph);
 
                     //Apply ELKNodes layout values into graph structure
                     updateNodesPosition(elkRoot, graph, layoutCommands);
@@ -106,10 +111,13 @@ public class NodeLayoutTemp {
     private static Promise<Object> processELKLayout(Graph graph,
                                                     Node parentNode,
                                                     Object parentLayoutOptions,
-                                                    Object nestedParentLayoutOptions) {
+                                                    Object nestedParentLayoutOptions,
+                                                    boolean isSubset) {
+
         final String rootUUID = parentNode.getUUID();
         //ELK root node definition
         final ELKNode[] elkRoot = new ELKNode[]{new ELKNode(rootUUID, parentLayoutOptions)};
+
         final Map<String, String> nodeContainment = new HashMap<>();
 
         new ChildrenTraverseProcessorImpl(new TreeWalkTraverseProcessorImpl())
@@ -221,9 +229,17 @@ public class NodeLayoutTemp {
 
                 //if nodes have same parent add edge into parent node structure
                 if (null != sourceParent && sourceParent.equals(targetParent)) {
-                    elkRoot[0].getChild(sourceParent).addEdge(elkEdge);
+                    if (isSubset) {
+                        elkRoot[0].getChild(sourceParent).addEdgeWithFilter(elkEdge);
+                    } else {
+                        elkRoot[0].getChild(sourceParent).addEdge(elkEdge);
+                    }
                 } else {
-                    elkRoot[0].addEdge(elkEdge);
+                    if (isSubset) {
+                        elkRoot[0].addEdgeWithFilter(elkEdge);
+                    } else {
+                        elkRoot[0].addEdge(elkEdge);
+                    }
                 }
             }
 
@@ -248,9 +264,35 @@ public class NodeLayoutTemp {
             }
         });
 
-        //DomGlobal.console.log("----->" + Global.JSON.stringify(elkRoot[0]));
+        //add container into new root
+        if (isSubset) {
+            final ELKNode newElkRoot = new ELKNode("root", parentLayoutOptions)
+                    .addNode(elkRoot[0].setLayoutOptions(nestedParentLayoutOptions));
+
+//            DomGlobal.console.log("----->" + Global.JSON.stringify(newElkRoot));
+
+            return ELKUtils.processGraph(newElkRoot);
+        }
+
+//        DomGlobal.console.log("----->" + Global.JSON.stringify(elkRoot[0]));
 
         return ELKUtils.processGraph(elkRoot[0]);
+    }
+
+    //Update node sizes after ELK processing
+    @SuppressWarnings("all")
+    private static void updateGraphNodeSizes(ELKNode elkRoot, Graph graph) {
+        for (ELKNode elkNode : elkRoot.getChildren().asList()) {
+            ((Node<View, Edge>) graph.getNode(elkNode.getId())).getContent()
+                    .setBounds(Bounds.create(elkNode.getX(),
+                                             elkNode.getY(),
+                                             elkNode.getX() + elkNode.getWidth(),
+                                             elkNode.getY() + elkNode.getHeight()));
+
+            if (elkNode.getChildren().length > 0) {
+                updateGraphNodeSizes(elkNode, graph);
+            }
+        }
     }
 
     @SuppressWarnings("all")
