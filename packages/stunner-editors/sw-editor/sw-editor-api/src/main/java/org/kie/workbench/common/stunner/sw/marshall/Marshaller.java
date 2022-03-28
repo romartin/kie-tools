@@ -35,7 +35,7 @@ import org.kie.workbench.common.stunner.core.graph.content.view.ViewConnector;
 import org.kie.workbench.common.stunner.core.graph.impl.GraphImpl;
 import org.kie.workbench.common.stunner.core.graph.processing.index.Index;
 import org.kie.workbench.common.stunner.core.graph.processing.index.map.MapIndexBuilder;
-import org.kie.workbench.common.stunner.sw.autolayout.NodeLayoutTemp;
+import org.kie.workbench.common.stunner.sw.autolayout.AutoLayout;
 import org.kie.workbench.common.stunner.sw.definition.CompensationTransition;
 import org.kie.workbench.common.stunner.sw.definition.End;
 import org.kie.workbench.common.stunner.sw.definition.ErrorTransition;
@@ -102,7 +102,7 @@ public class Marshaller {
         final DirectGraphCommandExecutionContext executionContext = builderContext.execute();
 
         // Perform automatic layout.
-        final Promise<Node> layout = NodeLayoutTemp.applyLayout(graph, context.getWorkflowRootNode(), promises, executionContext, false);
+        final Promise<Node> layout = AutoLayout.applyLayout(graph, context.getWorkflowRootNode(), promises, executionContext, false);
         return promises.create(new Promise.PromiseExecutorCallbackFn<Graph>() {
             @Override
             public void onInvoke(ResolveCallbackFn<Graph> success, RejectCallbackFn reject) {
@@ -153,7 +153,7 @@ public class Marshaller {
         final BuilderContext builderContext = new BuilderContext(context, definitionManager, factoryManager);
         Node node = unmarshallNode(builderContext, bean);
         DirectGraphCommandExecutionContext executionContext = builderContext.execute();
-        return NodeLayoutTemp.applyLayout(context.getGraph(), node, promises, executionContext, true);
+        return AutoLayout.applyLayout(context.getGraph(), node, promises, executionContext, true);
     }
 
     @FunctionalInterface
