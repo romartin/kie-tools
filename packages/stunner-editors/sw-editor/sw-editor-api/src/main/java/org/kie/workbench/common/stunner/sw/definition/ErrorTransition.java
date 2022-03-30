@@ -56,7 +56,7 @@ public class ErrorTransition {
             .add(LABEL_TRANSITION_ERROR)
             .build();
 
-    @Property(meta = PropertyMetaTypes.NAME)
+    @Property
     public String errorRef;
 
     public String transition;

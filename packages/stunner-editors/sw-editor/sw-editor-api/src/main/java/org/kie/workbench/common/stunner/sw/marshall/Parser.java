@@ -28,6 +28,7 @@ import org.kie.workbench.common.stunner.sw.definition.ErrorTransition;
 import org.kie.workbench.common.stunner.sw.definition.EventState;
 import org.kie.workbench.common.stunner.sw.definition.InjectState;
 import org.kie.workbench.common.stunner.sw.definition.OnEvent;
+import org.kie.workbench.common.stunner.sw.definition.OperationState;
 import org.kie.workbench.common.stunner.sw.definition.State;
 import org.kie.workbench.common.stunner.sw.definition.SwitchState;
 import org.kie.workbench.common.stunner.sw.definition.Workflow;
@@ -62,6 +63,8 @@ public class Parser {
             state = parseEventState(jso);
         } else if (SwitchState.TYPE_SWITCH.equals(jso.type)) {
             state = parse(SwitchState.class, jso);
+        } else if (OperationState.TYPE_OPERATION.equals(jso.type)) {
+            state = parseOperationState(jso);
         }
 
         if (null != state) {
@@ -76,6 +79,20 @@ public class Parser {
             }
         }
 
+        return state;
+    }
+
+    private OperationState parseOperationState(State jso) {
+        OperationState state = (OperationState) parse(OperationState.class, jso);
+        ActionNode[] actions = Js.uncheckedCast(Js.asPropertyMap(jso).get("actions"));
+        if (null != actions) {
+            state.actions = new ActionNode[actions.length];
+            for (int i = 0; i < actions.length; i++) {
+                ActionNode a = actions[i];
+                ActionNode action = parseAction(a);
+                state.actions[i] = action;
+            }
+        }
         return state;
     }
 

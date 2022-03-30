@@ -25,6 +25,7 @@ import org.kie.workbench.common.stunner.core.graph.content.relationship.Dock;
 import org.kie.workbench.common.stunner.core.graph.content.view.ViewConnector;
 import org.kie.workbench.common.stunner.sw.definition.ActionNode;
 import org.kie.workbench.common.stunner.sw.definition.ActionTransition;
+import org.kie.workbench.common.stunner.sw.definition.ActionsContainer;
 import org.kie.workbench.common.stunner.sw.definition.CompensationTransition;
 import org.kie.workbench.common.stunner.sw.definition.ErrorTransition;
 import org.kie.workbench.common.stunner.sw.definition.EventRef;
@@ -32,6 +33,7 @@ import org.kie.workbench.common.stunner.sw.definition.EventState;
 import org.kie.workbench.common.stunner.sw.definition.EventTimeout;
 import org.kie.workbench.common.stunner.sw.definition.EventTransition;
 import org.kie.workbench.common.stunner.sw.definition.OnEvent;
+import org.kie.workbench.common.stunner.sw.definition.OperationState;
 import org.kie.workbench.common.stunner.sw.definition.State;
 import org.kie.workbench.common.stunner.sw.definition.Transition;
 import org.kie.workbench.common.stunner.sw.marshall.Marshaller.NodeMarshaller;
@@ -68,6 +70,13 @@ public interface StateMarshalling {
                     Edge edge = unmarshallEdge(context, t);
                 }
 
+                // Parse compensation transition.
+                if (isValidString(state.compensatedBy)) {
+                    CompensationTransition compensationTransition = new CompensationTransition();
+                    compensationTransition.setTransition(state.compensatedBy);
+                    Edge<ViewConnector<Object>, Node> compensationEdge = unmarshallEdge(context, compensationTransition);
+                }
+
                 // Parse on-errors.
                 ErrorTransition[] onErrors = state.getOnErrors();
                 if (null != onErrors && onErrors.length > 0) {
@@ -85,13 +94,6 @@ public interface StateMarshalling {
                     eventTimeout.setEventTimeout(state.eventTimeout);
                     Node eventTimeoutNode = context.addNode(null, eventTimeout);
                     context.dock(stateNode, eventTimeoutNode);
-                }
-
-                // Parse compensation transition.
-                if (isValidString(state.compensatedBy)) {
-                    CompensationTransition compensationTransition = new CompensationTransition();
-                    compensationTransition.setTransition(state.compensatedBy);
-                    Edge<ViewConnector<Object>, Node> compensationEdge = unmarshallEdge(context, compensationTransition);
                 }
 
                 context.sourceNode = null;
@@ -168,6 +170,43 @@ public interface StateMarshalling {
                 context.parentNode = parent;
 
                 return onEventsNode;
+            };
+
+    NodeUnmarshaller<ActionNode[]> ACTIONS_UNMARSHALLER =
+            (context, actions) -> {
+                ActionsContainer actionsContainer = new ActionsContainer();
+                final Node actionsNode = context.addNode(null, actionsContainer);
+
+                // Set actual context parent node.
+                Node parent = context.parentNode;
+                context.parentNode = actionsNode;
+
+                for (int i = 0; i < actions.length; i++) {
+                    ActionNode action = actions[i];
+                    final Node actionNode = context.addNode(null, action);
+                }
+
+                // Set the original parent.
+                context.parentNode = parent;
+
+                return actionsNode;
+            };
+
+    NodeUnmarshaller<OperationState> OPERATION_STATE_UNMARSHALLER =
+            (context, state) -> {
+                Node stateNode = STATE_UNMARSHALLER.unmarshall(context, state);
+                if (Marshaller.LOAD_DETAILS) {
+                    ActionNode[] actions = state.actions;
+                    if (null != actions && actions.length > 0) {
+                        Node actionsNode = ACTIONS_UNMARSHALLER.unmarshall(context, actions);
+                        /*
+                        TODO: If necessary, enable the transition (but missing to check connection rules for ActionTransition)
+                        final ActionTransition actionsTransition = new ActionTransition();
+                        Edge onEventsEdge = context.addEdgeToTargetUUID(actionsTransition, stateNode, actionsNode.getUUID());
+                        */
+                    }
+                }
+                return stateNode;
             };
 
     NodeUnmarshaller<EventState> EVENT_STATE_UNMARSHALLER =

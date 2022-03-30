@@ -36,6 +36,7 @@ import org.kie.workbench.common.stunner.svg.client.shape.factory.SVGShapeViewRes
 import org.kie.workbench.common.stunner.svg.client.shape.view.SVGShapeView;
 import org.kie.workbench.common.stunner.sw.client.resources.GlyphFactory;
 import org.kie.workbench.common.stunner.sw.client.resources.ShapeViewFactory;
+import org.kie.workbench.common.stunner.sw.definition.ActionsContainer;
 import org.kie.workbench.common.stunner.sw.definition.CallFunctionAction;
 import org.kie.workbench.common.stunner.sw.definition.CallSubflowAction;
 import org.kie.workbench.common.stunner.sw.definition.End;
@@ -44,6 +45,7 @@ import org.kie.workbench.common.stunner.sw.definition.EventState;
 import org.kie.workbench.common.stunner.sw.definition.EventTimeout;
 import org.kie.workbench.common.stunner.sw.definition.InjectState;
 import org.kie.workbench.common.stunner.sw.definition.OnEvent;
+import org.kie.workbench.common.stunner.sw.definition.OperationState;
 import org.kie.workbench.common.stunner.sw.definition.Start;
 import org.kie.workbench.common.stunner.sw.definition.SwitchState;
 import org.kie.workbench.common.stunner.sw.definition.Workflow;
@@ -75,10 +77,12 @@ public class AnyStateShapeDef<W> implements ShapeViewDef<W, SVGShapeView>,
                     .put(InjectState.class, ShapeViewFactory::injectState)
                     .put(SwitchState.class, ShapeViewFactory::switchState)
                     .put(EventState.class, ShapeViewFactory::eventState)
+                    .put(OperationState.class, ShapeViewFactory::switchState)
                     // TODO: Why need for workflow here?
                     .put(Workflow.class, ShapeViewFactory::container)
                     .put(Start.class, ShapeViewFactory::startState)
                     .put(End.class, ShapeViewFactory::endState)
+                    .put(ActionsContainer.class, ShapeViewFactory::container)
                     .put(OnEvent.class, ShapeViewFactory::container)
                     .put(EventRef.class, ShapeViewFactory::event)
                     .put(EventTimeout.class, ShapeViewFactory::eventTimeout)
@@ -91,10 +95,12 @@ public class AnyStateShapeDef<W> implements ShapeViewDef<W, SVGShapeView>,
                     .put(InjectState.class, GlyphFactory.STATE_INJECT)
                     .put(SwitchState.class, GlyphFactory.STATE_SWITCH)
                     .put(EventState.class, GlyphFactory.STATE_EVENT)
+                    .put(OperationState.class, GlyphFactory.STATE_OPERATION)
                     // TODO: Why need for workflow here?
                     .put(Workflow.class, GlyphFactory.TRANSITION)
                     .put(Start.class, GlyphFactory.START)
                     .put(End.class, GlyphFactory.END)
+                    .put(ActionsContainer.class, GlyphFactory.CALL_FUNCTION)
                     .put(OnEvent.class, GlyphFactory.EVENTS)
                     .put(EventRef.class, GlyphFactory.EVENT)
                     .put(EventTimeout.class, GlyphFactory.EVENT_TIMEOUT)
@@ -104,6 +110,15 @@ public class AnyStateShapeDef<W> implements ShapeViewDef<W, SVGShapeView>,
 
     @Override
     public SVGShapeView<?> newViewInstance(ShapeViewFactory factory, W instance) {
+        /*if (instance instanceof OnEvent) {
+            return VIEW_RESOURCES.getResource(factory, instance).build(295d,100d, false);
+        }
+        if (instance instanceof ActionsContainer) {
+            return VIEW_RESOURCES.getResource(factory, instance).build(185d, 160d, false);
+        }
+        if (instance instanceof Timeout) {
+            return VIEW_RESOURCES.getResource(factory, instance).build(28d, 28d, false);
+        }*/
         return VIEW_RESOURCES.getResource(factory, instance).build(false);
     }
 

@@ -16,27 +16,44 @@
 
 package org.kie.workbench.common.stunner.sw.definition;
 
+import jsinterop.annotations.JsIgnore;
 import jsinterop.annotations.JsType;
 import org.jboss.errai.databinding.client.api.Bindable;
 import org.kie.workbench.common.stunner.core.definition.annotation.Definition;
 import org.kie.workbench.common.stunner.core.definition.annotation.Property;
 import org.kie.workbench.common.stunner.core.definition.annotation.morph.Morph;
-import org.kie.workbench.common.stunner.core.definition.property.PropertyMetaTypes;
 
 @Bindable
 @Definition
-@Morph(base = Timeout.class)
+@Morph(base = State.class)
 @JsType
-public class EventTimeout extends Timeout {
+public class OperationState extends State {
+
+    @JsIgnore
+    public static final String TYPE_OPERATION = "operation";
 
     @Property
-    public String eventTimeout;
+    public String actionMode;
 
-    public String getEventTimeout() {
-        return eventTimeout;
+    public ActionNode[] actions;
+
+    public OperationState() {
+        this.type = TYPE_OPERATION;
     }
 
-    public void setEventTimeout(String eventTimeout) {
-        this.eventTimeout = eventTimeout;
+    public String getActionMode() {
+        return actionMode;
+    }
+
+    public void setActionMode(String actionMode) {
+        this.actionMode = actionMode;
+    }
+
+    public ActionNode[] getActions() {
+        return actions;
+    }
+
+    public void setActions(ActionNode[] actions) {
+        this.actions = actions;
     }
 }

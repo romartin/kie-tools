@@ -189,6 +189,9 @@ public class TransitionShapeDef<W>
         if (type == Type.ACTION) {
             return "#323232";
         }
+        if (type == Type.COMPENSATION) {
+            return "#A87575";
+        }
         return "#000000";
     }
 }

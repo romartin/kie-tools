@@ -36,12 +36,14 @@ import org.kie.workbench.common.stunner.core.graph.impl.GraphImpl;
 import org.kie.workbench.common.stunner.core.graph.processing.index.Index;
 import org.kie.workbench.common.stunner.core.graph.processing.index.map.MapIndexBuilder;
 import org.kie.workbench.common.stunner.sw.autolayout.AutoLayout;
+import org.kie.workbench.common.stunner.sw.definition.ActionNode;
 import org.kie.workbench.common.stunner.sw.definition.CompensationTransition;
 import org.kie.workbench.common.stunner.sw.definition.End;
 import org.kie.workbench.common.stunner.sw.definition.ErrorTransition;
 import org.kie.workbench.common.stunner.sw.definition.EventState;
 import org.kie.workbench.common.stunner.sw.definition.InjectState;
 import org.kie.workbench.common.stunner.sw.definition.OnEvent;
+import org.kie.workbench.common.stunner.sw.definition.OperationState;
 import org.kie.workbench.common.stunner.sw.definition.Start;
 import org.kie.workbench.common.stunner.sw.definition.StartTransition;
 import org.kie.workbench.common.stunner.sw.definition.SwitchState;
@@ -49,9 +51,11 @@ import org.kie.workbench.common.stunner.sw.definition.Transition;
 import org.kie.workbench.common.stunner.sw.definition.Workflow;
 import org.uberfire.client.promise.Promises;
 
+import static org.kie.workbench.common.stunner.sw.marshall.StateMarshalling.ACTIONS_UNMARSHALLER;
 import static org.kie.workbench.common.stunner.sw.marshall.StateMarshalling.EVENT_STATE_MARSHALLER;
 import static org.kie.workbench.common.stunner.sw.marshall.StateMarshalling.EVENT_STATE_UNMARSHALLER;
 import static org.kie.workbench.common.stunner.sw.marshall.StateMarshalling.ONEVENTS_UNMARSHALLER;
+import static org.kie.workbench.common.stunner.sw.marshall.StateMarshalling.OPERATION_STATE_UNMARSHALLER;
 import static org.kie.workbench.common.stunner.sw.marshall.StateMarshalling.STATE_MARSHALLER;
 import static org.kie.workbench.common.stunner.sw.marshall.StateMarshalling.STATE_UNMARSHALLER;
 import static org.kie.workbench.common.stunner.sw.marshall.TransitionMarshalling.COMPENSATION_TRANSITION_MARSHALLER;
@@ -183,10 +187,14 @@ public class Marshaller {
             return (NodeUnmarshaller<T>) WORKFLOW_UNMARSHALLER;
         } else if (EventState.class.equals(type)) {
             return (NodeUnmarshaller<T>) EVENT_STATE_UNMARSHALLER;
+        } else if (OperationState.class.equals(type)) {
+            return (NodeUnmarshaller<T>) OPERATION_STATE_UNMARSHALLER;
         } else if (InjectState.class.equals(type)) {
             return (NodeUnmarshaller<T>) STATE_UNMARSHALLER;
         } else if (SwitchState.class.equals(type)) {
             return (NodeUnmarshaller<T>) STATE_UNMARSHALLER;
+        } else if (ActionNode[].class.equals(type)) {
+            return (NodeUnmarshaller<T>) ACTIONS_UNMARSHALLER;
         } else if (OnEvent[].class.equals(type)) {
             return (NodeUnmarshaller<T>) ONEVENTS_UNMARSHALLER;
         }

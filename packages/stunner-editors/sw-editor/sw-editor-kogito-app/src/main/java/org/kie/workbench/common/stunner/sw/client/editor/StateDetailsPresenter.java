@@ -49,8 +49,10 @@ import org.kie.workbench.common.stunner.core.graph.content.Bounds;
 import org.kie.workbench.common.stunner.core.graph.content.view.Point2D;
 import org.kie.workbench.common.stunner.core.graph.content.view.View;
 import org.kie.workbench.common.stunner.sw.client.command.DrawParentNodeCommand;
+import org.kie.workbench.common.stunner.sw.definition.ActionNode;
 import org.kie.workbench.common.stunner.sw.definition.EventState;
 import org.kie.workbench.common.stunner.sw.definition.OnEvent;
+import org.kie.workbench.common.stunner.sw.definition.OperationState;
 import org.kie.workbench.common.stunner.sw.marshall.Marshaller;
 
 // TODO: This is just a PoC fow now. Its goal is to display state node details, by unmarshalling and drawing nodes on demand.
@@ -94,7 +96,7 @@ public class StateDetailsPresenter {
                 draw(canvasHandler,
                      sourceNode,
                      nodeDef,
-                     new Point2D(sourceNodeBounds.getX() + sourceNodeBounds.getWidth() + 50,
+                     new Point2D(sourceNodeBounds.getX() + sourceNodeBounds.getWidth() + 15,
                                  sourceNodeBounds.getY() + 0));
                 return null;
             });
@@ -156,7 +158,7 @@ public class StateDetailsPresenter {
         parentGroup.animate(AnimationTweener.EASE_IN,
                             AnimationProperties.toPropertyList(AnimationProperty.Properties.SCALE(1),
                                                                AnimationProperty.Properties.ALPHA(1)),
-                            250,
+                            1000,
                             new IAnimationCallback() {
                                 @Override
                                 public void onStart(IAnimation animation, IAnimationHandle handle) {
@@ -259,6 +261,11 @@ public class StateDetailsPresenter {
             EventState es = (EventState) def;
             OnEvent[] onEvents = es.getOnEvents();
             return onEvents;
+        }
+        if (def instanceof OperationState) {
+            OperationState os = (OperationState) def;
+            ActionNode[] actions = os.getActions();
+            return actions;
         }
         return null;
     }

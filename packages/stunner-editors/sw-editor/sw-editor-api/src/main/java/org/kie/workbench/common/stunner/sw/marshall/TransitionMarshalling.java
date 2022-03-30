@@ -68,7 +68,7 @@ public interface TransitionMarshalling {
 
     EdgeUnmarshaller<CompensationTransition> COMPENSATION_TRANSITION_UNMARSHALLER =
             (context, transition) -> {
-                transition.setName("Compensated By");
+                // transition.setName("Compensated By");
                 String to = transition.getTransition();
                 Edge edge = context.addEdgeToTargetName(transition, context.sourceNode, to);
                 return edge;

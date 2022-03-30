@@ -77,10 +77,11 @@
         <option value="Basic" selected>Basic</option>
         <option value="Errors">Errors</option>
         <option value="Events">Events</option>
-        <option value="ErrorsAndEvents">Errors And Events</option>
+        <option value="Operation">Operation</option>
+        <option value="Example">Example</option>
       </select>
       <input type="button" onclick="loadText()" value="Load JSON Content" style="display: block; margin-bottom: 5px" />
-      <textarea id="jsonRawContent" rows="50" cols="50" style="font-size: larger"></textarea>
+      <textarea id="jsonRawContent" rows="50" cols="50" style="font-size: revert"></textarea>
     </div>
 
     <div style="display: inline; float: left; width: 50%">
@@ -160,6 +161,7 @@
           '  "id": "simpleEventStateExample",\n' +
           '  "version": "1.0",\n' +
           '  "name": "Simple Event State Example",\n' +
+          '  "start": "Event State 1",\n' +
           '  "states": [\n' +
           "    {\n" +
           '      "name": "Event State 1",\n' +
@@ -176,7 +178,6 @@
           "          ]\n" +
           "        }\n" +
           "      ],\n" +
-          '      "eventTimeout": "PT1H",\n' +
           '      "end": true\n' +
           "    }\n" +
           "  ],\n" +
@@ -195,64 +196,99 @@
           "    }\n" +
           "  ]\n" +
           "}",
+        // Operation State
+        "{\n" +
+          '  "id": "opStateWorkflow",\n' +
+          '  "name": "Operation State Workflow",\n' +
+          '  "description": "Op State Example",\n' +
+          '  "version": "1.0",\n' +
+          '  "specVersion": "0.8",\n' +
+          '  "start": "Operation1",\n' +
+          '  "states": [\n' +
+          "    {\n" +
+          '      "name": "Operation1",\n' +
+          '      "type": "operation",\n' +
+          '      "actionMode": "sequential",\n' +
+          '      "actions": [\n' +
+          "        {\n" +
+          '          "name": "action1",\n' +
+          '          "functionRef": "function1"\n' +
+          "        },\n" +
+          "        {\n" +
+          '          "name": "action2",\n' +
+          '          "subFlowRef": "subflow1"\n' +
+          "        }\n" +
+          "      ],\n" +
+          '      "end": true\n' +
+          "    }\n" +
+          "  ]\n" +
+          "}",
+        // Example
         "{\n" +
           '  "id": "helloworld",\n' +
           '  "version": "1.0",\n' +
           '  "specVersion": "0.8",\n' +
           '  "name": "Hello World Workflow",\n' +
           '  "description": "Inject Hello World",\n' +
-          '  "start": "Initial State",\n' +
+          '  "start": "Inject data",\n' +
           '  "states": [\n' +
           "    {\n" +
-          '      "name": "Initial State",\n' +
+          '      "name": "Inject data",\n' +
           '      "type": "inject",\n' +
           '      "end": false,\n' +
-          '      "transition": "State1",\n' +
+          '      "compensatedBy": "Compensate",\n' +
+          '      "transition": "Wait for Events",\n' +
           '      "onErrors": [\n' +
           "        {\n" +
           '          "errorRef": "SomeError1",\n' +
           '          "end": false,\n' +
-          '          "transition": "ErrorState1"\n' +
-          "        },\n" +
-          "        {\n" +
-          '          "errorRef": "SomeError2",\n' +
-          '          "end": false,\n' +
-          '          "transition": "ErrorState2"\n' +
+          '          "transition": "Handle Error"\n' +
           "        }\n" +
           "      ]\n" +
           "    },\n" +
           "    {\n" +
-          '      "name": "ErrorState1",\n' +
+          '      "name": "Handle Error",\n' +
           '      "type": "inject",\n' +
           '      "end": true\n' +
           "    },\n" +
           "    {\n" +
-          '      "name": "ErrorState2",\n' +
-          '      "type": "inject",\n' +
-          '      "end": true\n' +
-          "    },\n" +
-          "    {\n" +
-          '      "name": "State1",\n' +
-          '      "type": "inject",\n' +
-          '      "end": false,\n' +
-          '      "transition": "EventState1"\n' +
-          "    },\n" +
-          "    {\n" +
-          '      "name": "EventState1",\n' +
+          '      "name": "Wait for Events",\n' +
           '      "type": "event",\n' +
           '      "onEvents": [\n' +
           "        {\n" +
           '          "eventRefs": [\n' +
-          '            "Event1"\n' +
+          '            "Event"\n' +
           "          ],\n" +
           '          "actions": [\n' +
           "            {\n" +
-          '              "functionRef": "Function1"\n' +
+          '              "functionRef": "Function"\n' +
           "            }\n" +
           "          ]\n" +
           "        }\n" +
           "      ],\n" +
-          '      "compensatedBy": "ErrorState1",\n' +
+          '      "eventTimeout": "PT1H",\n' +
+          '      "transition": "Run Operations",\n' +
+          '      "end": false\n' +
+          "    },\n" +
+          "    {\n" +
+          '      "name": "Run Operations",\n' +
+          '      "type": "operation",\n' +
+          '      "actionMode": "sequential",\n' +
+          '      "actions": [\n' +
+          "        {\n" +
+          '          "name": "action1",\n' +
+          '          "functionRef": "Task1"\n' +
+          "        },\n" +
+          "        {\n" +
+          '          "name": "action2",\n' +
+          '          "subFlowRef": "Task2"\n' +
+          "        }\n" +
+          "      ],\n" +
+          '      "end": true\n' +
+          "    },\n" +
+          "    {\n" +
+          '      "name": "Compensate",\n' +
+          '      "type": "inject",\n' +
           '      "end": true\n' +
           "    }\n" +
           "  ]\n" +
