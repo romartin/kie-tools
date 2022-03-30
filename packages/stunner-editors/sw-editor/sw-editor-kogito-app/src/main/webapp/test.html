@@ -73,13 +73,7 @@
 
     <div style="display: inline; float: left; padding: 25px">
       <label for="selectExample">Examples:&nbsp;</label>
-      <select id="selectExample">
-        <option value="Basic" selected>Basic</option>
-        <option value="Errors">Errors</option>
-        <option value="Events">Events</option>
-        <option value="Operation">Operation</option>
-        <option value="Example">Example</option>
-      </select>
+      <select id="selectExample"></select>
       <input type="button" onclick="loadText()" value="Load JSON Content" style="display: block; margin-bottom: 5px" />
       <textarea id="jsonRawContent" rows="50" cols="50" style="font-size: revert"></textarea>
     </div>
@@ -87,6 +81,208 @@
     <div style="display: inline; float: left; width: 50%">
       <iframe id="editorFrame" src="index.html" width="100%" height="880px" frameborder="0" scrolling="no"></iframe>
     </div>
+
+    <script>
+      const examples = [
+        {
+          id: "injectExample",
+          version: "1.0",
+          specVersion: "0.8",
+          name: "Inject State Example",
+          description: "Inject Example",
+          start: "Inject State",
+          states: [
+            {
+              name: "Inject State",
+              type: "inject",
+              data: {
+                person: {
+                  fname: "John",
+                  lname: "Doe",
+                },
+              },
+              stateDataFilter: {
+                input: "${ {vegetables: .vegetables} }",
+                output: "${ {vegetables: [.vegetables[] | select(.veggieLike == true)]} }",
+              },
+              usedForCompensation: false,
+              metadata: {
+                prop1: "value1",
+                prop2: "value2",
+              },
+              end: true,
+            },
+          ],
+        },
+
+        {
+          id: "eventStateExample",
+          version: "1.0",
+          name: "Event State Example",
+          start: "Event State",
+          states: [
+            {
+              name: "Event State",
+              type: "event",
+              onEvents: [
+                {
+                  eventRefs: ["Event1"],
+                  actions: [
+                    {
+                      functionRef: "Function1",
+                    },
+                  ],
+                },
+              ],
+              end: true,
+            },
+          ],
+          events: [
+            {
+              name: "Event1",
+              type: "EventDef1Type",
+              source: "EventDef1Source",
+            },
+          ],
+          functions: [
+            {
+              name: "Function1",
+              operation: "openapiservicedef.json#someFunction",
+              type: "rest",
+            },
+          ],
+        },
+
+        {
+          id: "operationStateWorkflow",
+          name: "Operation State Example",
+          description: "Operation State Example",
+          version: "1.0",
+          specVersion: "0.8",
+          start: "Operation State",
+          states: [
+            {
+              name: "Operation State",
+              type: "operation",
+              actionMode: "sequential",
+              actions: [
+                {
+                  name: "action1",
+                  functionRef: "function1",
+                },
+                {
+                  name: "action2",
+                  subFlowRef: "subflow1",
+                },
+              ],
+              end: true,
+            },
+          ],
+        },
+
+        {
+          id: "errorsExample",
+          version: "1.0",
+          specVersion: "0.8",
+          name: "Errors Example",
+          description: "Errors Example",
+          start: "Init State",
+          states: [
+            {
+              name: "Init State",
+              type: "inject",
+              end: false,
+              transition: "Next State",
+              onErrors: [
+                {
+                  errorRef: "Some Error",
+                  end: false,
+                  transition: "Error State",
+                },
+              ],
+            },
+            {
+              name: "Error State",
+              type: "inject",
+              end: true,
+            },
+            {
+              name: "Next State",
+              type: "inject",
+              end: true,
+            },
+          ],
+        },
+
+        {
+          id: "statesExample",
+          version: "1.0",
+          specVersion: "0.8",
+          name: "States Example",
+          description: "States Example",
+          start: "Inject data",
+          states: [
+            {
+              name: "Inject data",
+              type: "inject",
+              end: false,
+              compensatedBy: "Compensate",
+              transition: "Wait for Events",
+              onErrors: [
+                {
+                  errorRef: "SomeError1",
+                  end: false,
+                  transition: "Handle Error",
+                },
+              ],
+            },
+            {
+              name: "Handle Error",
+              type: "inject",
+              end: true,
+            },
+            {
+              name: "Wait for Events",
+              type: "event",
+              onEvents: [
+                {
+                  eventRefs: ["Event"],
+                  actions: [
+                    {
+                      functionRef: "Function",
+                    },
+                  ],
+                },
+              ],
+              eventTimeout: "PT1H",
+              transition: "Run Operations",
+              end: false,
+            },
+            {
+              name: "Run Operations",
+              type: "operation",
+              actionMode: "sequential",
+              actions: [
+                {
+                  name: "action1",
+                  functionRef: "Task1",
+                },
+                {
+                  name: "action2",
+                  subFlowRef: "Task2",
+                },
+              ],
+              end: true,
+            },
+            {
+              name: "Compensate",
+              type: "inject",
+              end: true,
+            },
+          ],
+        },
+      ];
+    </script>
 
     <script>
       function applyText(object) {
@@ -101,206 +297,28 @@
       function getText() {
         return document.getElementById("jsonRawContent").value;
       }
+      function loadExamplesDropDown() {
+        var examplesSelect = document.getElementById("selectExample");
 
-      const examples = [
-        // Basic example
-        "{\n" +
-          '  "id": "helloworld",\n' +
-          '  "version": "1.0",\n' +
-          '  "specVersion": "0.8",\n' +
-          '  "name": "Hello World Workflow",\n' +
-          '  "description": "Inject Hello World",\n' +
-          '  "start": "Hello State",\n' +
-          '  "states": [\n' +
-          "    {\n" +
-          '      "name": "Hello State",\n' +
-          '      "type": "inject",\n' +
-          '      "data": {\n' +
-          '        "result": "Hello World!"\n' +
-          "      },\n" +
-          '      "end": true\n' +
-          "    }\n" +
-          "  ]\n" +
-          "}",
-        // Error example
-        "{\n" +
-          ' "id": "helloworld",\n' +
-          ' "version": "1.0",\n' +
-          ' "specVersion": "0.8",\n' +
-          ' "name": "Hello World Workflow",\n' +
-          ' "description": "Inject Hello World",\n' +
-          ' "start": "Hello State",\n' +
-          ' "states": [\n' +
-          "  {\n" +
-          '   "name": "Hello State",\n' +
-          '   "type": "inject",\n' +
-          '   "end": false,\n' +
-          '   "transition": "State1",\n' +
-          '   "onErrors": [\n' +
-          "    {\n" +
-          '     "errorRef": "Some Error",\n' +
-          '     "end": false,\n' +
-          '     "transition": "Error1"\n' +
-          "    }\n" +
-          "   ]\n" +
-          "  },\n" +
-          "  {\n" +
-          '   "name": "Error1",\n' +
-          '   "type": "inject",\n' +
-          '   "end": true\n' +
-          "  },\n" +
-          "  {\n" +
-          '   "name": "State1",\n' +
-          '   "type": "inject",\n' +
-          '   "end": true\n' +
-          "  }\n" +
-          " ]\n" +
-          "}",
-        // Simple Event State Example
-        "{\n" +
-          '  "id": "simpleEventStateExample",\n' +
-          '  "version": "1.0",\n' +
-          '  "name": "Simple Event State Example",\n' +
-          '  "start": "Event State 1",\n' +
-          '  "states": [\n' +
-          "    {\n" +
-          '      "name": "Event State 1",\n' +
-          '      "type": "event",\n' +
-          '      "onEvents": [\n' +
-          "        {\n" +
-          '          "eventRefs": [' +
-          '            "Event1"' +
-          "          ],\n" +
-          '          "actions": [\n' +
-          "            {\n" +
-          '              "functionRef": "Function1"\n' +
-          "            }\n" +
-          "          ]\n" +
-          "        }\n" +
-          "      ],\n" +
-          '      "end": true\n' +
-          "    }\n" +
-          "  ],\n" +
-          '  "events": [\n' +
-          "    {\n" +
-          '      "name": "Event1",\n' +
-          '      "type": "EventDef1Type",\n' +
-          '      "source": "EventDef1Source"\n' +
-          "    }\n" +
-          "  ],\n" +
-          '  "functions": [\n' +
-          "    {\n" +
-          '      "name": "Function1",\n' +
-          '      "operation": "openapiservicedef.json#someFunction",\n' +
-          '      "type": "rest"\n' +
-          "    }\n" +
-          "  ]\n" +
-          "}",
-        // Operation State
-        "{\n" +
-          '  "id": "opStateWorkflow",\n' +
-          '  "name": "Operation State Workflow",\n' +
-          '  "description": "Op State Example",\n' +
-          '  "version": "1.0",\n' +
-          '  "specVersion": "0.8",\n' +
-          '  "start": "Operation1",\n' +
-          '  "states": [\n' +
-          "    {\n" +
-          '      "name": "Operation1",\n' +
-          '      "type": "operation",\n' +
-          '      "actionMode": "sequential",\n' +
-          '      "actions": [\n' +
-          "        {\n" +
-          '          "name": "action1",\n' +
-          '          "functionRef": "function1"\n' +
-          "        },\n" +
-          "        {\n" +
-          '          "name": "action2",\n' +
-          '          "subFlowRef": "subflow1"\n' +
-          "        }\n" +
-          "      ],\n" +
-          '      "end": true\n' +
-          "    }\n" +
-          "  ]\n" +
-          "}",
-        // Example
-        "{\n" +
-          '  "id": "helloworld",\n' +
-          '  "version": "1.0",\n' +
-          '  "specVersion": "0.8",\n' +
-          '  "name": "Hello World Workflow",\n' +
-          '  "description": "Inject Hello World",\n' +
-          '  "start": "Inject data",\n' +
-          '  "states": [\n' +
-          "    {\n" +
-          '      "name": "Inject data",\n' +
-          '      "type": "inject",\n' +
-          '      "end": false,\n' +
-          '      "compensatedBy": "Compensate",\n' +
-          '      "transition": "Wait for Events",\n' +
-          '      "onErrors": [\n' +
-          "        {\n" +
-          '          "errorRef": "SomeError1",\n' +
-          '          "end": false,\n' +
-          '          "transition": "Handle Error"\n' +
-          "        }\n" +
-          "      ]\n" +
-          "    },\n" +
-          "    {\n" +
-          '      "name": "Handle Error",\n' +
-          '      "type": "inject",\n' +
-          '      "end": true\n' +
-          "    },\n" +
-          "    {\n" +
-          '      "name": "Wait for Events",\n' +
-          '      "type": "event",\n' +
-          '      "onEvents": [\n' +
-          "        {\n" +
-          '          "eventRefs": [\n' +
-          '            "Event"\n' +
-          "          ],\n" +
-          '          "actions": [\n' +
-          "            {\n" +
-          '              "functionRef": "Function"\n' +
-          "            }\n" +
-          "          ]\n" +
-          "        }\n" +
-          "      ],\n" +
-          '      "eventTimeout": "PT1H",\n' +
-          '      "transition": "Run Operations",\n' +
-          '      "end": false\n' +
-          "    },\n" +
-          "    {\n" +
-          '      "name": "Run Operations",\n' +
-          '      "type": "operation",\n' +
-          '      "actionMode": "sequential",\n' +
-          '      "actions": [\n' +
-          "        {\n" +
-          '          "name": "action1",\n' +
-          '          "functionRef": "Task1"\n' +
-          "        },\n" +
-          "        {\n" +
-          '          "name": "action2",\n' +
-          '          "subFlowRef": "Task2"\n' +
-          "        }\n" +
-          "      ],\n" +
-          '      "end": true\n' +
-          "    },\n" +
-          "    {\n" +
-          '      "name": "Compensate",\n' +
-          '      "type": "inject",\n' +
-          '      "end": true\n' +
-          "    }\n" +
-          "  ]\n" +
-          "}",
-      ];
+        for (let i = 0; i < examples.length; i++) {
+          let example = examples[i];
+          var option = document.createElement("option");
+          option.value = example.id;
+          option.textContent = example.name;
+          if (i === 0) {
+            option.selected = "selected";
+          }
+          examplesSelect.appendChild(option);
+        }
+      }
 
       document.getElementById("selectExample").onchange = function (e) {
         var i = document.getElementById("selectExample").selectedIndex;
-        setText(examples[i]);
+        applyText(examples[i]);
       };
 
-      setText(examples[0]);
+      loadExamplesDropDown();
+      applyText(examples[0]);
 
       window.frames.editorFrame.contentWindow.onContentChanged = function (raw) {
         setText(raw);

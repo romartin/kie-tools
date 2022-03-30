@@ -25,6 +25,7 @@ import elemental2.promise.Promise;
 import jsinterop.base.Js;
 import org.kie.workbench.common.stunner.core.api.DefinitionManager;
 import org.kie.workbench.common.stunner.core.api.FactoryManager;
+import org.kie.workbench.common.stunner.core.client.service.ClientRuntimeError;
 import org.kie.workbench.common.stunner.core.graph.Edge;
 import org.kie.workbench.common.stunner.core.graph.Graph;
 import org.kie.workbench.common.stunner.core.graph.Node;
@@ -92,8 +93,19 @@ public class Marshaller {
 
     @SuppressWarnings("all")
     public Promise<Graph> unmarshallGraph(String raw) {
-        final Object root = parse(raw);
-        final Workflow workflow = parser.parse(Js.uncheckedCast(root));
+        final Workflow workflow;
+        try {
+            final Object root = parse(raw);
+            workflow = parser.parse(Js.uncheckedCast(root));
+        } catch (Exception e) {
+            return promises.create(new Promise.PromiseExecutorCallbackFn<Graph>() {
+                @Override
+                public void onInvoke(ResolveCallbackFn<Graph> resolveCallbackFn,
+                                     RejectCallbackFn rejectCallbackFn) {
+                    rejectCallbackFn.onInvoke(new ClientRuntimeError("Error parsing JSON file.", e));
+                }
+            });
+        }
 
         // TODO: Use dedicated factory instead.
         final GraphImpl<Object> graph = GraphImpl.build(workflow.id);

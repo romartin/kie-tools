@@ -37,8 +37,11 @@ public class OperationState extends State {
 
     public ActionNode[] actions;
 
+    public boolean usedForCompensation;
+
     public OperationState() {
         this.type = TYPE_OPERATION;
+        this.usedForCompensation = false;
     }
 
     public String getActionMode() {
@@ -55,5 +58,13 @@ public class OperationState extends State {
 
     public void setActions(ActionNode[] actions) {
         this.actions = actions;
+    }
+
+    public boolean isUsedForCompensation() {
+        return usedForCompensation;
+    }
+
+    public void setUsedForCompensation(boolean usedForCompensation) {
+        this.usedForCompensation = usedForCompensation;
     }
 }

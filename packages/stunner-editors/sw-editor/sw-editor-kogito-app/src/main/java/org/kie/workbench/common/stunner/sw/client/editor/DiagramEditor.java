@@ -31,6 +31,7 @@ import org.kie.workbench.common.stunner.core.client.service.ClientRuntimeError;
 import org.kie.workbench.common.stunner.core.client.service.ServiceCallback;
 import org.kie.workbench.common.stunner.core.client.util.WindowJSType;
 import org.kie.workbench.common.stunner.core.diagram.Diagram;
+import org.kie.workbench.common.stunner.core.diagram.DiagramParsingException;
 import org.kie.workbench.common.stunner.core.diagram.Metadata;
 import org.kie.workbench.common.stunner.sw.client.services.ClientDiagramService;
 import org.kie.workbench.common.stunner.sw.client.services.IncrementalMarshaller;
@@ -121,6 +122,7 @@ public class DiagramEditor {
 
                                                          @Override
                                                          public void onError(ClientRuntimeError error) {
+                                                             stunnerEditor.handleError(error);
                                                              failure.onInvoke(error);
                                                          }
                                                      });
@@ -128,7 +130,7 @@ public class DiagramEditor {
 
                                          @Override
                                          public void onError(final ClientRuntimeError error) {
-                                             stunnerEditor.handleError(error);
+                                             stunnerEditor.handleError(new ClientRuntimeError(new DiagramParsingException()));
                                              failure.onInvoke(error);
                                          }
                                      });

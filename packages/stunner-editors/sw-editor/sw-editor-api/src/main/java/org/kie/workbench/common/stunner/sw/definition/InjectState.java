@@ -35,8 +35,11 @@ public class InjectState extends State {
     @Property
     public String data;
 
+    public boolean usedForCompensation;
+
     public InjectState() {
         this.type = TYPE_INJECT;
+        this.usedForCompensation = false;
     }
 
     public String getData() {
@@ -45,5 +48,13 @@ public class InjectState extends State {
 
     public void setData(String data) {
         this.data = data;
+    }
+
+    public boolean isUsedForCompensation() {
+        return usedForCompensation;
+    }
+
+    public void setUsedForCompensation(boolean usedForCompensation) {
+        this.usedForCompensation = usedForCompensation;
     }
 }

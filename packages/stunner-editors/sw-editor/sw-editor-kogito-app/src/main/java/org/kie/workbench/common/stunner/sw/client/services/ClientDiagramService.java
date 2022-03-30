@@ -137,7 +137,13 @@ public class ClientDiagramService {
         }, new IThenable.ThenOnRejectedCallbackFn<Object>() {
             @Override
             public IThenable<Object> onInvoke(Object o) {
-                serviceCallback.onError(new ClientRuntimeError((Throwable) o));
+                final ClientRuntimeError e;
+                if (o instanceof ClientRuntimeError) {
+                    e = (ClientRuntimeError) o;
+                } else {
+                    e = new ClientRuntimeError((Throwable) o);
+                }
+                serviceCallback.onError(e);
                 return null;
             }
         });

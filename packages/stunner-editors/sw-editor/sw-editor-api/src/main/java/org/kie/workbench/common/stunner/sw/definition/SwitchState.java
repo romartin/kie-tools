@@ -35,8 +35,11 @@ public class SwitchState extends State {
     @Property
     public String defaultCondition;
 
+    public boolean usedForCompensation;
+
     public SwitchState() {
         this.type = TYPE_SWITCH;
+        this.usedForCompensation = false;
     }
 
     public String getDefaultCondition() {
@@ -45,5 +48,13 @@ public class SwitchState extends State {
 
     public void setDefaultCondition(String defaultCondition) {
         this.defaultCondition = defaultCondition;
+    }
+
+    public boolean isUsedForCompensation() {
+        return usedForCompensation;
+    }
+
+    public void setUsedForCompensation(boolean usedForCompensation) {
+        this.usedForCompensation = usedForCompensation;
     }
 }
