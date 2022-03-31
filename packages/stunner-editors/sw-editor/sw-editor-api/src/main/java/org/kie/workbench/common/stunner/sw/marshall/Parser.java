@@ -24,7 +24,10 @@ import org.kie.workbench.common.stunner.core.api.FactoryManager;
 import org.kie.workbench.common.stunner.sw.definition.ActionNode;
 import org.kie.workbench.common.stunner.sw.definition.CallFunctionAction;
 import org.kie.workbench.common.stunner.sw.definition.CallSubflowAction;
+import org.kie.workbench.common.stunner.sw.definition.DataConditionTransition;
+import org.kie.workbench.common.stunner.sw.definition.DefaultConditionTransition;
 import org.kie.workbench.common.stunner.sw.definition.ErrorTransition;
+import org.kie.workbench.common.stunner.sw.definition.EventConditionTransition;
 import org.kie.workbench.common.stunner.sw.definition.EventState;
 import org.kie.workbench.common.stunner.sw.definition.InjectState;
 import org.kie.workbench.common.stunner.sw.definition.OnEvent;
@@ -62,7 +65,7 @@ public class Parser {
         } else if (EventState.TYPE_EVENT.equals(jso.type)) {
             state = parseEventState(jso);
         } else if (SwitchState.TYPE_SWITCH.equals(jso.type)) {
-            state = parse(SwitchState.class, jso);
+            state = parseSwitchState(jso);
         } else if (OperationState.TYPE_OPERATION.equals(jso.type)) {
             state = parseOperationState(jso);
         }
@@ -79,6 +82,33 @@ public class Parser {
             }
         }
 
+        return state;
+    }
+
+    private SwitchState parseSwitchState(State jso) {
+        SwitchState state = (SwitchState) parse(SwitchState.class, jso);
+        DefaultConditionTransition defaultCondition = Js.uncheckedCast(Js.asPropertyMap(jso).get("defaultCondition"));
+        if (null != defaultCondition) {
+            state.defaultCondition = parse(DefaultConditionTransition.class, defaultCondition);
+        }
+        EventConditionTransition[] eventConditions = Js.uncheckedCast(Js.asPropertyMap(jso).get("eventConditions"));
+        if (null != eventConditions) {
+            state.eventConditions = new EventConditionTransition[eventConditions.length];
+            for (int i = 0; i < eventConditions.length; i++) {
+                EventConditionTransition eventConditionJSO = eventConditions[i];
+                EventConditionTransition eventCondition = parse(EventConditionTransition.class, eventConditionJSO);
+                state.eventConditions[i] = eventCondition;
+            }
+        }
+        DataConditionTransition[] dataConditions = Js.uncheckedCast(Js.asPropertyMap(jso).get("dataConditions"));
+        if (null != dataConditions) {
+            state.dataConditions = new DataConditionTransition[dataConditions.length];
+            for (int i = 0; i < dataConditions.length; i++) {
+                DataConditionTransition dataConditionJSO = dataConditions[i];
+                DataConditionTransition dataCondition = parse(DataConditionTransition.class, dataConditionJSO);
+                state.dataConditions[i] = dataCondition;
+            }
+        }
         return state;
     }
 

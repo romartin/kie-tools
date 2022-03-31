@@ -40,8 +40,11 @@ import org.kie.workbench.common.stunner.core.graph.processing.index.map.MapIndex
 import org.kie.workbench.common.stunner.sw.autolayout.AutoLayout;
 import org.kie.workbench.common.stunner.sw.definition.ActionNode;
 import org.kie.workbench.common.stunner.sw.definition.CompensationTransition;
+import org.kie.workbench.common.stunner.sw.definition.DataConditionTransition;
+import org.kie.workbench.common.stunner.sw.definition.DefaultConditionTransition;
 import org.kie.workbench.common.stunner.sw.definition.End;
 import org.kie.workbench.common.stunner.sw.definition.ErrorTransition;
+import org.kie.workbench.common.stunner.sw.definition.EventConditionTransition;
 import org.kie.workbench.common.stunner.sw.definition.EventState;
 import org.kie.workbench.common.stunner.sw.definition.InjectState;
 import org.kie.workbench.common.stunner.sw.definition.OnEvent;
@@ -61,10 +64,15 @@ import static org.kie.workbench.common.stunner.sw.marshall.StateMarshalling.ONEV
 import static org.kie.workbench.common.stunner.sw.marshall.StateMarshalling.OPERATION_STATE_UNMARSHALLER;
 import static org.kie.workbench.common.stunner.sw.marshall.StateMarshalling.STATE_MARSHALLER;
 import static org.kie.workbench.common.stunner.sw.marshall.StateMarshalling.STATE_UNMARSHALLER;
+import static org.kie.workbench.common.stunner.sw.marshall.StateMarshalling.SWITCH_STATE_UNMARSHALLER;
+import static org.kie.workbench.common.stunner.sw.marshall.TransitionMarshalling.ANY_EDGE_MARSHALLER;
 import static org.kie.workbench.common.stunner.sw.marshall.TransitionMarshalling.COMPENSATION_TRANSITION_MARSHALLER;
 import static org.kie.workbench.common.stunner.sw.marshall.TransitionMarshalling.COMPENSATION_TRANSITION_UNMARSHALLER;
+import static org.kie.workbench.common.stunner.sw.marshall.TransitionMarshalling.DATA_CONDITION_TRANSITION_UNMARSHALLER;
+import static org.kie.workbench.common.stunner.sw.marshall.TransitionMarshalling.DEFAULT_CONDITION_TRANSITION_UNMARSHALLER;
 import static org.kie.workbench.common.stunner.sw.marshall.TransitionMarshalling.ERROR_TRANSITION_MARSHALLER;
 import static org.kie.workbench.common.stunner.sw.marshall.TransitionMarshalling.ERROR_TRANSITION_UNMARSHALLER;
+import static org.kie.workbench.common.stunner.sw.marshall.TransitionMarshalling.EVENT_CONDITION_TRANSITION_UNMARSHALLER;
 import static org.kie.workbench.common.stunner.sw.marshall.TransitionMarshalling.START_TRANSITION_MARSHALLER;
 import static org.kie.workbench.common.stunner.sw.marshall.TransitionMarshalling.START_TRANSITION_UNMARSHALLER;
 import static org.kie.workbench.common.stunner.sw.marshall.TransitionMarshalling.TRANSITION_MARSHALLER;
@@ -206,7 +214,7 @@ public class Marshaller {
         } else if (InjectState.class.equals(type)) {
             return (NodeUnmarshaller<T>) STATE_UNMARSHALLER;
         } else if (SwitchState.class.equals(type)) {
-            return (NodeUnmarshaller<T>) STATE_UNMARSHALLER;
+            return (NodeUnmarshaller<T>) SWITCH_STATE_UNMARSHALLER;
         } else if (ActionNode[].class.equals(type)) {
             return (NodeUnmarshaller<T>) ACTIONS_UNMARSHALLER;
         } else if (OnEvent[].class.equals(type)) {
@@ -229,6 +237,15 @@ public class Marshaller {
         }
         if (CompensationTransition.class.equals(type)) {
             return (EdgeUnmarshaller<T>) COMPENSATION_TRANSITION_UNMARSHALLER;
+        }
+        if (DefaultConditionTransition.class.equals(type)) {
+            return (EdgeUnmarshaller<T>) DEFAULT_CONDITION_TRANSITION_UNMARSHALLER;
+        }
+        if (EventConditionTransition.class.equals(type)) {
+            return (EdgeUnmarshaller<T>) EVENT_CONDITION_TRANSITION_UNMARSHALLER;
+        }
+        if (DataConditionTransition.class.equals(type)) {
+            return (EdgeUnmarshaller<T>) DATA_CONDITION_TRANSITION_UNMARSHALLER;
         }
         throw new UnsupportedOperationException("No EdgeUnmarshaller found for " + type.getName());
     }
@@ -277,8 +294,8 @@ public class Marshaller {
         Object bean = ((Definition) node.getContent()).getDefinition();
         NodeMarshaller<Object> marshaller = getNodeMarshallerForBean(bean);
         if (null == marshaller) {
-                DomGlobal.console.warn("No NodeMarshaller found for " + bean.getClass().getName());
-                marshaller = (NodeMarshaller<Object>) ANY_NODE_MARSHALLER;
+            DomGlobal.console.warn("No NodeMarshaller found for " + bean.getClass().getName());
+            marshaller = (NodeMarshaller<Object>) ANY_NODE_MARSHALLER;
         }
         return (NodeMarshaller<T>) marshaller;
     }
@@ -286,7 +303,12 @@ public class Marshaller {
     @SuppressWarnings("all")
     public static <T> EdgeMarshaller<T> getEdgeMarshaller(Edge edge) {
         Object bean = ((Definition) edge.getContent()).getDefinition();
-        return getEdgeMarshallerForBean(bean);
+        EdgeMarshaller<Object> marshaller = getEdgeMarshallerForBean(bean);
+        if (null == marshaller) {
+            DomGlobal.console.warn("No EdgeMarshaller found for " + bean.getClass().getName());
+            marshaller = (EdgeMarshaller<Object>) ANY_EDGE_MARSHALLER;
+        }
+        return (EdgeMarshaller<T>) marshaller;
     }
 
     @SuppressWarnings("unchecked")
@@ -323,7 +345,7 @@ public class Marshaller {
         if (ErrorTransition.class.equals(type)) {
             return (EdgeMarshaller<T>) ERROR_TRANSITION_MARSHALLER;
         }
-        throw new UnsupportedOperationException("No EdgeMarshaller found for " + type.getName());
+        return null;
     }
 
     public static boolean isStartState(Node node) {

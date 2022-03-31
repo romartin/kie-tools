@@ -58,6 +58,7 @@ public class Transition {
     @Property(meta = PropertyMetaTypes.NAME)
     public String name;
 
+    // TODO: Do as DefaultConditionTransition?
     @JsIgnore
     public String to;
 

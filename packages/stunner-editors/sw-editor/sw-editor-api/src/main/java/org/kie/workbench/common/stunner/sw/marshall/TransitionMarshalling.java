@@ -19,8 +19,11 @@ package org.kie.workbench.common.stunner.sw.marshall;
 import org.kie.workbench.common.stunner.core.graph.Edge;
 import org.kie.workbench.common.stunner.core.graph.Node;
 import org.kie.workbench.common.stunner.sw.definition.CompensationTransition;
+import org.kie.workbench.common.stunner.sw.definition.DataConditionTransition;
+import org.kie.workbench.common.stunner.sw.definition.DefaultConditionTransition;
 import org.kie.workbench.common.stunner.sw.definition.End;
 import org.kie.workbench.common.stunner.sw.definition.ErrorTransition;
+import org.kie.workbench.common.stunner.sw.definition.EventConditionTransition;
 import org.kie.workbench.common.stunner.sw.definition.StartTransition;
 import org.kie.workbench.common.stunner.sw.definition.State;
 import org.kie.workbench.common.stunner.sw.definition.Transition;
@@ -68,11 +71,52 @@ public interface TransitionMarshalling {
 
     EdgeUnmarshaller<CompensationTransition> COMPENSATION_TRANSITION_UNMARSHALLER =
             (context, transition) -> {
-                // transition.setName("Compensated By");
                 String to = transition.getTransition();
                 Edge edge = context.addEdgeToTargetName(transition, context.sourceNode, to);
                 return edge;
             };
+
+    EdgeUnmarshaller<DefaultConditionTransition> DEFAULT_CONDITION_TRANSITION_UNMARSHALLER =
+            (context, transition) -> {
+                boolean end = transition.isEnd();
+                Edge edge;
+                if (end) {
+                    edge = context.addEdgeToTargetName(transition, context.sourceNode, STATE_END);
+                } else {
+                    String to = transition.getTransition();
+                    edge = context.addEdgeToTargetName(transition, context.sourceNode, to);
+                }
+                return edge;
+            };
+
+    EdgeUnmarshaller<EventConditionTransition> EVENT_CONDITION_TRANSITION_UNMARSHALLER =
+            (context, transition) -> {
+                boolean end = transition.isEnd();
+                Edge edge;
+                if (end) {
+                    edge = context.addEdgeToTargetName(transition, context.sourceNode, STATE_END);
+                } else {
+                    String to = transition.getTransition();
+                    edge = context.addEdgeToTargetName(transition, context.sourceNode, to);
+                }
+                return edge;
+            };
+
+    EdgeUnmarshaller<DataConditionTransition> DATA_CONDITION_TRANSITION_UNMARSHALLER =
+            (context, transition) -> {
+                boolean end = transition.isEnd();
+                Edge edge;
+                if (end) {
+                    edge = context.addEdgeToTargetName(transition, context.sourceNode, STATE_END);
+                } else {
+                    String to = transition.getTransition();
+                    edge = context.addEdgeToTargetName(transition, context.sourceNode, to);
+                }
+                return edge;
+            };
+
+    EdgeMarshaller<Object> ANY_EDGE_MARSHALLER =
+            (context, edge) -> edge;
 
     EdgeMarshaller<Transition> TRANSITION_MARSHALLER =
             (context, edge) -> {

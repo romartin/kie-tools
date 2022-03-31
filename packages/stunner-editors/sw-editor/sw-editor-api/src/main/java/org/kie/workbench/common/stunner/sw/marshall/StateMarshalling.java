@@ -27,14 +27,17 @@ import org.kie.workbench.common.stunner.sw.definition.ActionNode;
 import org.kie.workbench.common.stunner.sw.definition.ActionTransition;
 import org.kie.workbench.common.stunner.sw.definition.ActionsContainer;
 import org.kie.workbench.common.stunner.sw.definition.CompensationTransition;
+import org.kie.workbench.common.stunner.sw.definition.DataConditionTransition;
+import org.kie.workbench.common.stunner.sw.definition.DefaultConditionTransition;
 import org.kie.workbench.common.stunner.sw.definition.ErrorTransition;
+import org.kie.workbench.common.stunner.sw.definition.EventConditionTransition;
 import org.kie.workbench.common.stunner.sw.definition.EventRef;
 import org.kie.workbench.common.stunner.sw.definition.EventState;
 import org.kie.workbench.common.stunner.sw.definition.EventTimeout;
-import org.kie.workbench.common.stunner.sw.definition.EventTransition;
 import org.kie.workbench.common.stunner.sw.definition.OnEvent;
 import org.kie.workbench.common.stunner.sw.definition.OperationState;
 import org.kie.workbench.common.stunner.sw.definition.State;
+import org.kie.workbench.common.stunner.sw.definition.SwitchState;
 import org.kie.workbench.common.stunner.sw.definition.Transition;
 import org.kie.workbench.common.stunner.sw.marshall.Marshaller.NodeMarshaller;
 import org.kie.workbench.common.stunner.sw.marshall.Marshaller.NodeUnmarshaller;
@@ -195,6 +198,36 @@ public interface StateMarshalling {
                 return actionsNode;
             };
 
+    NodeUnmarshaller<SwitchState> SWITCH_STATE_UNMARSHALLER =
+            (context, state) -> {
+                Node stateNode = STATE_UNMARSHALLER.unmarshall(context, state);
+                context.sourceNode = stateNode;
+                DefaultConditionTransition defaultCondition = state.getDefaultCondition();
+                if (null != defaultCondition) {
+                    Edge defaultConditionEdge = unmarshallEdge(context, defaultCondition);
+                }
+                EventConditionTransition[] eventConditions = state.getEventConditions();
+                if (null != eventConditions && eventConditions.length > 0) {
+                    for (int i = 0; i < eventConditions.length; i++) {
+                        EventConditionTransition eventCondition = eventConditions[i];
+                        if (null != eventCondition) {
+                            Edge eventConditionEdge = unmarshallEdge(context, eventCondition);
+                        }
+                    }
+                }
+                DataConditionTransition[] dataConditions = state.getDataConditions();
+                if (null != dataConditions && dataConditions.length > 0) {
+                    for (int i = 0; i < dataConditions.length; i++) {
+                        DataConditionTransition dataCondition = dataConditions[i];
+                        if (null != dataCondition) {
+                            Edge dataConditionEdge = unmarshallEdge(context, dataCondition);
+                        }
+                    }
+                }
+                context.sourceNode = null;
+                return stateNode;
+            };
+
     NodeUnmarshaller<OperationState> OPERATION_STATE_UNMARSHALLER =
             (context, state) -> {
                 Node stateNode = STATE_UNMARSHALLER.unmarshall(context, state);
@@ -219,9 +252,6 @@ public interface StateMarshalling {
                     OnEvent[] onEvents = state.getOnEvents();
                     if (null != onEvents && onEvents.length > 0) {
                         Node onEventsNode = ONEVENTS_UNMARSHALLER.unmarshall(context, onEvents);
-                        final EventTransition onEventsTransition = new EventTransition();
-                        // onEventsTransition.setName("OnEvents");
-                        Edge onEventsEdge = context.addEdgeToTargetUUID(onEventsTransition, stateNode, onEventsNode.getUUID());
                     }
                 }
                 return stateNode;

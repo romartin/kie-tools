@@ -120,6 +120,7 @@ public interface WorkflowMarshalling {
                 List<Node> childNodes = getChildNodes(workflowNode);
                 childNodes.forEach(node -> {
                     if (!isStartState(node) && !isEndState(node)) {
+                        // TODO: If node has been already processed by some edge, no real need to iterate over it here....
                         if (hasNodeMarshaller(node)) {
                             marshallNode(context, node);
                             beans.add(getElementDefinition(node));
