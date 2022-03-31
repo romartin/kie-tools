@@ -101,6 +101,9 @@ public interface StateMarshalling {
                 return stateNode;
             };
 
+    NodeMarshaller<Object> ANY_NODE_MARSHALLER =
+            (context, node) -> node.getContent().getDefinition();
+
     NodeMarshaller<State> STATE_MARSHALLER =
             (context, stateNode) -> {
                 State state = stateNode.getContent().getDefinition();

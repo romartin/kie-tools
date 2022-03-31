@@ -35,6 +35,7 @@ import static org.kie.workbench.common.stunner.core.graph.util.GraphUtils.getChi
 import static org.kie.workbench.common.stunner.sw.marshall.Marshaller.STATE_END;
 import static org.kie.workbench.common.stunner.sw.marshall.Marshaller.STATE_START;
 import static org.kie.workbench.common.stunner.sw.marshall.Marshaller.WORKFLOW_UUID;
+import static org.kie.workbench.common.stunner.sw.marshall.Marshaller.hasNodeMarshaller;
 import static org.kie.workbench.common.stunner.sw.marshall.Marshaller.isEndState;
 import static org.kie.workbench.common.stunner.sw.marshall.Marshaller.isStartState;
 import static org.kie.workbench.common.stunner.sw.marshall.Marshaller.marshallEdge;
@@ -119,8 +120,10 @@ public interface WorkflowMarshalling {
                 List<Node> childNodes = getChildNodes(workflowNode);
                 childNodes.forEach(node -> {
                     if (!isStartState(node) && !isEndState(node)) {
-                        marshallNode(context, node);
-                        beans.add(getElementDefinition(node));
+                        if (hasNodeMarshaller(node)) {
+                            marshallNode(context, node);
+                            beans.add(getElementDefinition(node));
+                        }
                     }
                 });
                 workflow.states = beans.isEmpty() ? null : beans.toArray(new State[beans.size()]);

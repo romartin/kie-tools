@@ -20,6 +20,7 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
 import elemental2.core.Global;
+import elemental2.dom.DomGlobal;
 import elemental2.promise.IThenable;
 import elemental2.promise.Promise;
 import jsinterop.base.Js;
@@ -53,6 +54,7 @@ import org.kie.workbench.common.stunner.sw.definition.Workflow;
 import org.uberfire.client.promise.Promises;
 
 import static org.kie.workbench.common.stunner.sw.marshall.StateMarshalling.ACTIONS_UNMARSHALLER;
+import static org.kie.workbench.common.stunner.sw.marshall.StateMarshalling.ANY_NODE_MARSHALLER;
 import static org.kie.workbench.common.stunner.sw.marshall.StateMarshalling.EVENT_STATE_MARSHALLER;
 import static org.kie.workbench.common.stunner.sw.marshall.StateMarshalling.EVENT_STATE_UNMARSHALLER;
 import static org.kie.workbench.common.stunner.sw.marshall.StateMarshalling.ONEVENTS_UNMARSHALLER;
@@ -264,9 +266,21 @@ public class Marshaller {
     }
 
     @SuppressWarnings("all")
+    public static boolean hasNodeMarshaller(Node node) {
+        Object bean = ((Definition) node.getContent()).getDefinition();
+        NodeMarshaller<Object> marshaller = getNodeMarshallerForBean(bean);
+        return null != marshaller;
+    }
+
+    @SuppressWarnings("all")
     public static <T> NodeMarshaller<T> getNodeMarshaller(Node node) {
         Object bean = ((Definition) node.getContent()).getDefinition();
-        return getNodeMarshallerForBean(bean);
+        NodeMarshaller<Object> marshaller = getNodeMarshallerForBean(bean);
+        if (null == marshaller) {
+                DomGlobal.console.warn("No NodeMarshaller found for " + bean.getClass().getName());
+                marshaller = (NodeMarshaller<Object>) ANY_NODE_MARSHALLER;
+        }
+        return (NodeMarshaller<T>) marshaller;
     }
 
     @SuppressWarnings("all")
@@ -286,10 +300,12 @@ public class Marshaller {
             return (NodeMarshaller<T>) EVENT_STATE_MARSHALLER;
         } else if (InjectState.class.equals(type)) {
             return (NodeMarshaller<T>) STATE_MARSHALLER;
+        } else if (OperationState.class.equals(type)) {
+            return (NodeMarshaller<T>) STATE_MARSHALLER;
         } else if (SwitchState.class.equals(type)) {
             return (NodeMarshaller<T>) STATE_MARSHALLER;
         }
-        throw new UnsupportedOperationException("No NodeMarshaller found for " + type.getName());
+        return null;
     }
 
     @SuppressWarnings("unchecked")
