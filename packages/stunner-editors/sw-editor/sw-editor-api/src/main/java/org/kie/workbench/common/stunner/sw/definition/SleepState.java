@@ -26,33 +26,22 @@ import org.kie.workbench.common.stunner.core.definition.annotation.morph.Morph;
 @Definition
 @Morph(base = State.class)
 @JsType
-public class InjectState extends State {
+public class SleepState extends State {
 
     @JsIgnore
-    public static final String TYPE_INJECT = "inject";
+    public static final String TYPE_SLEEP = "sleep";
 
-    public String data;
+    public String duration;
 
-    public boolean usedForCompensation;
-
-    public InjectState() {
-        this.type = TYPE_INJECT;
-        this.usedForCompensation = false;
+    public SleepState() {
+        this.type = TYPE_SLEEP;
     }
 
-    public String getData() {
-        return data;
+    public String getDuration() {
+        return duration;
     }
 
-    public void setData(String data) {
-        this.data = data;
-    }
-
-    public boolean isUsedForCompensation() {
-        return usedForCompensation;
-    }
-
-    public void setUsedForCompensation(boolean usedForCompensation) {
-        this.usedForCompensation = usedForCompensation;
+    public void setDuration(String duration) {
+        this.duration = duration;
     }
 }

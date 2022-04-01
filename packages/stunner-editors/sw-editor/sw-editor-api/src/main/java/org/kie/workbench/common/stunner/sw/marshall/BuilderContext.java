@@ -41,13 +41,17 @@ import org.kie.workbench.common.stunner.sw.definition.ActionNode;
 import org.kie.workbench.common.stunner.sw.definition.ActionsContainer;
 import org.kie.workbench.common.stunner.sw.definition.CallFunctionAction;
 import org.kie.workbench.common.stunner.sw.definition.CallSubflowAction;
+import org.kie.workbench.common.stunner.sw.definition.CallbackState;
 import org.kie.workbench.common.stunner.sw.definition.End;
 import org.kie.workbench.common.stunner.sw.definition.EventRef;
 import org.kie.workbench.common.stunner.sw.definition.EventState;
 import org.kie.workbench.common.stunner.sw.definition.EventTimeout;
+import org.kie.workbench.common.stunner.sw.definition.ForEachState;
 import org.kie.workbench.common.stunner.sw.definition.InjectState;
 import org.kie.workbench.common.stunner.sw.definition.OnEvent;
 import org.kie.workbench.common.stunner.sw.definition.OperationState;
+import org.kie.workbench.common.stunner.sw.definition.ParallelState;
+import org.kie.workbench.common.stunner.sw.definition.SleepState;
 import org.kie.workbench.common.stunner.sw.definition.Start;
 import org.kie.workbench.common.stunner.sw.definition.SwitchState;
 
@@ -188,6 +192,14 @@ public class BuilderContext {
         } else if (SwitchState.class.equals(type)) {
             return new double[]{154d, 102d};
         } else if (OperationState.class.equals(type)) {
+            return new double[]{154d, 102d};
+        } else if (SleepState.class.equals(type)) {
+            return new double[]{154d, 102d};
+        } else if (ParallelState.class.equals(type)) {
+            return new double[]{154d, 102d};
+        } else if (ForEachState.class.equals(type)) {
+            return new double[]{154d, 102d};
+        } else if (CallbackState.class.equals(type)) {
             return new double[]{154d, 102d};
         } else if (ActionsContainer.class.equals(type)) {
             return new double[]{450d, 150d};

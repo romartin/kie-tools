@@ -51,6 +51,7 @@ import org.kie.workbench.common.stunner.core.graph.content.view.View;
 import org.kie.workbench.common.stunner.sw.client.command.DrawParentNodeCommand;
 import org.kie.workbench.common.stunner.sw.definition.ActionNode;
 import org.kie.workbench.common.stunner.sw.definition.EventState;
+import org.kie.workbench.common.stunner.sw.definition.ForEachState;
 import org.kie.workbench.common.stunner.sw.definition.OnEvent;
 import org.kie.workbench.common.stunner.sw.definition.OperationState;
 import org.kie.workbench.common.stunner.sw.marshall.Marshaller;
@@ -264,6 +265,11 @@ public class StateDetailsPresenter {
         }
         if (def instanceof OperationState) {
             OperationState os = (OperationState) def;
+            ActionNode[] actions = os.getActions();
+            return actions;
+        }
+        if (def instanceof ForEachState) {
+            ForEachState os = (ForEachState) def;
             ActionNode[] actions = os.getActions();
             return actions;
         }

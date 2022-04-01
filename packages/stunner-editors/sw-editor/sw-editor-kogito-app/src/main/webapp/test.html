@@ -116,65 +116,17 @@
         },
 
         {
-          id: "eventStateExample",
-          version: "1.0",
-          name: "Event State Example",
-          start: "Event State",
-          states: [
-            {
-              name: "Event State",
-              type: "event",
-              onEvents: [
-                {
-                  eventRefs: ["Event1"],
-                  actions: [
-                    {
-                      functionRef: "Function1",
-                    },
-                  ],
-                },
-              ],
-              end: true,
-            },
-          ],
-          events: [
-            {
-              name: "Event1",
-              type: "EventDef1Type",
-              source: "EventDef1Source",
-            },
-          ],
-          functions: [
-            {
-              name: "Function1",
-              operation: "openapiservicedef.json#someFunction",
-              type: "rest",
-            },
-          ],
-        },
-
-        {
-          id: "operationStateWorkflow",
-          name: "Operation State Example",
-          description: "Operation State Example",
+          id: "sleepExample",
           version: "1.0",
           specVersion: "0.8",
-          start: "Operation State",
+          name: "Sleep State Example",
+          description: "Sleep State Example",
+          start: "Sleep State",
           states: [
             {
-              name: "Operation State",
-              type: "operation",
-              actionMode: "sequential",
-              actions: [
-                {
-                  name: "action1",
-                  functionRef: "function1",
-                },
-                {
-                  name: "action2",
-                  subFlowRef: "subflow1",
-                },
-              ],
+              name: "Sleep State",
+              type: "sleep",
+              duration: "PT5S",
               end: true,
             },
           ],
@@ -210,6 +162,99 @@
               name: "Next State",
               type: "inject",
               end: true,
+            },
+          ],
+        },
+
+        {
+          id: "operationStateWorkflow",
+          name: "Operation State Example",
+          description: "Operation State Example",
+          version: "1.0",
+          specVersion: "0.8",
+          start: "Operation State",
+          states: [
+            {
+              name: "Operation State",
+              type: "operation",
+              actionMode: "sequential",
+              actions: [
+                {
+                  name: "action1",
+                  functionRef: "function1",
+                },
+                {
+                  name: "action2",
+                  subFlowRef: "subflow1",
+                },
+              ],
+              end: true,
+            },
+          ],
+        },
+
+        {
+          id: "forEachExample",
+          version: "1.0",
+          specVersion: "0.8",
+          name: "ForEach State Example",
+          description: "ForEach State Example",
+          start: "ForEach State",
+          states: [
+            {
+              name: "ForEach State",
+              type: "foreach",
+              inputCollection: "${ .messages }",
+              iterationParam: "singlemessage",
+              actions: [
+                {
+                  functionRef: {
+                    refName: "sendTextFunction",
+                    arguments: {
+                      message: "${ .singlemessage }",
+                    },
+                  },
+                },
+              ],
+              end: true,
+            },
+          ],
+        },
+
+        {
+          id: "eventStateExample",
+          version: "1.0",
+          name: "Event State Example",
+          start: "Event State",
+          states: [
+            {
+              name: "Event State",
+              type: "event",
+              onEvents: [
+                {
+                  eventRefs: ["Event1"],
+                  actions: [
+                    {
+                      functionRef: "Function1",
+                    },
+                  ],
+                },
+              ],
+              end: true,
+            },
+          ],
+          events: [
+            {
+              name: "Event1",
+              type: "EventDef1Type",
+              source: "EventDef1Source",
+            },
+          ],
+          functions: [
+            {
+              name: "Function1",
+              operation: "openapiservicedef.json#someFunction",
+              type: "rest",
             },
           ],
         },
@@ -323,6 +368,41 @@
               actions: [
                 {
                   subFlowRef: "handleNoVisaDecisionWorkflowId",
+                },
+              ],
+              end: true,
+            },
+          ],
+        },
+
+        {
+          id: "parallelStateExample",
+          version: "1.0",
+          specVersion: "0.8",
+          name: "Parallel State Example",
+          description: "Parallel State Example",
+          start: "Parallel State",
+          states: [
+            {
+              name: "Parallel State",
+              type: "parallel",
+              completionType: "allOf",
+              branches: [
+                {
+                  name: "branch1",
+                  actions: [
+                    {
+                      subFlowRef: "subflow1",
+                    },
+                  ],
+                },
+                {
+                  name: "branch2",
+                  actions: [
+                    {
+                      subFlowRef: "subflow2",
+                    },
+                  ],
                 },
               ],
               end: true,

@@ -39,13 +39,17 @@ import org.kie.workbench.common.stunner.sw.client.resources.ShapeViewFactory;
 import org.kie.workbench.common.stunner.sw.definition.ActionsContainer;
 import org.kie.workbench.common.stunner.sw.definition.CallFunctionAction;
 import org.kie.workbench.common.stunner.sw.definition.CallSubflowAction;
+import org.kie.workbench.common.stunner.sw.definition.CallbackState;
 import org.kie.workbench.common.stunner.sw.definition.End;
 import org.kie.workbench.common.stunner.sw.definition.EventRef;
 import org.kie.workbench.common.stunner.sw.definition.EventState;
 import org.kie.workbench.common.stunner.sw.definition.EventTimeout;
+import org.kie.workbench.common.stunner.sw.definition.ForEachState;
 import org.kie.workbench.common.stunner.sw.definition.InjectState;
 import org.kie.workbench.common.stunner.sw.definition.OnEvent;
 import org.kie.workbench.common.stunner.sw.definition.OperationState;
+import org.kie.workbench.common.stunner.sw.definition.ParallelState;
+import org.kie.workbench.common.stunner.sw.definition.SleepState;
 import org.kie.workbench.common.stunner.sw.definition.Start;
 import org.kie.workbench.common.stunner.sw.definition.SwitchState;
 import org.kie.workbench.common.stunner.sw.definition.Workflow;
@@ -78,7 +82,10 @@ public class AnyStateShapeDef<W> implements ShapeViewDef<W, SVGShapeView>,
                     .put(SwitchState.class, ShapeViewFactory::switchState)
                     .put(EventState.class, ShapeViewFactory::eventState)
                     .put(OperationState.class, ShapeViewFactory::switchState)
-                    // TODO: Why need for workflow here?
+                    .put(SleepState.class, ShapeViewFactory::switchState)
+                    .put(ParallelState.class, ShapeViewFactory::switchState)
+                    .put(ForEachState.class, ShapeViewFactory::switchState)
+                    .put(CallbackState.class, ShapeViewFactory::switchState)
                     .put(Workflow.class, ShapeViewFactory::container)
                     .put(Start.class, ShapeViewFactory::startState)
                     .put(End.class, ShapeViewFactory::endState)
@@ -96,7 +103,10 @@ public class AnyStateShapeDef<W> implements ShapeViewDef<W, SVGShapeView>,
                     .put(SwitchState.class, GlyphFactory.STATE_SWITCH)
                     .put(EventState.class, GlyphFactory.STATE_EVENT)
                     .put(OperationState.class, GlyphFactory.STATE_OPERATION)
-                    // TODO: Why need for workflow here?
+                    .put(SleepState.class, GlyphFactory.STATE_INJECT)
+                    .put(ParallelState.class, GlyphFactory.STATE_INJECT)
+                    .put(ForEachState.class, GlyphFactory.STATE_INJECT)
+                    .put(CallbackState.class, GlyphFactory.STATE_INJECT)
                     .put(Workflow.class, GlyphFactory.TRANSITION)
                     .put(Start.class, GlyphFactory.START)
                     .put(End.class, GlyphFactory.END)

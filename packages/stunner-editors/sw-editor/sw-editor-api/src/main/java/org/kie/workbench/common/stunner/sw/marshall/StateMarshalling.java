@@ -26,6 +26,7 @@ import org.kie.workbench.common.stunner.core.graph.content.view.ViewConnector;
 import org.kie.workbench.common.stunner.sw.definition.ActionNode;
 import org.kie.workbench.common.stunner.sw.definition.ActionTransition;
 import org.kie.workbench.common.stunner.sw.definition.ActionsContainer;
+import org.kie.workbench.common.stunner.sw.definition.CallbackState;
 import org.kie.workbench.common.stunner.sw.definition.CompensationTransition;
 import org.kie.workbench.common.stunner.sw.definition.DataConditionTransition;
 import org.kie.workbench.common.stunner.sw.definition.DefaultConditionTransition;
@@ -34,6 +35,7 @@ import org.kie.workbench.common.stunner.sw.definition.EventConditionTransition;
 import org.kie.workbench.common.stunner.sw.definition.EventRef;
 import org.kie.workbench.common.stunner.sw.definition.EventState;
 import org.kie.workbench.common.stunner.sw.definition.EventTimeout;
+import org.kie.workbench.common.stunner.sw.definition.ForEachState;
 import org.kie.workbench.common.stunner.sw.definition.OnEvent;
 import org.kie.workbench.common.stunner.sw.definition.OperationState;
 import org.kie.workbench.common.stunner.sw.definition.State;
@@ -198,6 +200,25 @@ public interface StateMarshalling {
                 return actionsNode;
             };
 
+    NodeUnmarshaller<ForEachState> FOREACH_STATE_UNMARSHALLER =
+            (context, state) -> {
+                Node stateNode = STATE_UNMARSHALLER.unmarshall(context, state);
+                if (Marshaller.LOAD_DETAILS) {
+                    ActionNode[] actions = state.actions;
+                    if (null != actions && actions.length > 0) {
+                        Node actionsNode = ACTIONS_UNMARSHALLER.unmarshall(context, actions);
+                    }
+                }
+                return stateNode;
+            };
+
+    NodeUnmarshaller<CallbackState> CALLBACK_STATE_UNMARSHALLER =
+            (context, state) -> {
+                Node stateNode = STATE_UNMARSHALLER.unmarshall(context, state);
+                // TODO: Parser for [eventRef + Action]
+                return stateNode;
+            };
+
     NodeUnmarshaller<SwitchState> SWITCH_STATE_UNMARSHALLER =
             (context, state) -> {
                 Node stateNode = STATE_UNMARSHALLER.unmarshall(context, state);
@@ -255,10 +276,5 @@ public interface StateMarshalling {
                     }
                 }
                 return stateNode;
-            };
-
-    NodeMarshaller<State> EVENT_STATE_MARSHALLER =
-            (context, node) -> {
-                return STATE_MARSHALLER.marshall(context, node);
             };
 }

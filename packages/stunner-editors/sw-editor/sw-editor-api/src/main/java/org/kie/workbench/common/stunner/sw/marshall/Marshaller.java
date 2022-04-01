@@ -39,6 +39,7 @@ import org.kie.workbench.common.stunner.core.graph.processing.index.Index;
 import org.kie.workbench.common.stunner.core.graph.processing.index.map.MapIndexBuilder;
 import org.kie.workbench.common.stunner.sw.autolayout.AutoLayout;
 import org.kie.workbench.common.stunner.sw.definition.ActionNode;
+import org.kie.workbench.common.stunner.sw.definition.CallbackState;
 import org.kie.workbench.common.stunner.sw.definition.CompensationTransition;
 import org.kie.workbench.common.stunner.sw.definition.DataConditionTransition;
 import org.kie.workbench.common.stunner.sw.definition.DefaultConditionTransition;
@@ -46,9 +47,12 @@ import org.kie.workbench.common.stunner.sw.definition.End;
 import org.kie.workbench.common.stunner.sw.definition.ErrorTransition;
 import org.kie.workbench.common.stunner.sw.definition.EventConditionTransition;
 import org.kie.workbench.common.stunner.sw.definition.EventState;
+import org.kie.workbench.common.stunner.sw.definition.ForEachState;
 import org.kie.workbench.common.stunner.sw.definition.InjectState;
 import org.kie.workbench.common.stunner.sw.definition.OnEvent;
 import org.kie.workbench.common.stunner.sw.definition.OperationState;
+import org.kie.workbench.common.stunner.sw.definition.ParallelState;
+import org.kie.workbench.common.stunner.sw.definition.SleepState;
 import org.kie.workbench.common.stunner.sw.definition.Start;
 import org.kie.workbench.common.stunner.sw.definition.StartTransition;
 import org.kie.workbench.common.stunner.sw.definition.SwitchState;
@@ -58,8 +62,9 @@ import org.uberfire.client.promise.Promises;
 
 import static org.kie.workbench.common.stunner.sw.marshall.StateMarshalling.ACTIONS_UNMARSHALLER;
 import static org.kie.workbench.common.stunner.sw.marshall.StateMarshalling.ANY_NODE_MARSHALLER;
-import static org.kie.workbench.common.stunner.sw.marshall.StateMarshalling.EVENT_STATE_MARSHALLER;
+import static org.kie.workbench.common.stunner.sw.marshall.StateMarshalling.CALLBACK_STATE_UNMARSHALLER;
 import static org.kie.workbench.common.stunner.sw.marshall.StateMarshalling.EVENT_STATE_UNMARSHALLER;
+import static org.kie.workbench.common.stunner.sw.marshall.StateMarshalling.FOREACH_STATE_UNMARSHALLER;
 import static org.kie.workbench.common.stunner.sw.marshall.StateMarshalling.ONEVENTS_UNMARSHALLER;
 import static org.kie.workbench.common.stunner.sw.marshall.StateMarshalling.OPERATION_STATE_UNMARSHALLER;
 import static org.kie.workbench.common.stunner.sw.marshall.StateMarshalling.STATE_MARSHALLER;
@@ -215,6 +220,14 @@ public class Marshaller {
             return (NodeUnmarshaller<T>) STATE_UNMARSHALLER;
         } else if (SwitchState.class.equals(type)) {
             return (NodeUnmarshaller<T>) SWITCH_STATE_UNMARSHALLER;
+        } else if (SleepState.class.equals(type)) {
+            return (NodeUnmarshaller<T>) STATE_UNMARSHALLER;
+        } else if (ParallelState.class.equals(type)) {
+            return (NodeUnmarshaller<T>) STATE_UNMARSHALLER;
+        } else if (ForEachState.class.equals(type)) {
+            return (NodeUnmarshaller<T>) FOREACH_STATE_UNMARSHALLER;
+        } else if (CallbackState.class.equals(type)) {
+            return (NodeUnmarshaller<T>) CALLBACK_STATE_UNMARSHALLER;
         } else if (ActionNode[].class.equals(type)) {
             return (NodeUnmarshaller<T>) ACTIONS_UNMARSHALLER;
         } else if (OnEvent[].class.equals(type)) {
@@ -319,12 +332,20 @@ public class Marshaller {
         } else if (Start.class.equals(type)) {
             return (NodeMarshaller<T>) START_NODE_MARSHALLER;
         } else if (EventState.class.equals(type)) {
-            return (NodeMarshaller<T>) EVENT_STATE_MARSHALLER;
+            return (NodeMarshaller<T>) STATE_MARSHALLER;
         } else if (InjectState.class.equals(type)) {
             return (NodeMarshaller<T>) STATE_MARSHALLER;
         } else if (OperationState.class.equals(type)) {
             return (NodeMarshaller<T>) STATE_MARSHALLER;
         } else if (SwitchState.class.equals(type)) {
+            return (NodeMarshaller<T>) STATE_MARSHALLER;
+        } else if (SleepState.class.equals(type)) {
+            return (NodeMarshaller<T>) STATE_MARSHALLER;
+        } else if (ParallelState.class.equals(type)) {
+            return (NodeMarshaller<T>) STATE_MARSHALLER;
+        } else if (ForEachState.class.equals(type)) {
+            return (NodeMarshaller<T>) STATE_MARSHALLER;
+        } else if (CallbackState.class.equals(type)) {
             return (NodeMarshaller<T>) STATE_MARSHALLER;
         }
         return null;
