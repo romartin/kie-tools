@@ -65,10 +65,10 @@ public abstract class BaseExample implements Example {
         width = panel.getWidePx();
         height = panel.getHighPx();
 
-        MouseWheelZoomMediator zoom = new MouseWheelZoomMediator(EventFilter.SHIFT);
+        MouseWheelZoomMediator zoom = new MouseWheelZoomMediator(EventFilter.CONTROL);
         panel.getViewport().pushMediator(zoom);
 
-        MousePanMediator pan = new MousePanMediator(EventFilter.META);
+        MousePanMediator pan = new MousePanMediator(EventFilter.ALT);
         this.panel.getViewport().pushMediator(pan);
 
         jsCanvas = new JsCanvas(this.panel, this.layer, null);

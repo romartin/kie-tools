@@ -174,12 +174,16 @@ public class ScrollablePanel extends LienzoBoundsPanel {
     }
 
     private void fitToParentSize() {
-        HTMLDivElement parent = (HTMLDivElement) rootPanel.parentNode.parentNode;
+        HTMLDivElement parent = getPanelParent();
         int offsetWidth = parent.offsetWidth;
         int offsetHeight = parent.offsetHeight;
         if (offsetWidth > 0 && offsetHeight > 0) {
             setPxSize(offsetWidth, offsetHeight);
         }
+    }
+
+    public HTMLDivElement getPanelParent() {
+        return (HTMLDivElement) rootPanel.parentNode.parentNode;
     }
 
     public void setPxSize(final int widePx,

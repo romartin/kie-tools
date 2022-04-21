@@ -29,8 +29,9 @@ import com.ait.lienzo.client.widget.panel.impl.ScrollablePanel;
 public class PreviewLienzoPanel
         extends DelegateLienzoPanel<StunnerLienzoBoundsPanel> {
 
-    private static final int DEFAULT_WIDTH = 420;
-    private static final int DEFAULT_HEIGHT = 210;
+    // TODO: Avoid hardcoding.
+    public static final int DEFAULT_WIDTH = 210;
+    public static final int DEFAULT_HEIGHT = 210;
 
     private final StunnerLienzoBoundsPanel panel;
 

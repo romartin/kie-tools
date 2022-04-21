@@ -13,7 +13,7 @@ import com.ait.lienzo.client.core.types.Point2DArray;
 
 public class WiresUtils {
 
-    public static void connect(MagnetManager.Magnets magnets0,
+    public static WiresConnector connect(MagnetManager.Magnets magnets0,
                                int i0_1,
                                MagnetManager.Magnets magnets1,
                                int i1_1,
@@ -69,11 +69,13 @@ public class WiresUtils {
                                                       line,
                                                       new MultiPathDecorator(head),
                                                       new MultiPathDecorator(tail));
-        wiresManager.register(connector);
+        wiresManager.register(connector, true);
 
         head.setStrokeWidth(5).setStrokeColor("#0000CC");
         tail.setStrokeWidth(5).setStrokeColor("#0000CC");
         line.setStrokeWidth(5).setStrokeColor("#0000CC");
+
+        return connector;
     }
 
     public static OrthogonalPolyLine createOrthogonalPolyline(final double... points) {

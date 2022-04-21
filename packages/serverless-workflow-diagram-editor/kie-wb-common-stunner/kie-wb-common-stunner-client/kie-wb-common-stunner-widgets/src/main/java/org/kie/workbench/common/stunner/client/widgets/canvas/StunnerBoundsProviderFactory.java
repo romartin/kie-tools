@@ -21,17 +21,18 @@ import static com.ait.lienzo.client.widget.panel.impl.BoundsProviderFactory.comp
 
 public class StunnerBoundsProviderFactory {
 
-    public static final float ASPECT_RATIO = 300 / 150;
-    public static final double PADDING = 50d;
+    // TODO: Refactor these both fields properly, maybe drop this whole class?
+    public static float ratio = 1;
+    public static double padding = 0;
 
     public static WiresBoundsProvider newProvider() {
         return new WiresBoundsProvider()
-                .setPadding(PADDING)
-                .setBoundsBuilder(boundingBox -> computeBoundsAspectRatio(ASPECT_RATIO, boundingBox));
+                .setPadding(padding)
+                .setBoundsBuilder(boundingBox -> computeBoundsAspectRatio(ratio, boundingBox));
     }
 
     public static double computeWidth(final double height) {
-        return height * ASPECT_RATIO;
+        return height * ratio;
     }
 
     public static int computeWidth(final int height) {
@@ -39,7 +40,7 @@ public class StunnerBoundsProviderFactory {
     }
 
     public static double computeHeight(final double width) {
-        return width * (1 / ASPECT_RATIO);
+        return width * (1 / ratio);
     }
 
     public static int computeHeight(final int width) {

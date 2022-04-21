@@ -302,6 +302,32 @@ public class JsCanvas implements JsCanvasNodeLister {
         }
     }
 
+    // TODO: This is just a test based on above centerNode. Sync with Jaime on the impl...
+    public double[] calculateCenter(String UUID) {
+        NFastArrayList<Double> absoluteLocation = getAbsoluteLocation(UUID);
+
+        if (absoluteLocation != null) {
+
+            double width = layer.getViewport().getWidth();
+            double height = layer.getViewport().getHeight();
+
+            NFastArrayList<Double> dimensions = getDimensions(UUID);
+            double nodeWidth = 0;
+            double nodeHeight = 0;
+
+            if (dimensions != null) {
+                nodeWidth = dimensions.get(0);
+                nodeHeight = dimensions.get(1);
+            }
+
+            double translatedX = -absoluteLocation.get(0) + (width / 2) - (nodeWidth / 2);
+            double translatedY = -absoluteLocation.get(1) + (height / 2) - (nodeHeight / 2);
+
+            return new double[] { translatedX, translatedY };
+        }
+        return null;
+    }
+
     @Override
     public Set<String> getNodeIdSet() {
         WiresShape[] shapes = getWiresManager().getShapes();

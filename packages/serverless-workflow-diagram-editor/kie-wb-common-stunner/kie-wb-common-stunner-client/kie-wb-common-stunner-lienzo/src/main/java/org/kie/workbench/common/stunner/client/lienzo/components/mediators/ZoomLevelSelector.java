@@ -119,6 +119,10 @@ public class ZoomLevelSelector implements IsWidget {
         return view.asWidget();
     }
 
+    public View getView() {
+        return view;
+    }
+
     void onReset() {
         onReset.execute();
     }

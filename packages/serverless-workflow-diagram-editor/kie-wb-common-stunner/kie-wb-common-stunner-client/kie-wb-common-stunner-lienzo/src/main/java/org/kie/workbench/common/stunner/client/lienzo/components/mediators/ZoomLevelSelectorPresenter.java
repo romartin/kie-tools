@@ -236,7 +236,7 @@ public class ZoomLevelSelectorPresenter {
         return computeLevel(getLayer().getViewport());
     }
 
-    private void reset() {
+    public void reset() {
         PanelTransformUtils.reset(getLayer().getViewport());
         getLayer().batch();
     }
@@ -268,6 +268,18 @@ public class ZoomLevelSelectorPresenter {
 
     private LienzoPanel getPanel() {
         return (LienzoPanel) canvas.get().getView().getPanel();
+    }
+
+    public FloatingView<IsWidget> getFloatingView() {
+        return floatingView;
+    }
+
+    public ZoomLevelSelector getSelector() {
+        return selector;
+    }
+
+    public Element getSelectorElement() {
+        return selectorElement;
     }
 
     private static String parseLevel(final double level) {

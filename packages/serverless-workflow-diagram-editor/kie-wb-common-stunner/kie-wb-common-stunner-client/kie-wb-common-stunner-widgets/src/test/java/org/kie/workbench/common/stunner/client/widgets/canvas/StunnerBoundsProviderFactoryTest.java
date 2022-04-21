@@ -61,7 +61,7 @@ public class StunnerBoundsProviderFactoryTest {
         assertEquals(0d, bounds.getX(), 0d);
         assertEquals(0d, bounds.getY(), 0d);
         assertEquals(1260d, bounds.getWidth(), 0d);
-        assertEquals(580d + StunnerBoundsProviderFactory.PADDING, bounds.getHeight(), 0d);
+        assertEquals(580d + StunnerBoundsProviderFactory.padding, bounds.getHeight(), 0d);
     }
 
     @Test

@@ -21,6 +21,7 @@ import jsinterop.annotations.JsOverlay;
 import jsinterop.annotations.JsPackage;
 import jsinterop.annotations.JsProperty;
 import jsinterop.annotations.JsType;
+import jsinterop.base.Js;
 
 @JsType(isNative = true, namespace = JsPackage.GLOBAL, name = "window")
 public class WindowJSCanvas {
@@ -34,6 +35,11 @@ public class WindowJSCanvas {
     @JsOverlay
     public static final void linkJSCanvas(JsCanvas canvas) {
         WindowJSCanvas.jsCanvas = canvas;
+    }
+
+    @JsOverlay
+    public static final JsCanvas getJSCanvas() {
+        return Js.uncheckedCast(WindowJSCanvas.jsCanvas);
     }
 
     @JsOverlay

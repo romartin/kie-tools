@@ -22,7 +22,8 @@ public class BaseLienzoExamples {
     private Example test;
 
     public void doLoad() {
-        createTests(new BasicShapesExample("Shapes"),
+        createTests(new SWFViewerNavigationExample("SWF Viewer"),
+                    new BasicShapesExample("Shapes"),
                     new BasicWiresExample("Wires"),
                     new LineSpliceExample("Line Splice"),
                     new ToolboxExample("Toolbox"),

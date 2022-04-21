@@ -71,15 +71,17 @@
     <input type="button" id="download_btn" value="Download the diagram" onclick="download()" disabled/>
 </div>
 
-<div style="display: inline; float: left; padding: 25px">
+<div id="loadPanel" style="display: inline; float: left; padding: 25px; border: 1px dotted;
+                            resize: both; overflow: auto; width: auto;">
     <label for="selectExample">Examples:&nbsp;</label>
     <select id="selectExample"></select>
-    <input type="button" onclick="loadText()" value="Load JSON Content" style="display: block; margin-bottom: 5px"/>
+    <input type="button" onclick="toggleLoadPanel()" value="<>" style="display: block; margin-bottom: 5px"/>
+    <input type="button" onclick="loadText()" value="Load" style="display: block; margin-bottom: 5px"/>
     <textarea id="jsonRawContent" rows="50" cols="50" style="font-size: revert"></textarea>
 </div>
 
 <div style="display: inline; float: left; width: 50%">
-    <iframe id="editorFrame" src="index.html" width="100%" height="880px" frameborder="0" scrolling="no"></iframe>
+    <iframe id="editorFrame" src="index.html" width="100%" height="880px" frameborder="0" scrolling="no" style="border: 1px solid black;"></iframe>
 </div>
 
 <script>
@@ -416,8 +418,14 @@
             specVersion: "0.8",
             name: "States Example",
             description: "States Example",
-            start: "Inject data",
+            start: "Create Initial Data",
             states: [
+                {
+                    name: "Create Initial Data",
+                    type: "inject",
+                    end: false,
+                    transition: "Inject data"
+                },
                 {
                     name: "Inject data",
                     type: "inject",
@@ -428,12 +436,22 @@
                         {
                             errorRef: "SomeError1",
                             end: false,
-                            transition: "Handle Error",
+                            transition: "Handle Error1",
+                        },
+                        {
+                            errorRef: "SomeError2",
+                            end: false,
+                            transition: "Handle Error2",
                         },
                     ],
                 },
                 {
-                    name: "Handle Error",
+                    name: "Handle Error1",
+                    type: "inject",
+                    end: true,
+                },
+                {
+                    name: "Handle Error2",
                     type: "inject",
                     end: true,
                 },
@@ -450,7 +468,7 @@
                             ],
                         },
                     ],
-                    eventTimeout: "PT1H",
+                    // eventTimeout: "PT1H",
                     transition: "Run Operations",
                     end: false,
                 },
@@ -468,6 +486,51 @@
                             subFlowRef: "Task2",
                         },
                     ],
+                    end: false,
+                    transition: "Switch State"
+                },
+                {
+                    name: "Switch State",
+                    type: "switch",
+                    onErrors: [
+                        {
+                            errorRef: "SomeError3",
+                            end: false,
+                            transition: "Handle Error3",
+                        },
+                    ],
+                    eventConditions: [
+                        {
+                            eventRef: "event1",
+                            transition: "Event1 State",
+                        },
+                        {
+                            eventRef: "event2",
+                            transition: "Event2 State",
+                        },
+                    ],
+                    defaultCondition: {
+                        transition: "Default State",
+                    },
+                },
+                {
+                    name: "Handle Error3",
+                    type: "inject",
+                    end: true,
+                },
+                {
+                    name: "Event1 State",
+                    type: "inject",
+                    end: true,
+                },
+                {
+                    name: "Event2 State",
+                    type: "inject",
+                    end: true,
+                },
+                {
+                    name: "Default State",
+                    type: "inject",
                     end: true,
                 },
                 {
@@ -489,6 +552,15 @@
         document.getElementById("jsonRawContent").value = object;
     }
 
+    function toggleLoadPanel() {
+        if ("auto" === document.getElementById("loadPanel").style.width) {
+            document.getElementById("loadPanel").style.width = "25px";
+        } else {
+            document.getElementById("loadPanel").style.width = "auto";
+        }
+
+    }
+
     function loadText() {
         loadDiagram(getText());
     }
@@ -497,7 +569,7 @@
         return document.getElementById("jsonRawContent").value;
     }
 
-    function loadExamplesDropDown() {
+    function loadExamplesDropDown(selectedIndex) {
         var examplesSelect = document.getElementById("selectExample");
 
         for (let i = 0; i < examples.length; i++) {
@@ -505,7 +577,7 @@
             var option = document.createElement("option");
             option.value = example.id;
             option.textContent = example.name;
-            if (i === 0) {
+            if (i === selectedIndex) {
                 option.selected = "selected";
             }
             examplesSelect.appendChild(option);
@@ -517,8 +589,9 @@
         applyText(examples[i]);
     };
 
-    loadExamplesDropDown();
-    applyText(examples[0]);
+    const selectedIndex = examples.length - 1;
+    loadExamplesDropDown(selectedIndex);
+    applyText(examples[selectedIndex]);
 
     window.frames.editorFrame.contentWindow.onContentChanged = function (raw) {
         setText(raw);

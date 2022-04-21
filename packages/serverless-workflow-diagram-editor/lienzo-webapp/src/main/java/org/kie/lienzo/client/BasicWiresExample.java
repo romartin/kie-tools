@@ -6,10 +6,17 @@ import com.ait.lienzo.client.core.shape.wires.IContainmentAcceptor;
 import com.ait.lienzo.client.core.shape.wires.IControlPointsAcceptor;
 import com.ait.lienzo.client.core.shape.wires.IDockingAcceptor;
 import com.ait.lienzo.client.core.shape.wires.ILocationAcceptor;
+import com.ait.lienzo.client.core.shape.wires.WiresConnector;
 import com.ait.lienzo.client.core.shape.wires.WiresContainer;
 import com.ait.lienzo.client.core.shape.wires.WiresManager;
 import com.ait.lienzo.client.core.shape.wires.WiresShape;
 import com.ait.lienzo.client.core.types.Point2D;
+import com.ait.lienzo.client.core.types.Point2DArray;
+import com.ait.lienzo.client.widget.panel.LienzoPanel;
+import com.google.gwt.dom.client.Style;
+import elemental2.dom.DomGlobal;
+import elemental2.dom.HTMLButtonElement;
+import elemental2.dom.HTMLDivElement;
 
 import static org.kie.lienzo.client.util.WiresUtils.connect;
 
@@ -25,9 +32,24 @@ public class BasicWiresExample extends BaseExample implements Example {
     private WiresShape shapeCircle;
     private WiresShape shapeBlueRectangle;
     private WiresShape shapeParent;
+    WiresConnector connector;
+    HTMLButtonElement logCpsButton;
 
     public BasicWiresExample(final String title) {
         super(title);
+    }
+
+    @Override
+    public void init(LienzoPanel panel, HTMLDivElement topDiv) {
+        super.init(panel, topDiv);
+        topDiv.style.display = Style.Display.INLINE_BLOCK.getCssName();
+        logCpsButton = createButton("Log CPs", this::logLineCps);
+        topDiv.appendChild(logCpsButton);
+    }
+
+    private void logLineCps() {
+        Point2DArray controlPoints = connector.getControlPoints();
+        DomGlobal.console.log(controlPoints);
     }
 
     private WiresShape createShape(String id, MultiPath path, Point2D location) {
@@ -75,12 +97,20 @@ public class BasicWiresExample extends BaseExample implements Example {
                                           .setFillColor("#FFFFFF"),
                                   new Point2D(50, 300));
 
-        connect(shapeRedRectangle.getMagnets(),
-                3,
-                shapeCircle.getMagnets(),
-                7,
-                wiresManager,
-                false);
+        connector = connect(shapeRedRectangle.getMagnets(),
+                                         3,
+                                         shapeCircle.getMagnets(),
+                                         7,
+                                         wiresManager,
+                                         false);
+
+
+    }
+
+    @Override
+    public void destroy() {
+        super.destroy();
+        logCpsButton.remove();
     }
 
     private static final IContainmentAcceptor CONTAINMENT_ACCEPTOR = new IContainmentAcceptor() {

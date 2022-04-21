@@ -19,6 +19,7 @@ package com.ait.lienzo.client.core.animation;
 import com.ait.lienzo.client.core.Attribute;
 import com.ait.lienzo.client.core.shape.Node;
 import com.ait.lienzo.client.core.types.Point2D;
+import com.ait.lienzo.client.core.types.Transform;
 import com.ait.lienzo.client.core.util.ColorExtractor;
 import com.ait.lienzo.shared.core.types.Color;
 import com.ait.lienzo.shared.core.types.Color.HSL;
@@ -214,6 +215,10 @@ public interface AnimationProperty {
 
         public static final AnimationProperty STROKE_WIDTH(final double stroke) {
             return new DoubleAnimationPropertyConstrained(stroke, Attribute.STROKE_WIDTH, 0.0, Float.MAX_VALUE);
+        }
+
+        public static final AnimationProperty TRANSFORM(final Transform transform) {
+            return new TransformAnimationProperty(transform);
         }
 
         public static final AnimationProperty SCALE(final Point2D scale) {
@@ -823,6 +828,51 @@ public interface AnimationProperty {
             }
         }
 
+        private static final class TransformAnimationProperty implements AnimationProperty {
+
+            private Transform m_target;
+            private Transform m_origin;
+
+            public TransformAnimationProperty(Transform m_target) {
+                this.m_target = m_target;
+            }
+
+            @Override
+            public boolean init(Node<?> node) {
+                m_origin = node.getTransform().copy();
+                return true;
+            }
+
+            @Override
+            public boolean apply(Node<?> node, double percent) {
+                final double[] t = new double[6];
+                for (int i = 0; i < 6; i++) {
+                    double origin = m_origin.v[i];
+                    double target = m_target.v[i];
+                    t[i] = origin + ((target - origin) * percent);
+                }
+                JsPropertyMap<Object> nodeMap = Js.uncheckedCast(node);
+                Transform target = Transform.makeFromArray(t);
+                nodeMap.set(Attribute.TRANSFORM.getProperty(), target);
+                return true;
+            }
+
+            @Override
+            public boolean isStateful() {
+                return true;
+            }
+
+            @Override
+            public boolean isRefreshing() {
+                // TODO
+                return true;
+            }
+
+            @Override
+            public AnimationProperty copy() {
+                return new TransformAnimationProperty(m_target.copy());
+            }
+        }
         private static final class Point2DAnimationProperty_1 implements AnimationProperty {
 
             private double m_orig_x;

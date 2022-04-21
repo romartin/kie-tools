@@ -21,6 +21,7 @@ import javax.inject.Inject;
 import com.ait.lienzo.client.core.types.JsCanvas;
 import com.ait.lienzo.client.widget.panel.LienzoBoundsPanel;
 import com.google.gwt.user.client.ui.IsWidget;
+import elemental2.dom.DomGlobal;
 import elemental2.promise.Promise;
 import org.kie.workbench.common.stunner.client.lienzo.canvas.LienzoCanvas;
 import org.kie.workbench.common.stunner.client.lienzo.canvas.LienzoPanel;
@@ -138,6 +139,15 @@ public class DiagramEditor {
         metadata.setPath(path);
         incrementalMarshaller.run(diagramService.getMarshaller());
         initJsTypes();
+        initFlowNavigator();
+    }
+
+    @Inject
+    private EditorFlowNavigator flowNavigator;
+
+    private void initFlowNavigator() {
+        // TODO: Refactor timeout, this is just a workaround for listening to the right callback....
+        DomGlobal.setTimeout(p0 -> flowNavigator.enable(), 500);
     }
 
     private void initJsTypes() {
