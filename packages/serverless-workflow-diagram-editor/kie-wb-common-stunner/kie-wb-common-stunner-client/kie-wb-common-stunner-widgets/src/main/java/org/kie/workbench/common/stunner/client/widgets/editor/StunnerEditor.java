@@ -23,6 +23,7 @@ import javax.enterprise.context.Dependent;
 import javax.inject.Inject;
 
 import com.google.gwt.user.client.ui.IsWidget;
+import elemental2.dom.DomGlobal;
 import org.jboss.errai.ioc.client.api.ManagedInstance;
 import org.kie.workbench.common.stunner.client.widgets.presenters.session.SessionDiagramPresenter;
 import org.kie.workbench.common.stunner.client.widgets.presenters.session.SessionPresenter;
@@ -32,6 +33,7 @@ import org.kie.workbench.common.stunner.core.client.canvas.CanvasHandler;
 import org.kie.workbench.common.stunner.core.client.i18n.ClientTranslationService;
 import org.kie.workbench.common.stunner.core.client.service.ClientRuntimeError;
 import org.kie.workbench.common.stunner.core.client.session.ClientSession;
+import org.kie.workbench.common.stunner.core.client.session.impl.DefaultViewerSession;
 import org.kie.workbench.common.stunner.core.client.session.impl.EditorSession;
 import org.kie.workbench.common.stunner.core.client.session.impl.ViewerSession;
 import org.kie.workbench.common.stunner.core.definition.exception.DefinitionNotFoundException;
@@ -109,6 +111,16 @@ public class StunnerEditor {
             diagramPresenter.withToolbar(false);
             view.setWidget(diagramPresenter.getView());
         }
+
+        // TODO: Just a test....
+        boolean doesSessionExist = null != getSession();
+        DomGlobal.console.log("doesSessionExist=" + doesSessionExist);
+        if (doesSessionExist) {
+            diagramPresenter.clear();
+            DefaultViewerSession session = (DefaultViewerSession) getSession();
+            session.close();
+        }
+
         diagramPresenter.open(diagram, new SessionPresenter.SessionPresenterCallback() {
             @Override
             public void onOpen(Diagram diagram) {

@@ -141,19 +141,23 @@ public class Marshaller {
         builderContext.execute();
 
         // Perform automatic layout.
-        final Promise<Node> layout = AutoLayout.applyLayout(graph, context.getWorkflowRootNode(), promises, builderContext.buildExecutionContext(), false);
-        return promises.create(new Promise.PromiseExecutorCallbackFn<Graph>() {
-            @Override
-            public void onInvoke(ResolveCallbackFn<Graph> success, RejectCallbackFn reject) {
-                layout.then(new IThenable.ThenOnFulfilledCallbackFn<Node, Object>() {
-                    @Override
-                    public IThenable<Object> onInvoke(Node node) {
-                        success.onInvoke(graph);
-                        return null;
-                    }
-                });
-            }
-        });
+        if (true) {
+            final Promise<Node> layout = AutoLayout.applyLayout(graph, context.getWorkflowRootNode(), promises, builderContext.buildExecutionContext(), false);
+            return promises.create(new Promise.PromiseExecutorCallbackFn<Graph>() {
+                @Override
+                public void onInvoke(ResolveCallbackFn<Graph> success, RejectCallbackFn reject) {
+                    layout.then(new IThenable.ThenOnFulfilledCallbackFn<Node, Object>() {
+                        @Override
+                        public IThenable<Object> onInvoke(Node node) {
+                            success.onInvoke(graph);
+                            return null;
+                        }
+                    });
+                }
+            });
+        } else {
+            return promises.resolve(graph);
+        }
     }
 
     @SuppressWarnings("all")

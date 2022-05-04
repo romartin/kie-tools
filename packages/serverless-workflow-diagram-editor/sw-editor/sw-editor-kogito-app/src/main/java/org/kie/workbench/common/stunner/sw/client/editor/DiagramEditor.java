@@ -96,7 +96,7 @@ public class DiagramEditor {
     }
 
     public Promise<Void> setContent(final String path, final String value) {
-        close();
+        // TODO close();
         return promises.create((success, failure) -> {
             diagramService.transform(path,
                                      value,
@@ -105,7 +105,7 @@ public class DiagramEditor {
                                          @Override
                                          public void onSuccess(final Diagram diagram) {
                                              stunnerEditor
-                                                     .close()
+                                                     // TODO .close()
                                                      .open(diagram, new SessionPresenter.SessionPresenterCallback() {
                                                          @Override
                                                          public void onSuccess() {
