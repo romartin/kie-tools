@@ -22,6 +22,7 @@ import java.util.stream.Stream;
 
 import jsinterop.annotations.JsIgnore;
 import jsinterop.annotations.JsType;
+import jsinterop.base.Js;
 import org.jboss.errai.databinding.client.api.Bindable;
 import org.kie.workbench.common.stunner.core.definition.annotation.Definition;
 import org.kie.workbench.common.stunner.core.definition.annotation.Property;
@@ -57,9 +58,9 @@ public class ErrorTransition {
     @Property
     public String errorRef;
 
-    public String transition;
+    public Object transition;
 
-    public boolean end;
+    public Object end;
 
     public ErrorTransition() {
     }
@@ -68,27 +69,30 @@ public class ErrorTransition {
         return errorRef;
     }
 
-    public ErrorTransition setErrorRef(String errorRef) {
+    public void setErrorRef(String errorRef) {
         this.errorRef = errorRef;
-        return this;
     }
 
-    public String getTransition() {
+    public Object getTransition() {
         return transition;
     }
 
-    public ErrorTransition setTransition(String transition) {
+    public void setTransition(Object transition) {
         this.transition = transition;
-        return this;
     }
 
-    public boolean isEnd() {
-        return end;
+    public Object isEnd() {
+        if (end instanceof Boolean) {
+            return (boolean) end;
+        } else if (end != null) {
+            return (boolean) Js.asPropertyMap(end).get("terminate");
+        }
+
+        return false;
     }
 
-    public ErrorTransition setEnd(boolean end) {
+    public void setEnd(Object end) {
         this.end = end;
-        return this;
     }
 
     public Set<String> getLabels() {

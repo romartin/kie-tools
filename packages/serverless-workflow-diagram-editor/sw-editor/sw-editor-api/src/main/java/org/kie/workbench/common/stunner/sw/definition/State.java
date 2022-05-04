@@ -22,6 +22,7 @@ import java.util.stream.Stream;
 
 import jsinterop.annotations.JsIgnore;
 import jsinterop.annotations.JsType;
+import jsinterop.base.Js;
 import org.jboss.errai.databinding.client.api.Bindable;
 import org.kie.workbench.common.stunner.core.definition.annotation.Definition;
 import org.kie.workbench.common.stunner.core.definition.annotation.Property;
@@ -70,13 +71,13 @@ public class State {
      * Next transition of the workflow.
      */
     // TODO: Not all states supports this (eg: switch state)
-    public String transition;
+    public Object transition;
 
     /**
      * Whether this State is a last state in the workflow.
      */
     // TODO: Not all states supports this (eg: switch state)
-    public boolean end;
+    public Object end;
 
     /**
      * Definitions of states error handling.
@@ -116,7 +117,13 @@ public class State {
     }
 
     public String getTransition() {
-        return transition;
+        if (transition instanceof String) {
+            return (String) transition;
+        } else if (transition != null) {
+            return (String) Js.asPropertyMap(transition).get("nextState");
+        }
+
+        return null;
     }
 
     public State setTransition(String transition) {
@@ -125,10 +132,16 @@ public class State {
     }
 
     public boolean isEnd() {
-        return end;
+        if (end instanceof Boolean) {
+            return (boolean) end;
+        } else if (end != null) {
+            return (boolean) Js.asPropertyMap(end).get("terminate");
+        }
+
+        return false;
     }
 
-    public State setEnd(boolean end) {
+    public State setEnd(Object end) {
         this.end = end;
         return this;
     }
