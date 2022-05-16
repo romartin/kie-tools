@@ -58,6 +58,7 @@ public abstract class AbstractCanvasViewer<T, H extends AbstractCanvasHandler, V
     @Override
     public void clear() {
         getHandler().clear();
+        // TODO: I think we should not be clearing when updating content.
         getView().clear();
     }
 

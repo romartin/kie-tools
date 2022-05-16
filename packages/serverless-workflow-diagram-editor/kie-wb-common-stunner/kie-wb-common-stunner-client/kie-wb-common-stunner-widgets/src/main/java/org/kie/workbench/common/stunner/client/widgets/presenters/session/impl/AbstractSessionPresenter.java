@@ -24,6 +24,7 @@ import java.util.logging.Logger;
 
 import javax.enterprise.event.Event;
 
+import elemental2.dom.DomGlobal;
 import org.kie.workbench.common.stunner.client.widgets.event.SessionFocusedEvent;
 import org.kie.workbench.common.stunner.client.widgets.event.SessionLostFocusEvent;
 import org.kie.workbench.common.stunner.client.widgets.notification.CommandNotification;
@@ -102,6 +103,7 @@ public abstract class AbstractSessionPresenter<D extends Diagram, H extends Abst
     @SuppressWarnings("unchecked")
     public void open(final D diagram,
                      final SessionPresenterCallback<D> callback) {
+        DomGlobal.console.log(this.getClass().getSimpleName() + ": Opening diagram (new session)");
         this.diagram = diagram;
         notificationsObserver.onCommandExecutionFailed(this::showCommandError);
         notificationsObserver.onValidationSuccess(this::showNotificationMessage);
@@ -114,6 +116,7 @@ public abstract class AbstractSessionPresenter<D extends Diagram, H extends Abst
 
     public void open(final S session,
                      final SessionPresenterCallback<D> callback) {
+        DomGlobal.console.log(this.getClass().getSimpleName() + ": Opening session");
         getDisplayer().open(session,
                             new SessionViewer.SessionViewerCallback<D>() {
                                 @Override

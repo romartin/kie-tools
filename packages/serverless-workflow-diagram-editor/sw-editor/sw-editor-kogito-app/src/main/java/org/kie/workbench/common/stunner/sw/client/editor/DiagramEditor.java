@@ -36,11 +36,14 @@ import org.kie.workbench.common.stunner.core.diagram.DiagramParsingException;
 import org.kie.workbench.common.stunner.core.diagram.Metadata;
 import org.kie.workbench.common.stunner.sw.client.services.ClientDiagramService;
 import org.kie.workbench.common.stunner.sw.client.services.IncrementalMarshaller;
+import org.kie.workbench.common.stunner.sw.dom.DomConsole;
 import org.uberfire.backend.vfs.Path;
 import org.uberfire.backend.vfs.PathFactory;
 import org.uberfire.client.promise.Promises;
 import org.uberfire.mvp.PlaceRequest;
 import org.uberfire.workbench.model.bridge.Notification;
+
+import static org.kie.workbench.common.stunner.sw.marshall.Marshaller.IS_STRUCTURAL_PROFILING_ENABLED;
 
 @ApplicationScoped
 public class DiagramEditor {
@@ -84,6 +87,7 @@ public class DiagramEditor {
 
     public Promise<String> getPreview() {
         // TODO
+        close();
         return promises.resolve("");
     }
 
@@ -96,19 +100,94 @@ public class DiagramEditor {
     }
 
     public Promise<Void> setContent(final String path, final String value) {
-        // TODO close();
+        if (true) {
+            return updateContent(path, value);
+        } else {
+            return putContent(path, value);
+        }
+    }
+
+    public Promise<Void> putContent(final String path, final String value) {
+        if (IS_STRUCTURAL_PROFILING_ENABLED) {
+            DomConsole.getInstance().time("SWF_VIEWER_E2E");
+            DomConsole.getInstance().timeStamp("T_SWF_VIEWER_E2E");
+        }
+        close();
         return promises.create((success, failure) -> {
+            if (IS_STRUCTURAL_PROFILING_ENABLED) {
+                DomConsole.getInstance().time("TRANSFORM");
+                DomConsole.getInstance().timeStamp("T_TRANSFORM");
+            }
             diagramService.transform(path,
                                      value,
                                      new ServiceCallback<Diagram>() {
 
                                          @Override
                                          public void onSuccess(final Diagram diagram) {
+                                             if (IS_STRUCTURAL_PROFILING_ENABLED) {
+                                                 DomConsole.getInstance().timeEnd("TRANSFORM");
+                                                 DomConsole.getInstance().time("OPEN");
+                                                 DomConsole.getInstance().timeStamp("T_OPEN");
+                                             }
+                                             stunnerEditor
+                                                     .close()
+                                                     .open(diagram, new SessionPresenter.SessionPresenterCallback() {
+                                                         @Override
+                                                         public void onSuccess() {
+                                                             if (IS_STRUCTURAL_PROFILING_ENABLED) {
+                                                                 DomConsole.getInstance().timeEnd("OPEN");
+                                                             }
+                                                             onDiagramOpenSuccess();
+                                                             success.onInvoke((Void) null);
+                                                         }
+
+                                                         @Override
+                                                         public void onError(ClientRuntimeError error) {
+                                                             stunnerEditor.handleError(error);
+                                                             failure.onInvoke(error);
+                                                         }
+                                                     });
+                                         }
+
+                                         @Override
+                                         public void onError(final ClientRuntimeError error) {
+                                             stunnerEditor.handleError(new ClientRuntimeError(new DiagramParsingException()));
+                                             failure.onInvoke(error);
+                                         }
+                                     });
+        });
+    }
+
+    public Promise<Void> updateContent(final String path, final String value) {
+        if (IS_STRUCTURAL_PROFILING_ENABLED) {
+            DomConsole.getInstance().time("SWF_VIEWER_E2E");
+            DomConsole.getInstance().timeStamp("T_SWF_VIEWER_E2E");
+        }
+        // TODO close();
+        return promises.create((success, failure) -> {
+            if (IS_STRUCTURAL_PROFILING_ENABLED) {
+                DomConsole.getInstance().time("TRANSFORM");
+                DomConsole.getInstance().timeStamp("T_TRANSFORM");
+            }
+            diagramService.transform(path,
+                                     value,
+                                     new ServiceCallback<Diagram>() {
+
+                                         @Override
+                                         public void onSuccess(final Diagram diagram) {
+                                             if (IS_STRUCTURAL_PROFILING_ENABLED) {
+                                                 DomConsole.getInstance().timeEnd("TRANSFORM");
+                                                 DomConsole.getInstance().time("OPEN");
+                                                 DomConsole.getInstance().timeStamp("T_OPEN");
+                                             }
                                              stunnerEditor
                                                      // TODO .close()
                                                      .open(diagram, new SessionPresenter.SessionPresenterCallback() {
                                                          @Override
                                                          public void onSuccess() {
+                                                             if (IS_STRUCTURAL_PROFILING_ENABLED) {
+                                                                 DomConsole.getInstance().timeEnd("OPEN");
+                                                             }
                                                              onDiagramOpenSuccess();
                                                              success.onInvoke((Void) null);
                                                          }
@@ -138,6 +217,9 @@ public class DiagramEditor {
         metadata.setPath(path);
         incrementalMarshaller.run(diagramService.getMarshaller());
         initJsTypes();
+        if (IS_STRUCTURAL_PROFILING_ENABLED) {
+            DomConsole.getInstance().timeEnd("SWF_VIEWER_E2E");
+        }
     }
 
     private void initJsTypes() {

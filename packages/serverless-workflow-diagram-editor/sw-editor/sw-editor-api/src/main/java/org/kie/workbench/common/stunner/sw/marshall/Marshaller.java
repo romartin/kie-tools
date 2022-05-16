@@ -58,6 +58,7 @@ import org.kie.workbench.common.stunner.sw.definition.State;
 import org.kie.workbench.common.stunner.sw.definition.SwitchState;
 import org.kie.workbench.common.stunner.sw.definition.Transition;
 import org.kie.workbench.common.stunner.sw.definition.Workflow;
+import org.kie.workbench.common.stunner.sw.dom.DomConsole;
 import org.uberfire.client.promise.Promises;
 
 import static org.kie.workbench.common.stunner.sw.marshall.StateMarshalling.ACTIONS_UNMARSHALLER;
@@ -115,12 +116,21 @@ public class Marshaller {
         this.promises = promises;
     }
 
+    public static boolean IS_STRUCTURAL_PROFILING_ENABLED = false;
+
     @SuppressWarnings("all")
     public Promise<Graph> unmarshallGraph(String raw) {
         final Workflow workflow;
         try {
+            if (IS_STRUCTURAL_PROFILING_ENABLED) {
+                DomConsole.getInstance().time("PARSE");
+                DomConsole.getInstance().timeStamp("T_PARSE");
+            }
             final Object root = parse(raw);
             workflow = parser.parse(Js.uncheckedCast(root));
+            if (IS_STRUCTURAL_PROFILING_ENABLED) {
+                DomConsole.getInstance().timeEnd("PARSE");
+            }
         } catch (Exception e) {
             return promises.create(new Promise.PromiseExecutorCallbackFn<Graph>() {
                 @Override
@@ -134,14 +144,25 @@ public class Marshaller {
         // TODO: Use dedicated factory instead.
         final GraphImpl<Object> graph = GraphImpl.build(workflow.id);
         final Index index = new MapIndexBuilder().build(graph);
+        if (IS_STRUCTURAL_PROFILING_ENABLED) {
+            DomConsole.getInstance().time("UNMARSHALL");
+            DomConsole.getInstance().timeStamp("T_UNMARSHALL");
+        }
         context = new Context(index);
         final BuilderContext builderContext = new BuilderContext(context, definitionManager, factoryManager);
         unmarshallNode(builderContext, workflow);
         // TODO: Handle errors? if any (no rules execution context)?
         builderContext.execute();
+        if (IS_STRUCTURAL_PROFILING_ENABLED) {
+            DomConsole.getInstance().timeEnd("UNMARSHALL");
+        }
 
         // Perform automatic layout.
         if (true) {
+            if (IS_STRUCTURAL_PROFILING_ENABLED) {
+                DomConsole.getInstance().time("AUTOLAYOUT");
+                DomConsole.getInstance().timeStamp("T_AUTOLAYOUT");
+            }
             final Promise<Node> layout = AutoLayout.applyLayout(graph, context.getWorkflowRootNode(), promises, builderContext.buildExecutionContext(), false);
             return promises.create(new Promise.PromiseExecutorCallbackFn<Graph>() {
                 @Override
@@ -149,6 +170,9 @@ public class Marshaller {
                     layout.then(new IThenable.ThenOnFulfilledCallbackFn<Node, Object>() {
                         @Override
                         public IThenable<Object> onInvoke(Node node) {
+                            if (IS_STRUCTURAL_PROFILING_ENABLED) {
+                                DomConsole.getInstance().timeEnd("AUTOLAYOUT");
+                            }
                             success.onInvoke(graph);
                             return null;
                         }

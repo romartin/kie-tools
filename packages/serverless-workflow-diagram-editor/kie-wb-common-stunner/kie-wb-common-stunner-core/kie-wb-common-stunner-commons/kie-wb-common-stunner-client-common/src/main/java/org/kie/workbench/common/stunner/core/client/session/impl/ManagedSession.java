@@ -202,7 +202,14 @@ public class ManagedSession
 
     @Override
     public void destroy() {
-        close();
+        sessionLoader.destroy();
+        removeListeners();
+        destroyCanvasControls();
+        destroyCanvasHandlerControls();
+        canvasControlTypes.clear();
+        canvasHandlerControlTypes.clear();
+        canvasControlInstances.destroyAll();
+        canvasHandlerControlInstances.destroyAll();
         canvasHandler.destroy();
         canvasInstances.destroyAll();
         canvasHandlerInstances.destroyAll();
@@ -218,16 +225,18 @@ public class ManagedSession
 
     @Override
     public void close() {
-        sessionLoader.destroy();
-        removeListeners();
+        destroyCanvasControls();
+        destroyCanvasHandlerControls();
+    }
+
+    private void destroyCanvasControls() {
         canvasControls.forEach(this::destroyCanvasControl);
         canvasControls.clear();
-        canvasControlTypes.clear();
+    }
+
+    private void destroyCanvasHandlerControls() {
         canvasHandlerControls.forEach(this::destroyCanvasHandlerControl);
         canvasHandlerControls.clear();
-        canvasHandlerControlTypes.clear();
-        canvasControlInstances.destroyAll();
-        canvasHandlerControlInstances.destroyAll();
     }
 
     @Override

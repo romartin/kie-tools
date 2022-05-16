@@ -33,7 +33,7 @@ import org.kie.workbench.common.stunner.core.client.canvas.CanvasHandler;
 import org.kie.workbench.common.stunner.core.client.i18n.ClientTranslationService;
 import org.kie.workbench.common.stunner.core.client.service.ClientRuntimeError;
 import org.kie.workbench.common.stunner.core.client.session.ClientSession;
-import org.kie.workbench.common.stunner.core.client.session.impl.DefaultViewerSession;
+import org.kie.workbench.common.stunner.core.client.session.impl.AbstractSession;
 import org.kie.workbench.common.stunner.core.client.session.impl.EditorSession;
 import org.kie.workbench.common.stunner.core.client.session.impl.ViewerSession;
 import org.kie.workbench.common.stunner.core.definition.exception.DefinitionNotFoundException;
@@ -101,6 +101,7 @@ public class StunnerEditor {
     public void open(final Diagram diagram,
                      final SessionPresenter.SessionPresenterCallback callback) {
         if (isClosed()) {
+            DomGlobal.console.log("Stunner Editor - Creating Presenter instances....");
             if (!isReadOnly) {
                 diagramPresenter = editorSessionPresenterInstances.get();
             } else {
@@ -113,41 +114,75 @@ public class StunnerEditor {
         }
 
         // TODO: Just a test....
-        boolean doesSessionExist = null != getSession();
-        DomGlobal.console.log("doesSessionExist=" + doesSessionExist);
+        AbstractSession session = getSession();
+        boolean doesSessionExist = null != session;
+        // DomGlobal.console.log("doesSessionExist=" + doesSessionExist);
         if (doesSessionExist) {
             diagramPresenter.clear();
-            DefaultViewerSession session = (DefaultViewerSession) getSession();
-            session.close();
+            // TODO session.close();
+            Diagram diagram1 = session.getCanvasHandler().getDiagram();
         }
 
-        diagramPresenter.open(diagram, new SessionPresenter.SessionPresenterCallback() {
-            @Override
-            public void onOpen(Diagram diagram) {
-                callback.onOpen(diagram);
-            }
+        boolean isOpenDiagramNorSession = !doesSessionExist;
 
-            @Override
-            public void afterSessionOpened() {
-                callback.afterSessionOpened();
-            }
+        if (true) {
+            diagramPresenter.open(diagram, new SessionPresenter.SessionPresenterCallback<Diagram>() {
+                @Override
+                public void onOpen(Diagram diagram) {
+                    callback.onOpen(diagram);
+                }
 
-            @Override
-            public void afterCanvasInitialized() {
-                callback.afterCanvasInitialized();
-            }
+                @Override
+                public void afterSessionOpened() {
+                    callback.afterSessionOpened();
+                }
 
-            @Override
-            public void onSuccess() {
-                callback.onSuccess();
-            }
+                @Override
+                public void afterCanvasInitialized() {
+                    callback.afterCanvasInitialized();
+                }
 
-            @Override
-            public void onError(ClientRuntimeError error) {
-                handleError(error);
-                callback.onError(error);
-            }
-        });
+                @Override
+                public void onSuccess() {
+                    callback.onSuccess();
+                }
+
+                @Override
+                public void onError(ClientRuntimeError error) {
+                    handleError(error);
+                    callback.onError(error);
+                }
+            });
+        } else {
+            diagramPresenter.open((ClientSession)session, new SessionPresenter.SessionPresenterCallback<Diagram>() {
+
+                @Override
+                public void afterCanvasInitialized() {
+                    callback.afterCanvasInitialized();
+                }
+
+                @Override
+                public void onOpen(Diagram diagram) {
+                    callback.onOpen(diagram);
+                }
+
+                @Override
+                public void afterSessionOpened() {
+                    callback.afterSessionOpened();
+                }
+
+                @Override
+                public void onSuccess() {
+                    callback.onSuccess();
+                }
+
+                @Override
+                public void onError(ClientRuntimeError error) {
+                    handleError(error);
+                    callback.onError(error);
+                }
+            });
+        }
     }
 
     public int getCurrentContentHash() {
@@ -206,8 +241,8 @@ public class StunnerEditor {
         return null == diagramPresenter;
     }
 
-    public ClientSession getSession() {
-        return (ClientSession) diagramPresenter.getInstance();
+    public AbstractSession getSession() {
+        return (AbstractSession) diagramPresenter.getInstance();
     }
 
     public CanvasHandler getCanvasHandler() {
