@@ -26,11 +26,8 @@ import javax.enterprise.event.Event;
 
 import org.kie.workbench.common.stunner.client.widgets.event.SessionFocusedEvent;
 import org.kie.workbench.common.stunner.client.widgets.event.SessionLostFocusEvent;
-import org.kie.workbench.common.stunner.client.widgets.notification.CommandNotification;
 import org.kie.workbench.common.stunner.client.widgets.notification.Notification;
 import org.kie.workbench.common.stunner.client.widgets.notification.NotificationContext;
-import org.kie.workbench.common.stunner.client.widgets.notification.NotificationsObserver;
-import org.kie.workbench.common.stunner.client.widgets.notification.ValidationFailedNotification;
 import org.kie.workbench.common.stunner.client.widgets.palette.DefaultPaletteFactory;
 import org.kie.workbench.common.stunner.client.widgets.palette.PaletteWidget;
 import org.kie.workbench.common.stunner.client.widgets.presenters.session.SessionPresenter;
@@ -56,12 +53,11 @@ public abstract class AbstractSessionPresenter<D extends Diagram, H extends Abst
     private final SessionManager sessionManager;
     private final DefaultPaletteFactory<H> paletteFactory;
     private final SessionPresenter.View view;
-    private final NotificationsObserver notificationsObserver;
     private final Event<SessionFocusedEvent> sessionFocusedEvent;
     private final Event<SessionLostFocusEvent> sessionLostFocusEvent;
     private final Event<CanvasLostFocusEvent> canvasLostFocusEventEvent;
 
-    private D diagram;
+    private transient D diagram;
     private Toolbar<S> toolbar;
     private PaletteWidget<PaletteDefinition> palette;
     private boolean hasToolbar = false;
@@ -73,14 +69,12 @@ public abstract class AbstractSessionPresenter<D extends Diagram, H extends Abst
                                        final SessionManager sessionManager,
                                        final SessionPresenter.View view,
                                        final DefaultPaletteFactory<H> paletteFactory,
-                                       final NotificationsObserver notificationsObserver,
                                        final Event<SessionFocusedEvent> sessionFocusedEvent,
                                        final Event<SessionLostFocusEvent> sessionLostFocusEvent,
                                        final Event<CanvasLostFocusEvent> canvasLostFocusEventEvent) {
         this.definitionUtils = definitionUtils;
         this.sessionManager = sessionManager;
         this.paletteFactory = paletteFactory;
-        this.notificationsObserver = notificationsObserver;
         this.sessionFocusedEvent = sessionFocusedEvent;
         this.sessionLostFocusEvent = sessionLostFocusEvent;
         this.canvasLostFocusEventEvent = canvasLostFocusEventEvent;
@@ -103,9 +97,6 @@ public abstract class AbstractSessionPresenter<D extends Diagram, H extends Abst
     public void open(final D diagram,
                      final SessionPresenterCallback<D> callback) {
         this.diagram = diagram;
-        notificationsObserver.onCommandExecutionFailed(this::showCommandError);
-        notificationsObserver.onValidationSuccess(this::showNotificationMessage);
-        notificationsObserver.onValidationFailed(this::showValidationError);
         sessionManager.newSession(diagram.getMetadata(),
                                   getSessionType(),
                                   session -> open((S) session,
@@ -126,12 +117,14 @@ public abstract class AbstractSessionPresenter<D extends Diagram, H extends Abst
                                 @Override
                                 public void onSuccess() {
                                     onSessionOpened(session);
+                                    diagram = null;
                                     callback.onSuccess();
                                 }
 
                                 @Override
                                 public void onError(final ClientRuntimeError error) {
                                     AbstractSessionPresenter.this.showError(error);
+                                    diagram = null;
                                     callback.onError(error);
                                 }
                             });
@@ -227,7 +220,17 @@ public abstract class AbstractSessionPresenter<D extends Diagram, H extends Abst
     }
 
     protected D getDiagram() {
-        return diagram;
+        if (null != diagram) {
+            return diagram;
+        }
+        if (getSession().isPresent()) {
+            return (D) getAbstractSession().getCanvasHandler().getDiagram();
+        }
+        return null;
+    }
+
+    private AbstractSession getAbstractSession() {
+        return getSession().get();
     }
 
     @SuppressWarnings("unchecked")
@@ -324,28 +327,6 @@ public abstract class AbstractSessionPresenter<D extends Diagram, H extends Abst
         if (null != palette) {
             palette.destroy();
             palette = null;
-        }
-    }
-
-    private void showNotificationMessage(final Notification notification) {
-        if (isThisContext(notification)) {
-            showMessage(notification.getMessage());
-        }
-    }
-
-    private void showCommandError(final CommandNotification notification) {
-        if (isThisContext(notification)) {
-            showError(notification.getMessage());
-        }
-    }
-
-    private void showValidationError(final ValidationFailedNotification notification) {
-        if (isThisContext(notification)) {
-            if (Notification.Type.ERROR.equals(notification.getType())) {
-                showError(notification.getMessage());
-            } else {
-                showWarning(notification.getMessage());
-            }
         }
     }
 

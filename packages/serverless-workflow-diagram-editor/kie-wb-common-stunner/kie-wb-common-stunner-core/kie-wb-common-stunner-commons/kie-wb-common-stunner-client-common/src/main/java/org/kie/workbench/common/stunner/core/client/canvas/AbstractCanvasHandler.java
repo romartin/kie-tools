@@ -29,7 +29,6 @@ import org.kie.workbench.common.stunner.core.client.canvas.listener.CanvasElemen
 import org.kie.workbench.common.stunner.core.client.canvas.listener.HasCanvasListeners;
 import org.kie.workbench.common.stunner.core.client.canvas.listener.HasDomainObjectListeners;
 import org.kie.workbench.common.stunner.core.client.canvas.util.CanvasLayoutUtils;
-import org.kie.workbench.common.stunner.core.client.command.QueueGraphExecutionContext;
 import org.kie.workbench.common.stunner.core.client.shape.MutationContext;
 import org.kie.workbench.common.stunner.core.client.shape.Shape;
 import org.kie.workbench.common.stunner.core.client.shape.factory.ShapeFactory;
@@ -110,7 +109,7 @@ public abstract class AbstractCanvasHandler<D extends Diagram, C extends Abstrac
      * It sets the shape for the <code>child</code> instance as child shape for the
      * <code>parent</code> instance's shape.
      * @param parent The parent graph element.
-     * @param child The graph element to set as child.
+     * @param child  The graph element to set as child.
      */
     public abstract void addChild(final Element parent,
                                   final Element child);
@@ -121,8 +120,8 @@ public abstract class AbstractCanvasHandler<D extends Diagram, C extends Abstrac
      * implementation adds the child to the parent and index is unused. The Child's
      * Shape is also set as a sibling of the Parent Shape.
      * @param parent The parent graph element.
-     * @param child The graph element to set as child.
-     * @param index The index of the child in the parent.
+     * @param child  The graph element to set as child.
+     * @param index  The index of the child in the parent.
      */
     public abstract void addChild(final Element parent,
                                   final Element child,
@@ -134,7 +133,7 @@ public abstract class AbstractCanvasHandler<D extends Diagram, C extends Abstrac
      * It removes the shape for the <code>child</code> instance as child shape for the
      * <code>parent</code> instance's shape.
      * @param parent The parent graph element.
-     * @param child The element to remove as a child from the parent.
+     * @param child  The element to remove as a child from the parent.
      */
     public abstract void removeChild(final Element parent,
                                      final Element child);
@@ -154,7 +153,7 @@ public abstract class AbstractCanvasHandler<D extends Diagram, C extends Abstrac
      * It sets the shape for the <code>child</code> instance as a docked child shape for the
      * <code>parent</code> instance's shape.
      * @param parent The parent graph element.
-     * @param child The graph element to set as a docked child.
+     * @param child  The graph element to set as a docked child.
      */
     public abstract boolean dock(final Element parent,
                                  final Element child);
@@ -165,7 +164,7 @@ public abstract class AbstractCanvasHandler<D extends Diagram, C extends Abstrac
      * It removes the shape for the <code>child</code> instance as a docked child shape for the
      * <code>parent</code> instance's shape.
      * @param parent The parent graph element.
-     * @param child The element to remove as a docked child from the parent.
+     * @param child  The element to remove as a docked child from the parent.
      */
     public abstract void undock(final Element parent,
                                 final Element child);
@@ -201,6 +200,7 @@ public abstract class AbstractCanvasHandler<D extends Diagram, C extends Abstrac
      * - Registers a new graph element into the structure
      * - Creates the shape for the element to register, using the shape factory provided
      * for the given <code>shapeSetId</code> value.
+     *
      * @param shapeSetId The identifier for the ShapeSet to use.
      * @param candidate The graph element to register.
      */
@@ -397,22 +397,29 @@ public abstract class AbstractCanvasHandler<D extends Diagram, C extends Abstrac
         }
     }
 
-    private GraphCommandExecutionContext graphContext = null;
+    // TODO: Leaks after update content. Ask Jaime about this.
+    // protected GraphCommandExecutionContext graphContext = null;
 
     /**
      * Sets the Graphic Context to be used for multiple operations
      * @param graphContext Graph context to be set
      */
-    public void setStaticContext(GraphCommandExecutionContext graphContext) {
+    // TODO: Leaks after update content. Ask Jaime about this.
+    /*public void setStaticContext(GraphCommandExecutionContext graphContext) {
         this.graphContext = graphContext;
-    }
+    }*/
 
     /**
      * Notifies an element updated to the listeners.
      */
     public void notifyCanvasElementUpdated(final Element candidate) {
 
-        if (graphContext != null) {
+        for (final CanvasElementListener instance : listeners) {
+            instance.update(candidate);
+        }
+
+        // TODO: Leaks after update content. Ask Jaime about this.
+        /*if (graphContext != null) {
             if (graphContext instanceof QueueGraphExecutionContext) {
                 ((QueueGraphExecutionContext) graphContext).addElement(candidate);
             } else {
@@ -420,7 +427,7 @@ public abstract class AbstractCanvasHandler<D extends Diagram, C extends Abstrac
                     instance.update(candidate);
                 }
             }
-        }
+        }*/
     }
 
     /**

@@ -94,7 +94,7 @@
       <label for="selectExample">Examples:&nbsp;</label>
       <select id="selectExample"></select>
       <input type="button" onclick="loadText()" value="Load JSON Content" style="display: block; margin-bottom: 5px" />
-      <textarea id="jsonRawContent" rows="50" cols="50" style="font-size: revert"></textarea>
+      <textarea id="jsonRawContent" onkeypress="jsonTextChanged()" rows="50" cols="50" style="font-size: revert"></textarea>
     </div>
 
     <div style="display: inline; float: left; width: 50%">
@@ -109,7 +109,6 @@
           specVersion: "0.8",
           name: "Inject State Example",
           description: "Inject Example",
-          start: "Inject State",
           states: [
             {
               name: "Inject State",
@@ -567,6 +566,10 @@
 
       function setText(object) {
         document.getElementById("jsonRawContent").value = object;
+      }
+
+      function jsonTextChanged() {
+        loadText();
       }
 
       function loadText() {

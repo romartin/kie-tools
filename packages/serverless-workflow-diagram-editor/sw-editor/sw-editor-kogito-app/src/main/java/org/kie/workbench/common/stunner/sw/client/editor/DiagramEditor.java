@@ -25,6 +25,8 @@ import com.ait.lienzo.client.widget.panel.LienzoBoundsPanel;
 import com.ait.lienzo.client.widget.panel.impl.ScrollablePanel;
 import com.ait.lienzo.client.widget.panel.util.PanelTransformUtils;
 import com.google.gwt.user.client.ui.IsWidget;
+import elemental2.dom.DomGlobal;
+import elemental2.promise.IThenable;
 import elemental2.promise.Promise;
 import org.kie.workbench.common.stunner.client.lienzo.canvas.LienzoCanvas;
 import org.kie.workbench.common.stunner.client.lienzo.canvas.LienzoPanel;
@@ -36,10 +38,16 @@ import org.kie.workbench.common.stunner.client.widgets.presenters.session.Sessio
 import org.kie.workbench.common.stunner.core.client.canvas.AbstractCanvasHandler;
 import org.kie.workbench.common.stunner.core.client.canvas.CanvasHandler;
 import org.kie.workbench.common.stunner.core.client.canvas.util.CanvasFileExport;
+import org.kie.workbench.common.stunner.core.client.canvas.command.ClearAllCommand;
+import org.kie.workbench.common.stunner.core.client.canvas.controls.CanvasRegistrationControl;
+import org.kie.workbench.common.stunner.core.client.command.CanvasCommandManager;
 import org.kie.workbench.common.stunner.core.client.service.ClientRuntimeError;
 import org.kie.workbench.common.stunner.core.client.service.ServiceCallback;
+import org.kie.workbench.common.stunner.core.client.session.impl.ViewerSession;
 import org.kie.workbench.common.stunner.core.client.shape.Shape;
 import org.kie.workbench.common.stunner.core.client.util.WindowJSType;
+import org.kie.workbench.common.stunner.core.command.CommandResult;
+import org.kie.workbench.common.stunner.core.command.util.CommandUtils;
 import org.kie.workbench.common.stunner.core.diagram.Diagram;
 import org.kie.workbench.common.stunner.core.diagram.DiagramParsingException;
 import org.kie.workbench.common.stunner.core.diagram.Metadata;
@@ -48,6 +56,7 @@ import org.kie.workbench.common.stunner.sw.client.services.IncrementalMarshaller
 import org.uberfire.backend.vfs.Path;
 import org.uberfire.backend.vfs.PathFactory;
 import org.uberfire.client.promise.Promises;
+import org.uberfire.mvp.ParameterizedCommand;
 import org.uberfire.mvp.PlaceRequest;
 import org.uberfire.workbench.model.bridge.Notification;
 
@@ -89,6 +98,7 @@ public class DiagramEditor {
 
     private void close() {
         stunnerEditor.close();
+        diagramService.getMarshaller().clearContext();
     }
 
     public IsWidget asWidget() {
@@ -96,12 +106,51 @@ public class DiagramEditor {
     }
 
     public Promise<String> getPreview() {
+        if (true) {
+            close();
+            // testPromisesConcurrency();
+            return promises.resolve("");
+        }
+
         CanvasHandler canvasHandler = stunnerEditor.getCanvasHandler();
         if (canvasHandler != null) {
             return promises.resolve(canvasFileExport.exportToSvg((AbstractCanvasHandler) canvasHandler));
         } else {
             return promises.resolve("");
         }
+    }
+
+    private void testPromisesConcurrency() {
+
+        Promise<String> p1 = promises.create((success, failure) -> {
+            DomGlobal.console.log("Running P1");
+            DomGlobal.console.time("fib");
+            computeSomeTime();
+            DomGlobal.console.timeEnd("fib");
+            DomGlobal.console.log("Complete P1");
+            success.onInvoke("p1");
+        });
+
+        p1.then(new IThenable.ThenOnFulfilledCallbackFn<String, String>() {
+            @Override
+            public IThenable<String> onInvoke(String s) {
+                return promises.resolve(s);
+            }
+        });
+    }
+
+    private static void computeSomeTime() {
+        fib(35); // Logarithmic computation time. It takes about 250ms in my laptop.
+    }
+
+    private static int fib(int n) {
+        if (n < 1) {
+            return 0;
+        }
+        if (n <= 2) {
+            return 1;
+        }
+        return fib(n - 1) + fib(n - 2);
     }
 
     public Promise validate() {
@@ -112,7 +161,86 @@ public class DiagramEditor {
         return diagramService.transform(stunnerEditor.getDiagram());
     }
 
+    /*
+        TODO: SetVsUpdate content
+        - Decouple lifecycle from actual StunnerEditor
+        - Set logic
+            - Marshalling
+            - new Session
+            - Auto-fit
+        - Update logic
+            - Session.saveState*
+            - Session.clearState
+            - Marshalling - preserve UUIDs <-> state name
+            - Update graph command
+                - clear canvas / handler
+                - clear memory model
+                - clear caches
+                - re-populate
+                - canvas root UUID
+            - Session. restoreState*
+            - DO NOT auto-fit
+
+        - TODO: Apply in conjunction with other proposed actions (Handrey)
+        - TODO: Sync with Jaime/Wagner on vscode integration issues
+        - TODO: Tooling Channels -> ensure closing / different states for each tab
+     */
+
+    public Promise<Void> updateContent(final String path, final String value) {
+        DomGlobal.console.log("UPDATING CONTENT");
+        return promises.create((success, failure) -> {
+            diagramService.transform(path,
+                                     value,
+                                     new ServiceCallback<Diagram>() {
+
+                                         @Override
+                                         public void onSuccess(final Diagram diagram) {
+                                             updateDiagram(diagram);
+                                         }
+
+                                         @Override
+                                         public void onError(final ClientRuntimeError error) {
+                                             stunnerEditor.handleError(new ClientRuntimeError(new DiagramParsingException()));
+                                             failure.onInvoke(error);
+                                         }
+                                     });
+        });
+    }
+
+    public void updateDiagram(Diagram diagram) {
+        DomGlobal.console.log("UPDATING DIAGRAM");
+        ViewerSession session = (ViewerSession) stunnerEditor.getSession();
+        AbstractCanvasHandler canvasHandler = session.getCanvasHandler();
+        CanvasCommandManager<AbstractCanvasHandler> commandManager = session.getCommandManager();
+
+
+        // TODO: Clear ALL controls state
+        ((CanvasRegistrationControl) session.getSelectionControl()).clear();
+
+        commandManager.execute(canvasHandler, new ClearAllCommand());
+
+        canvasHandler.draw(diagram,
+                           (ParameterizedCommand<CommandResult<?>>) result -> {
+                               if (!CommandUtils.isError(result)) {
+                                   DomGlobal.console.log("(RE)DRAW DONE!!!");
+                               } else {
+                                   DomGlobal.console.error("An error occurred while drawing the diagram [result=" + result + "]");
+                               }
+                           });
+
+        // TODO: Restore previous controls state??
+
+    }
+
     public Promise<Void> setContent(final String path, final String value) {
+        if (stunnerEditor.isClosed()) {
+            return setNewContent(path, value);
+        } else {
+            return updateContent(path, value);
+        }
+    }
+
+    public Promise<Void> setNewContent(final String path, final String value) {
         close();
         return promises.create((success, failure) -> {
             diagramService.transform(path,
@@ -185,8 +313,8 @@ public class DiagramEditor {
         String title = metadata.getTitle();
         Path path = PathFactory.newPath(title, "/" + title + ".sw");
         metadata.setPath(path);
-        incrementalMarshaller.run(diagramService.getMarshaller());
-        initJsTypes();
+        // TODO: Finally leaking DiagramImpl or not?
+        //  initJsTypes();
     }
 
     private void initJsTypes() {

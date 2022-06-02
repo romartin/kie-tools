@@ -93,6 +93,13 @@ public class CanvasHandlerImpl<D extends Diagram, C extends AbstractCanvas> exte
     @Override
     @SuppressWarnings("unchecked")
     protected void buildGraphIndex(final Command loadCallback) {
+        // TODO: Apply this fix to other CanvasHandler impls?
+        if (null != this.graphIndex) {
+            // Release old references in heap.
+            this.graphIndex.clear();
+            this.graphIndex = null;
+        }
+        // TODO: Clear graphExecutionContext?
         this.graphIndex = getIndexBuilder().build(getDiagram().getGraph());
         loadCallback.execute();
     }

@@ -134,7 +134,7 @@ public class BaseCanvasHandlerTest {
 
     @Test
     public void checkApplyElementMutationNotifyQueued() {
-        canvasHandler.setStaticContext(queueGraphExecutionContext);
+        // TODO canvasHandler.setStaticContext(queueGraphExecutionContext);
         final ElementShape shape = mock(ElementShape.class);
         final Element candidate = mock(Element.class);
         final boolean applyPosition = true;
@@ -153,7 +153,7 @@ public class BaseCanvasHandlerTest {
 
     @Test
     public void checkApplyElementMutationNullQueue() {
-        canvasHandler.setStaticContext(null);
+        // TODO canvasHandler.setStaticContext(null);
         final ElementShape shape = mock(ElementShape.class);
         final Element candidate = mock(Element.class);
         final boolean applyPosition = true;
@@ -173,7 +173,7 @@ public class BaseCanvasHandlerTest {
     @Test
     public void checkNotifyElementUpdatedOnNonQueuedContext() {
         canvasHandler.addRegistrationListener(updateListener);
-        canvasHandler.setStaticContext(contextualGraphExecutionContext);
+        // TODO canvasHandler.setStaticContext(contextualGraphExecutionContext);
         final ElementShape shape = mock(ElementShape.class);
         final Element candidate = mock(Element.class);
         final boolean applyPosition = true;

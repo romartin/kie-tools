@@ -27,7 +27,6 @@ import javax.inject.Inject;
 import org.jboss.errai.ioc.client.api.ManagedInstance;
 import org.kie.workbench.common.stunner.client.widgets.event.SessionFocusedEvent;
 import org.kie.workbench.common.stunner.client.widgets.event.SessionLostFocusEvent;
-import org.kie.workbench.common.stunner.client.widgets.notification.NotificationsObserver;
 import org.kie.workbench.common.stunner.client.widgets.presenters.session.SessionDiagramPresenter;
 import org.kie.workbench.common.stunner.client.widgets.presenters.session.SessionDiagramViewer;
 import org.kie.workbench.common.stunner.client.widgets.presenters.session.SessionViewer;
@@ -68,7 +67,6 @@ public class SessionViewerPresenter<S extends ViewerSession>
                                   final SessionViewerImpl<S> viewer,
                                   final @Any ManagedInstance<ViewerToolbar> toolbars,
                                   final Event<SessionDiagramOpenedEvent> sessionDiagramOpenedEvent,
-                                  final NotificationsObserver notificationsObserver,
                                   final Event<SessionFocusedEvent> sessionFocusedEvent,
                                   final Event<SessionLostFocusEvent> sessionLostFocusEvent,
                                   final Event<CanvasLostFocusEvent> canvasLostFocusEventEvent,
@@ -77,7 +75,6 @@ public class SessionViewerPresenter<S extends ViewerSession>
               sessionManager,
               view,
               null,
-              notificationsObserver,
               sessionFocusedEvent,
               sessionLostFocusEvent,
               canvasLostFocusEventEvent);

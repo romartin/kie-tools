@@ -85,6 +85,11 @@ public class BuilderContext {
     public Node addNode(String name,
                         Object bean) {
         final String uuid = context.obtainUUID(name);
+        return addNodeByUUID(uuid, bean);
+    }
+
+    public Node addNodeByUUID(String uuid,
+                        Object bean) {
         final ElementFactory elementFactory = factoryManager.registry().getElementFactory(NodeFactory.class);
         final Node node = (Node) elementFactory.build(uuid, bean);
         updateNodeBounds(node);

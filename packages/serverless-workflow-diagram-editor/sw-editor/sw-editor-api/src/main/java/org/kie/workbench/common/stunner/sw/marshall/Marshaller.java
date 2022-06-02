@@ -115,6 +115,13 @@ public class Marshaller {
         this.promises = promises;
     }
 
+    public void clearContext() {
+        if (null != context) {
+            context.clear();
+            context = null;
+        }
+    }
+
     @SuppressWarnings("all")
     public Promise<Graph> unmarshallGraph(String raw) {
         final Workflow workflow;

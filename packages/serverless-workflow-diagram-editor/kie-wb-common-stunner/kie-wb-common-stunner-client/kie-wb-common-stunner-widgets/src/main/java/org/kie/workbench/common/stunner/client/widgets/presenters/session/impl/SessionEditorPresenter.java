@@ -28,7 +28,6 @@ import javax.inject.Inject;
 import org.jboss.errai.ioc.client.api.ManagedInstance;
 import org.kie.workbench.common.stunner.client.widgets.event.SessionFocusedEvent;
 import org.kie.workbench.common.stunner.client.widgets.event.SessionLostFocusEvent;
-import org.kie.workbench.common.stunner.client.widgets.notification.NotificationsObserver;
 import org.kie.workbench.common.stunner.client.widgets.palette.DefaultPaletteFactory;
 import org.kie.workbench.common.stunner.client.widgets.presenters.session.RequestSessionRefreshEvent;
 import org.kie.workbench.common.stunner.client.widgets.presenters.session.SessionDiagramEditor;
@@ -79,7 +78,6 @@ public class SessionEditorPresenter<S extends EditorSession>
                                   final Event<SessionDiagramOpenedEvent> sessionDiagramOpenedEvent,
                                   final @Any ManagedInstance<EditorToolbar> toolbars,
                                   final DefaultPaletteFactory<AbstractCanvasHandler> paletteWidgetFactory,
-                                  final NotificationsObserver notificationsObserver,
                                   final Event<SessionFocusedEvent> sessionFocusedEvent,
                                   final Event<SessionLostFocusEvent> sessionLostFocusEvent,
                                   final Event<CanvasLostFocusEvent> canvasLostFocusEventEvent,
@@ -88,7 +86,6 @@ public class SessionEditorPresenter<S extends EditorSession>
               sessionManager,
               view,
               paletteWidgetFactory,
-              notificationsObserver,
               sessionFocusedEvent,
               sessionLostFocusEvent,
               canvasLostFocusEventEvent);

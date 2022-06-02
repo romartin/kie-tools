@@ -59,6 +59,11 @@ public class Context {
         return graphIndex.getGraph();
     }
 
+    public void clear() {
+        nameToUUIDBindings.clear();
+        workflowRootNode = null;
+    }
+
     public String obtainUUID(String name) {
         if (null == name) {
             return generateUUID();
