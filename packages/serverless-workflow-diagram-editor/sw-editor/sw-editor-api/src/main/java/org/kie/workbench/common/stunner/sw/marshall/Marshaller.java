@@ -26,7 +26,6 @@ import elemental2.promise.Promise;
 import jsinterop.base.Js;
 import org.kie.workbench.common.stunner.core.api.DefinitionManager;
 import org.kie.workbench.common.stunner.core.api.FactoryManager;
-import org.kie.workbench.common.stunner.core.client.service.ClientRuntimeError;
 import org.kie.workbench.common.stunner.core.graph.Edge;
 import org.kie.workbench.common.stunner.core.graph.Graph;
 import org.kie.workbench.common.stunner.core.graph.Node;
@@ -58,6 +57,7 @@ import org.kie.workbench.common.stunner.sw.definition.State;
 import org.kie.workbench.common.stunner.sw.definition.SwitchState;
 import org.kie.workbench.common.stunner.sw.definition.Transition;
 import org.kie.workbench.common.stunner.sw.definition.Workflow;
+import org.kie.workbench.common.stunner.sw.dom.DomTimings;
 import org.uberfire.client.promise.Promises;
 
 import static org.kie.workbench.common.stunner.sw.marshall.StateMarshalling.ACTIONS_UNMARSHALLER;
@@ -116,49 +116,69 @@ public class Marshaller {
     }
 
     public void clearContext() {
-        if (null != context) {
+        if (false && null != context) {
             context.clear();
             context = null;
         }
     }
 
+    public static boolean IS_STRUCTURAL_PROFILING_ENABLED = true;
+
     @SuppressWarnings("all")
     public Promise<Graph> unmarshallGraph(String raw) {
-        final Workflow workflow;
-        try {
-            final Object root = parse(raw);
-            workflow = parser.parse(Js.uncheckedCast(root));
-        } catch (Exception e) {
-            return promises.create(new Promise.PromiseExecutorCallbackFn<Graph>() {
-                @Override
-                public void onInvoke(ResolveCallbackFn<Graph> resolveCallbackFn,
-                                     RejectCallbackFn rejectCallbackFn) {
-                    rejectCallbackFn.onInvoke(new ClientRuntimeError("Error parsing JSON file.", e));
-                }
-            });
-        }
-
-        // TODO: Use dedicated factory instead.
-        final GraphImpl<Object> graph = GraphImpl.build(workflow.id);
-        final Index index = new MapIndexBuilder().build(graph);
-        context = new Context(index);
-        final BuilderContext builderContext = new BuilderContext(context, definitionManager, factoryManager);
-        unmarshallNode(builderContext, workflow);
-        // TODO: Handle errors? if any (no rules execution context)?
-        builderContext.execute();
-
-        // Perform automatic layout.
-        final Promise<Node> layout = AutoLayout.applyLayout(graph, context.getWorkflowRootNode(), promises, builderContext.buildExecutionContext(), false);
         return promises.create(new Promise.PromiseExecutorCallbackFn<Graph>() {
             @Override
             public void onInvoke(ResolveCallbackFn<Graph> success, RejectCallbackFn reject) {
-                layout.then(new IThenable.ThenOnFulfilledCallbackFn<Node, Object>() {
-                    @Override
-                    public IThenable<Object> onInvoke(Node node) {
-                        success.onInvoke(graph);
-                        return null;
+                final Workflow workflow;
+                try {
+                    if (IS_STRUCTURAL_PROFILING_ENABLED) {
+                        DomTimings.time(DomTimings.PARSE);
                     }
-                });
+                    final Object root = parse(raw);
+                    workflow = parser.parse(Js.uncheckedCast(root));
+                    if (IS_STRUCTURAL_PROFILING_ENABLED) {
+                        DomTimings.timeEnd(DomTimings.PARSE);
+                    }
+                } catch (Exception e) {
+                    // TODO: Handle promise error, as done before changing this method logic.
+                    throw new RuntimeException("Error parsing JSON file", e);
+                }
+
+                // TODO: Use dedicated factory instead.
+                final GraphImpl<Object> graph = GraphImpl.build(workflow.id);
+                final Index index = new MapIndexBuilder().build(graph);
+
+                if (IS_STRUCTURAL_PROFILING_ENABLED) {
+                    DomTimings.time(DomTimings.UNMARSHALL);
+                }
+                context = new Context(index);
+                final BuilderContext builderContext = new BuilderContext(context, definitionManager, factoryManager);
+                unmarshallNode(builderContext, workflow);
+                // TODO: Handle errors? if any (no rules execution context)?
+                builderContext.execute();
+                if (IS_STRUCTURAL_PROFILING_ENABLED) {
+                    DomTimings.timeEnd(DomTimings.UNMARSHALL);
+                }
+
+                if (true) {
+                    if (IS_STRUCTURAL_PROFILING_ENABLED) {
+                        DomTimings.time(DomTimings.AUTOLAYOUT);
+                    }
+                    final Promise<Node> layout = AutoLayout.applyLayout(graph, context.getWorkflowRootNode(), promises, builderContext.buildExecutionContext(), false);
+                    // TODO: Handle promise error during layout.
+                    layout.then(new IThenable.ThenOnFulfilledCallbackFn<Node, Object>() {
+                        @Override
+                        public IThenable<Object> onInvoke(Node node) {
+                            if (IS_STRUCTURAL_PROFILING_ENABLED) {
+                                DomTimings.timeEnd(DomTimings.AUTOLAYOUT);
+                            }
+                            success.onInvoke(graph);
+                            return null;
+                        }
+                    });
+                } else {
+                    success.onInvoke(graph);
+                }
             }
         });
     }

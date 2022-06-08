@@ -22,10 +22,11 @@
   <inherits name='com.google.gwt.user.User'/>
   <inherits name="org.kie.workbench.common.stunner.core.StunnerCoreCommon"/>
   <inherits name="org.kie.workbench.common.stunner.core.StunnerClientApi"/>
-  <inherits name="com.google.gwt.resources.Resources" />
+  <inherits name="com.google.gwt.resources.Resources"/>
 
   <source path="autolayout"/>
   <source path="definition"/>
+  <source path="dom"/>
   <source path="factory"/>
   <source path="marshall"/>
   <source path="" includes="SWEditor.java"/>

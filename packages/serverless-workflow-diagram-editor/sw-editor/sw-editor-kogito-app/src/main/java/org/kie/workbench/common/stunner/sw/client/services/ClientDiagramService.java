@@ -70,24 +70,23 @@ public class ClientDiagramService {
 
     public void transform(final String xml,
                           final ServiceCallback<Diagram> callback) {
-        doTransform("default", xml, callback);
+        // TODO return doTransform("default", xml, 0, callback);
     }
 
-    public void transform(final String fileName,
-                          final String xml,
-                          final ServiceCallback<Diagram> callback) {
-        doTransform(fileName, xml, callback);
+    public Promise<Diagram> transform(final String fileName,
+                                      final String xml) {
+        return doTransform(fileName, xml);
     }
 
-    private void doTransform(final String fileName,
-                             final String xml,
-                             final ServiceCallback<Diagram> callback) {
+    public Promise<Diagram> doTransform(final String fileName,
+                                        final String xml) {
 
         if (Objects.isNull(xml) || xml.isEmpty()) {
             Diagram newDiagram = createNewDiagram(fileName);
-            callback.onSuccess(newDiagram);
+            // TODO callback.onSuccess(newDiagram);
+            return null;
         } else {
-            parse(fileName, xml, callback);
+            return parse(fileName, xml);
         }
     }
 
@@ -116,36 +115,35 @@ public class ClientDiagramService {
     }
 
     @SuppressWarnings("all")
-    private void parse(final String fileName,
-                       final String raw,
-                       ServiceCallback<Diagram> serviceCallback) {
+    private Promise<Diagram> parse(final String fileName, final String raw) {
         final Metadata metadata = createMetadata();
         final Promise<Graph> promise = unmarshall(metadata, raw);
-        promise.then(new IThenable.ThenOnFulfilledCallbackFn<Graph, Object>() {
-            @Override
-            public IThenable<Object> onInvoke(Graph graph) {
-                final String title = "SW Test Diagram";
-                metadata.setTitle(title);
-                final Diagram diagram = diagramFactory.build(title,
-                                                             metadata,
-                                                             graph);
-                updateClientMetadata(diagram);
-
-                serviceCallback.onSuccess(diagram);
-                return null;
-            }
-        }, new IThenable.ThenOnRejectedCallbackFn<Object>() {
-            @Override
-            public IThenable<Object> onInvoke(Object o) {
-                final ClientRuntimeError e;
-                if (o instanceof ClientRuntimeError) {
-                    e = (ClientRuntimeError) o;
-                } else {
-                    e = new ClientRuntimeError((Throwable) o);
+        return promises.create((success, failure) -> {
+            promise.then(new IThenable.ThenOnFulfilledCallbackFn<Graph, Object>() {
+                @Override
+                public IThenable<Object> onInvoke(Graph graph) {
+                    final String title = "SW Test Diagram";
+                    metadata.setTitle(title);
+                    final Diagram diagram = diagramFactory.build(title,
+                                                                 metadata,
+                                                                 graph);
+                    updateClientMetadata(diagram);
+                    success.onInvoke(diagram);
+                    return null;
                 }
-                serviceCallback.onError(e);
-                return null;
-            }
+            }, new IThenable.ThenOnRejectedCallbackFn<Object>() {
+                @Override
+                public IThenable<Object> onInvoke(Object o) {
+                    final ClientRuntimeError e;
+                    if (o instanceof ClientRuntimeError) {
+                        e = (ClientRuntimeError) o;
+                    } else {
+                        e = new ClientRuntimeError((Throwable) o);
+                    }
+                    failure.onInvoke(e);
+                    return null;
+                }
+            });
         });
     }
 

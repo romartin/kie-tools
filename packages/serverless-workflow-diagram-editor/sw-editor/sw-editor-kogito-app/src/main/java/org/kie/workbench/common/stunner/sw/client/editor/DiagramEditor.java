@@ -37,12 +37,11 @@ import org.kie.workbench.common.stunner.client.widgets.editor.StunnerEditor;
 import org.kie.workbench.common.stunner.client.widgets.presenters.session.SessionPresenter;
 import org.kie.workbench.common.stunner.core.client.canvas.AbstractCanvasHandler;
 import org.kie.workbench.common.stunner.core.client.canvas.CanvasHandler;
-import org.kie.workbench.common.stunner.core.client.canvas.util.CanvasFileExport;
 import org.kie.workbench.common.stunner.core.client.canvas.command.ClearAllCommand;
 import org.kie.workbench.common.stunner.core.client.canvas.controls.CanvasRegistrationControl;
+import org.kie.workbench.common.stunner.core.client.canvas.util.CanvasFileExport;
 import org.kie.workbench.common.stunner.core.client.command.CanvasCommandManager;
 import org.kie.workbench.common.stunner.core.client.service.ClientRuntimeError;
-import org.kie.workbench.common.stunner.core.client.service.ServiceCallback;
 import org.kie.workbench.common.stunner.core.client.session.impl.ViewerSession;
 import org.kie.workbench.common.stunner.core.client.shape.Shape;
 import org.kie.workbench.common.stunner.core.client.util.WindowJSType;
@@ -51,14 +50,18 @@ import org.kie.workbench.common.stunner.core.command.util.CommandUtils;
 import org.kie.workbench.common.stunner.core.diagram.Diagram;
 import org.kie.workbench.common.stunner.core.diagram.DiagramParsingException;
 import org.kie.workbench.common.stunner.core.diagram.Metadata;
+import org.kie.workbench.common.stunner.sw.client.metrics.DiagramEditorStressTool;
 import org.kie.workbench.common.stunner.sw.client.services.ClientDiagramService;
 import org.kie.workbench.common.stunner.sw.client.services.IncrementalMarshaller;
+import org.kie.workbench.common.stunner.sw.dom.DomTimings;
 import org.uberfire.backend.vfs.Path;
 import org.uberfire.backend.vfs.PathFactory;
 import org.uberfire.client.promise.Promises;
 import org.uberfire.mvp.ParameterizedCommand;
 import org.uberfire.mvp.PlaceRequest;
 import org.uberfire.workbench.model.bridge.Notification;
+
+import static org.kie.workbench.common.stunner.sw.marshall.Marshaller.IS_STRUCTURAL_PROFILING_ENABLED;
 
 @ApplicationScoped
 public class DiagramEditor {
@@ -70,7 +73,6 @@ public class DiagramEditor {
     private final ClientDiagramService diagramService;
     private final IncrementalMarshaller incrementalMarshaller;
     private final CanvasFileExport canvasFileExport;
-
 
     @Inject
     public DiagramEditor(Promises promises,
@@ -105,8 +107,16 @@ public class DiagramEditor {
         return stunnerEditor.getView();
     }
 
+    @Inject
+    private DiagramEditorStressTool stressTool;
+
     public Promise<String> getPreview() {
         if (true) {
+            stressTool.run();
+            return promises.resolve("");
+        }
+
+        if (false) {
             close();
             // testPromisesConcurrency();
             return promises.resolve("");
@@ -189,21 +199,17 @@ public class DiagramEditor {
     public Promise<Void> updateContent(final String path, final String value) {
         DomGlobal.console.log("UPDATING CONTENT");
         return promises.create((success, failure) -> {
-            diagramService.transform(path,
-                                     value,
-                                     new ServiceCallback<Diagram>() {
-
-                                         @Override
-                                         public void onSuccess(final Diagram diagram) {
-                                             updateDiagram(diagram);
-                                         }
-
-                                         @Override
-                                         public void onError(final ClientRuntimeError error) {
-                                             stunnerEditor.handleError(new ClientRuntimeError(new DiagramParsingException()));
-                                             failure.onInvoke(error);
-                                         }
-                                     });
+            diagramService
+                    .transform(path, value)
+                    .then(diagram -> {
+                        updateDiagram(diagram);
+                        success.onInvoke((Void) null);
+                        return null;
+                    }, o -> {
+                        stunnerEditor.handleError(new ClientRuntimeError(new DiagramParsingException()));
+                        failure.onInvoke(o);
+                        return null;
+                    });
         });
     }
 
@@ -212,7 +218,6 @@ public class DiagramEditor {
         ViewerSession session = (ViewerSession) stunnerEditor.getSession();
         AbstractCanvasHandler canvasHandler = session.getCanvasHandler();
         CanvasCommandManager<AbstractCanvasHandler> commandManager = session.getCommandManager();
-
 
         // TODO: Clear ALL controls state
         ((CanvasRegistrationControl) session.getSelectionControl()).clear();
@@ -241,56 +246,71 @@ public class DiagramEditor {
     }
 
     public Promise<Void> setNewContent(final String path, final String value) {
-        close();
+        if (IS_STRUCTURAL_PROFILING_ENABLED) {
+            DomTimings.time(DomTimings.SWF_VIEWER_E2E);
+        }
+        // close();
         return promises.create((success, failure) -> {
-            diagramService.transform(path,
-                                     value,
-                                     new ServiceCallback<Diagram>() {
+            if (IS_STRUCTURAL_PROFILING_ENABLED) {
+                DomTimings.time(DomTimings.TRANSFORM);
+            }
+            diagramService
+                    .doTransform(path, value)
+                    .then(new IThenable.ThenOnFulfilledCallbackFn<Diagram, Object>() {
+                        @Override
+                        public IThenable<Object> onInvoke(Diagram diagram) {
+                            if (IS_STRUCTURAL_PROFILING_ENABLED) {
+                                DomTimings.timeEnd(DomTimings.TRANSFORM);
+                                DomTimings.time(DomTimings.OPEN);
+                            }
+                            stunnerEditor
+                                    //.close()
+                                    .open(diagram, new SessionPresenter.SessionPresenterCallback() {
+                                        @Override
+                                        public void onSuccess() {
+                                            if (IS_STRUCTURAL_PROFILING_ENABLED) {
+                                                DomTimings.timeEnd(DomTimings.OPEN);
+                                            }
+                                            onDiagramOpenSuccess();
+                                            scaleToFitWorkflow(stunnerEditor);
+                                            if (IS_STRUCTURAL_PROFILING_ENABLED) {
+                                                DomTimings.timeEnd(DomTimings.SWF_VIEWER_E2E);
+                                            }
+                                            success.onInvoke((Void) null);
+                                        }
 
-                                         @Override
-                                         public void onSuccess(final Diagram diagram) {
-                                             stunnerEditor
-                                                     .close()
-                                                     .open(diagram, new SessionPresenter.SessionPresenterCallback() {
-                                                         @Override
-                                                         public void onSuccess() {
-                                                             onDiagramOpenSuccess();
-                                                             scaleToFitWorkflow(stunnerEditor);
-                                                             success.onInvoke((Void) null);
-                                                         }
+                                        @Override
+                                        public void onError(ClientRuntimeError error) {
+                                            stunnerEditor.handleError(error);
+                                            failure.onInvoke(error);
+                                        }
 
-                                                         @Override
-                                                         public void onError(ClientRuntimeError error) {
-                                                             stunnerEditor.handleError(error);
-                                                             failure.onInvoke(error);
-                                                         }
+                                        @Override
+                                        public void afterCanvasInitialized() {
+                                            WiresCanvas canvas = (WiresCanvas) stunnerEditor.getCanvasHandler().getCanvas();
+                                            ScrollableLienzoPanel lienzoPanel = (ScrollableLienzoPanel) canvas.getView().getLienzoPanel();
 
-                                                         @Override
-                                                         public void afterCanvasInitialized() {
-                                                             WiresCanvas canvas = (WiresCanvas) stunnerEditor.getCanvasHandler().getCanvas();
-                                                             ScrollableLienzoPanel lienzoPanel = (ScrollableLienzoPanel) canvas.getView().getLienzoPanel();
+                                            Layer bgLayer = new Layer() {
+                                                @Override
+                                                public Layer draw(Context2D context) {
+                                                    super.draw(context);
+                                                    context.setFillColor("#f2f2f2");
+                                                    context.fillRect(0, 0, getWidth(), getHeight());
 
-                                                             Layer bgLayer = new Layer() {
-                                                                 @Override
-                                                                 public Layer draw(Context2D context) {
-                                                                     super.draw(context);
-                                                                     context.setFillColor("#f2f2f2");
-                                                                     context.fillRect(0, 0, getWidth(), getHeight());
-
-                                                                     return this;
-                                                                 }
-                                                             };
-                                                             lienzoPanel.setBackgroundLayer(bgLayer);
-                                                         }
-                                                     });
-                                         }
-
-                                         @Override
-                                         public void onError(final ClientRuntimeError error) {
-                                             stunnerEditor.handleError(new ClientRuntimeError(new DiagramParsingException()));
-                                             failure.onInvoke(error);
-                                         }
-                                     });
+                                                    return this;
+                                                }
+                                            };
+                                            lienzoPanel.setBackgroundLayer(bgLayer);
+                                        }
+                                    });
+                            return promises.resolve();
+                        }
+                    }, new IThenable.ThenOnRejectedCallbackFn<Object>() {
+                        @Override
+                        public IThenable<Object> onInvoke(Object o) {
+                            return null;
+                        }
+                    });
         });
     }
 
