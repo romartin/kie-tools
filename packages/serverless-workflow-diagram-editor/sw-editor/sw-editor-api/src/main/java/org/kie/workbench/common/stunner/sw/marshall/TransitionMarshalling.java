@@ -150,6 +150,7 @@ public interface TransitionMarshalling {
 
     EdgeUnmarshaller<EventConditionTransition> EVENT_CONDITION_TRANSITION_UNMARSHALLER =
             (context, transition) -> {
+                // transition.setName(transition.getEventRef());
                 boolean end = transition.isEnd();
                 Edge edge;
                 if (end) {
