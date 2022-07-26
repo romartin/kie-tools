@@ -23,25 +23,44 @@ import javax.inject.Inject;
 
 import com.ait.lienzo.client.widget.panel.impl.PreviewPanel;
 import com.ait.lienzo.client.widget.panel.impl.ScrollablePanel;
+import org.kie.workbench.common.stunner.client.lienzo.canvas.wires.WiresCanvas;
+import org.kie.workbench.common.stunner.client.lienzo.canvas.wires.WiresCanvasView;
+import org.kie.workbench.common.stunner.core.client.api.SessionManager;
+import org.kie.workbench.common.stunner.core.client.session.ClientSession;
 
 @Dependent
 @Typed(PreviewLienzoPanel.class)
 public class PreviewLienzoPanel
         extends DelegateLienzoPanel<StunnerLienzoBoundsPanel> {
 
-    private static final int DEFAULT_WIDTH = 420;
-    private static final int DEFAULT_HEIGHT = 210;
+    public static final int DEFAULT_WIDTH = 300;
 
     private final StunnerLienzoBoundsPanel panel;
+    private final SessionManager sessionManager;
 
     @Inject
-    public PreviewLienzoPanel(final StunnerLienzoBoundsPanel panel) {
+    public PreviewLienzoPanel(final StunnerLienzoBoundsPanel panel,
+                              final SessionManager sessionManager) {
         this.panel = panel;
+        this.sessionManager = sessionManager;
     }
 
     @PostConstruct
     public void init() {
-        panel.setPanelBuilder(() -> new PreviewPanel(DEFAULT_WIDTH, DEFAULT_HEIGHT));
+        ClientSession session = sessionManager.getCurrentSession();
+        WiresCanvas wiresCanvas = (WiresCanvas) session.getCanvas();
+        WiresCanvasView wiresCanvasView = wiresCanvas.getView();
+        ScrollableLienzoPanel scrollableLienzoPanel = (ScrollableLienzoPanel) wiresCanvasView.getPanel();
+        ScrollablePanel scrollablePanel = scrollableLienzoPanel.getView();
+
+        final double internalWidth = scrollablePanel.getInternalWidth();
+        final double internalHeight = scrollablePanel.getInternalHeight();
+        final double internalRatio = internalWidth / internalHeight;
+        final int width = DEFAULT_WIDTH;
+        final int height = (int) (DEFAULT_WIDTH / internalRatio);
+
+        PreviewPanel previewPanel = new PreviewPanel(width, height);
+        panel.setPanelBuilder(() -> previewPanel);
     }
 
     public PreviewLienzoPanel observe(final ScrollableLienzoPanel panel) {

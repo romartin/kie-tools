@@ -52,6 +52,7 @@ public class StunnerEditor {
     private final ClientTranslationService translationService;
     private final StunnerEditorView view;
     private final ErrorPage errorPage;
+    private final PreviewWindow previewWindow;
 
     private SessionDiagramPresenter diagramPresenter;
     private boolean isReadOnly;
@@ -62,7 +63,7 @@ public class StunnerEditor {
 
     // CDI proxy.
     public StunnerEditor() {
-        this(null, null, null, null, null);
+        this(null, null, null, null, null, null);
     }
 
     @Inject
@@ -70,13 +71,15 @@ public class StunnerEditor {
                          ManagedInstance<SessionViewerPresenter<ViewerSession>> viewerSessionPresenterInstances,
                          ClientTranslationService translationService,
                          StunnerEditorView view,
-                         ErrorPage errorPage) {
+                         ErrorPage errorPage,
+                         PreviewWindow previewWindow) {
         this.editorSessionPresenterInstances = editorSessionPresenterInstances;
         this.viewerSessionPresenterInstances = viewerSessionPresenterInstances;
         this.translationService = translationService;
         this.isReadOnly = false;
         this.view = view;
         this.errorPage = errorPage;
+        this.previewWindow = previewWindow;
         this.parsingExceptionProcessor = e -> {
         };
         this.exceptionProcessor = e -> {

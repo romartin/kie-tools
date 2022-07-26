@@ -114,7 +114,8 @@ public class StunnerEditorTest {
                                    sessionViewerPresenters,
                                    translationService,
                                    view,
-                                   errorPage);
+                                   errorPage,
+                                   null);
     }
 
     @Test
