@@ -25,6 +25,11 @@ public class State {
 
     public String type;
 
+    public Metadata metadata;
+
+    /**
+     * Next transition of the workflow.
+     */
     // TODO: Not all states supports this (eg: switch state)
     public Object transition;
 
@@ -102,5 +107,13 @@ public class State {
     public State setCompensatedBy(String compensatedBy) {
         this.compensatedBy = compensatedBy;
         return this;
+    }
+
+    public Metadata getMetadata() {
+        return metadata;
+    }
+
+    public void setMetadata(Metadata metadata) {
+        this.metadata = metadata;
     }
 }
