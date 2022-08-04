@@ -103,6 +103,13 @@ public abstract class AbstractSelectionControl<H extends AbstractCanvasHandler>
         return this;
     }
 
+    // TODO
+    public void refreshView() {
+        Collection<String> selected = getSelectedItems();
+        // TODO: Clear no longer existing items.
+        selectionControl.updateViewShapesState(selected);
+    }
+
     protected void onSelect(final Collection<String> uuids) {
     }
 

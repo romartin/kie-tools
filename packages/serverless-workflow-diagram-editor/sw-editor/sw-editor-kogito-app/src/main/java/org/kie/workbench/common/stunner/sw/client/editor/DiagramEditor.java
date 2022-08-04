@@ -46,6 +46,7 @@ import org.kie.workbench.common.stunner.core.client.canvas.AbstractCanvasHandler
 import org.kie.workbench.common.stunner.core.client.canvas.CanvasHandler;
 import org.kie.workbench.common.stunner.core.client.canvas.controls.CanvasRegistrationControl;
 import org.kie.workbench.common.stunner.core.client.canvas.controls.SelectionControl;
+import org.kie.workbench.common.stunner.core.client.canvas.controls.select.AbstractSelectionControl;
 import org.kie.workbench.common.stunner.core.client.canvas.util.CanvasFileExport;
 import org.kie.workbench.common.stunner.core.client.command.CanvasCommandManager;
 import org.kie.workbench.common.stunner.core.client.command.ClearAllCommand;
@@ -80,13 +81,14 @@ public class DiagramEditor {
     static String ID_SEARCH_PATTERN = "(?:\\\"|\\')(?<id>[^\"]*)(?:\\\"|\\')(?=:)(?:\\:\\s*)(?:\\\"|\\')" +
             "?(?<value>true|false|[0-9a-zA-Z\\+\\-\\,\\.\\$]*)";
     static JsRegExp jsRegExp = new JsRegExp(ID_SEARCH_PATTERN, "i"); //case insensitive
-    static int UPDATE_DIAGRAM_TIMER_INTERVAL = 25; //milliseconds
+    static int UPDATE_DIAGRAM_TIMER_INTERVAL = 0; //milliseconds
 
     private final Promises promises;
     private final StunnerEditor stunnerEditor;
     private final ClientDiagramService diagramService;
     private final IncrementalMarshaller incrementalMarshaller;
     private final CanvasFileExport canvasFileExport;
+    // TODO: Drop this? Handrey?
     private final UpdateDiagramTimer updateDiagramTimer;
 
     JsCanvas jsCanvas;
@@ -135,6 +137,7 @@ public class DiagramEditor {
     }
 
     public Promise<Void> setNewContent(final String path, final String value) {
+        DomGlobal.console.log("Setting Content!!!");
         return promises.create((success, failure) -> {
             stunnerEditor.clearAlerts();
             diagramService.transform(path,
@@ -191,6 +194,7 @@ public class DiagramEditor {
 
     Diagram renderDiagram;
     public Promise<Void> updateContent(final String path, final String value) {
+        DomGlobal.console.log("Updating Content!!!");
         return promises.create((success, failure) -> {
             updateDiagramTimer.cancel();
             stunnerEditor.clearAlerts();
@@ -251,7 +255,7 @@ public class DiagramEditor {
 
         currentDiagram = null;
         selectedItems = null;
-        ((CanvasRegistrationControl) session.getSelectionControl()).clear();
+        // TODO ((CanvasRegistrationControl) session.getSelectionControl()).clear();
 
         // Clearing the graph & canvas
         commandManager.execute(canvasHandler, new ClearAllCommand());
@@ -259,8 +263,10 @@ public class DiagramEditor {
         canvasHandler.draw(diagram,
                            (ParameterizedCommand<CommandResult<?>>) result -> {
                                if (!CommandUtils.isError(result)) {
+                                   // TODO: Fix this properly.
                                    DomGlobal.console.log("(RE)DRAW DONE!!!");
                                } else {
+                                   // TODO: Fix this properly.
                                    DomGlobal.console.error("An error occurred while drawing the diagram [result=" + result + "]");
                                }
                            });
@@ -270,9 +276,12 @@ public class DiagramEditor {
         while (iterator.hasNext()) {
             final Node<View<?>, Edge> node = (Node<View<?>, Edge>) iterator.next();
             if (selection.contains(node.getUUID())) {
-                session.getSelectionControl().select(node.getUUID());
+                // TODO session.getSelectionControl().select(node.getUUID());
             }
         }
+
+        // TODO
+        ((AbstractSelectionControl) session.getSelectionControl()).refreshView();
 
         centerFirstSelectedNode(stunnerEditor, jsCanvas);
     }

@@ -217,8 +217,9 @@ public final class MapSelectionControl<H extends AbstractCanvasHandler>
         return this;
     }
 
+    //  TODO
     @SuppressWarnings("unchecked")
-    private void updateViewShapesState(Collection<String> uuids) {
+    public void updateViewShapesState(Collection<String> uuids) {
         uuids.stream()
                 .map(uuid -> getCanvas().getShape(uuid))
                 .filter(Objects::nonNull)
