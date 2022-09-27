@@ -69,13 +69,13 @@ public class Workflow {
     public static final Set<String> labels = Stream.of(LABEL_WORKFLOW).collect(Collectors.toSet());
 
     /**
-     *  Workflow unique identifier.
+     * Workflow unique identifier.
      */
     @Property
     private String id;
 
     /**
-     *  Domain-specific workflow identifier
+     * Domain-specific workflow identifier
      */
     @Property
     private String key;
@@ -134,6 +134,9 @@ public class Workflow {
     private Object errors;
 
     private Retry[] retries;
+
+    public JsDefinition jsDefinitionTest1;
+    public JsDefinition jsDefinitionTest2;
 
     public Workflow() {
     }
