@@ -23,9 +23,6 @@ import org.kie.workbench.common.stunner.core.graph.Edge;
 import org.kie.workbench.common.stunner.core.graph.Node;
 import org.kie.workbench.common.stunner.core.graph.content.relationship.Dock;
 import org.kie.workbench.common.stunner.core.graph.content.view.ViewConnector;
-import org.kie.workbench.common.stunner.sw.definition.ActionNode;
-import org.kie.workbench.common.stunner.sw.definition.ActionTransition;
-import org.kie.workbench.common.stunner.sw.definition.ActionsContainer;
 import org.kie.workbench.common.stunner.sw.definition.CallbackState;
 import org.kie.workbench.common.stunner.sw.definition.CompensationTransition;
 import org.kie.workbench.common.stunner.sw.definition.DataConditionTransition;
@@ -155,7 +152,6 @@ public interface StateMarshalling {
                 context.parentNode = onEventsNode;
 
                 String[] eventRefs = onEvent.getEventRefs();
-                ActionNode[] actions = onEvent.getActions();
 
                 // TODO: Only parsing a SINGLE (FIRST) event definition.
                 // Event Node.
@@ -165,51 +161,15 @@ public interface StateMarshalling {
                 event.setName(eventRef);
                 final Node eventNode = context.addNode(null, event);
 
-                // TODO: Only parsing a SINGLE (FIRST) action definition.
-                // Action Node.
-                ActionNode action = actions[0];
-                final Node actionNode = context.addNode(null, action);
-
-                // Transition to Actions Node.
-                final ActionTransition at = new ActionTransition();
-                // at.setName("Call " + action.getName());
-                Edge actionsEdge = context.addEdgeToTargetUUID(at, eventNode, actionNode.getUUID());
-
                 // Set the original parent.
                 context.parentNode = parent;
 
                 return onEventsNode;
             };
 
-    NodeUnmarshaller<ActionNode[]> ACTIONS_UNMARSHALLER =
-            (context, actions) -> {
-                ActionsContainer actionsContainer = new ActionsContainer();
-                final Node actionsNode = context.addNode(null, actionsContainer);
-
-                // Set actual context parent node.
-                Node parent = context.parentNode;
-                context.parentNode = actionsNode;
-
-                for (int i = 0; i < actions.length; i++) {
-                    ActionNode action = actions[i];
-                    final Node actionNode = context.addNode(action.getName(), action);
-                }
-
-                // Set the original parent.
-                context.parentNode = parent;
-
-                return actionsNode;
-            };
-
     NodeUnmarshaller<ForEachState> FOREACH_STATE_UNMARSHALLER =
             (context, state) -> {
                 Node stateNode = STATE_UNMARSHALLER.unmarshall(context, state);
-                if (Marshaller.LOAD_DETAILS) {
-                    ActionNode[] actions = state.getActions();
-                    if (null != actions && actions.length > 0) {
-                        Node actionsNode = ACTIONS_UNMARSHALLER.unmarshall(context, actions);
-                    }
-                }
                 return stateNode;
             };
 
@@ -253,17 +213,6 @@ public interface StateMarshalling {
     NodeUnmarshaller<OperationState> OPERATION_STATE_UNMARSHALLER =
             (context, state) -> {
                 Node stateNode = STATE_UNMARSHALLER.unmarshall(context, state);
-                if (Marshaller.LOAD_DETAILS) {
-                    ActionNode[] actions = state.getActions();
-                    if (null != actions && actions.length > 0) {
-                        Node actionsNode = ACTIONS_UNMARSHALLER.unmarshall(context, actions);
-                        /*
-                        TODO: If necessary, enable the transition (but missing to check connection rules for ActionTransition)
-                        final ActionTransition actionsTransition = new ActionTransition();
-                        Edge onEventsEdge = context.addEdgeToTargetUUID(actionsTransition, stateNode, actionsNode.getUUID());
-                        */
-                    }
-                }
                 return stateNode;
             };
 

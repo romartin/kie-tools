@@ -25,12 +25,11 @@ import org.kie.workbench.common.stunner.sw.definition.custom.WorkflowTimeoutsJso
 @JsType
 public class ParallelStateBranch {
 
-    private String name;
-    private ActionNode[] actions;
+    public String name;
 
     @JsonbTypeSerializer(WorkflowTimeoutsJsonSerializer.class)
     @JsonbTypeDeserializer(WorkflowTimeoutsJsonDeserializer.class)
-    private Object timeouts;
+    public Object timeouts;
 
     public final String getName() {
         return name;
@@ -38,14 +37,6 @@ public class ParallelStateBranch {
 
     public final void setName(String name) {
         this.name = name;
-    }
-
-    public final ActionNode[] getActions() {
-        return actions;
-    }
-
-    public final void setActions(ActionNode[] actions) {
-        this.actions = actions;
     }
 
     public final Object getTimeouts() {
