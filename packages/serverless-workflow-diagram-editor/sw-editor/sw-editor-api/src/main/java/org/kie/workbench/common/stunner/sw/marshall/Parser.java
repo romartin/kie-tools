@@ -33,6 +33,8 @@ import org.kie.workbench.common.stunner.sw.definition.EventConditionTransition;
 import org.kie.workbench.common.stunner.sw.definition.EventState;
 import org.kie.workbench.common.stunner.sw.definition.ForEachState;
 import org.kie.workbench.common.stunner.sw.definition.InjectState;
+import org.kie.workbench.common.stunner.sw.definition.JsDefinition;
+import org.kie.workbench.common.stunner.sw.definition.JsDefinition1;
 import org.kie.workbench.common.stunner.sw.definition.ModelUtils;
 import org.kie.workbench.common.stunner.sw.definition.OnEvent;
 import org.kie.workbench.common.stunner.sw.definition.OperationState;
@@ -62,8 +64,19 @@ public class Parser {
         ModelUtils.cleanWorkflow(workflow);
         parse(workflow, newWorkflow);
         loadStates(workflow, newWorkflow);
+        loadJsDefinitions(workflow, newWorkflow);
 
         return workflow;
+    }
+
+    // TODO: Just for testing.
+    private void loadJsDefinitions(Workflow workflow, Workflow jso) {
+        JsDefinition jsDefinitionTest1 = jso.jsDefinitionTest1;
+        Object result1 = parse(JsDefinition1.class, jsDefinitionTest1);
+        JsDefinition jsDefinitionTest2 = jso.jsDefinitionTest2;
+        Object result2 = parse(JsDefinition1.class, jsDefinitionTest2);
+        workflow.jsDefinitionTest1 = (JsDefinition) result1;
+        workflow.jsDefinitionTest2 = (JsDefinition) result2;
     }
 
     private void loadStates(Workflow workflow, Workflow jso) {

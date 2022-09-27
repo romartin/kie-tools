@@ -40,6 +40,8 @@ import org.kie.workbench.common.stunner.sw.definition.EventState;
 import org.kie.workbench.common.stunner.sw.definition.EventTimeout;
 import org.kie.workbench.common.stunner.sw.definition.ForEachState;
 import org.kie.workbench.common.stunner.sw.definition.InjectState;
+import org.kie.workbench.common.stunner.sw.definition.JsDefinition1;
+import org.kie.workbench.common.stunner.sw.definition.JsDefinition2;
 import org.kie.workbench.common.stunner.sw.definition.OnEvent;
 import org.kie.workbench.common.stunner.sw.definition.OperationState;
 import org.kie.workbench.common.stunner.sw.definition.ParallelState;
@@ -84,7 +86,9 @@ import org.kie.workbench.common.stunner.sw.definition.Workflow;
                 DefaultConditionTransition.class,
                 ActionTransition.class,
                 CompensationTransition.class,
-                Transition.class
+                Transition.class,
+                JsDefinition1.class,
+                JsDefinition2.class
         },
         builder = Definitions.DefinitionsBuilder.class
 )
