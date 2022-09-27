@@ -36,6 +36,7 @@ import org.kie.workbench.common.stunner.sw.definition.EventRef;
 import org.kie.workbench.common.stunner.sw.definition.EventState;
 import org.kie.workbench.common.stunner.sw.definition.EventTimeout;
 import org.kie.workbench.common.stunner.sw.definition.ForEachState;
+import org.kie.workbench.common.stunner.sw.definition.JsDefinition;
 import org.kie.workbench.common.stunner.sw.definition.OnEvent;
 import org.kie.workbench.common.stunner.sw.definition.OperationState;
 import org.kie.workbench.common.stunner.sw.definition.State;
@@ -56,6 +57,15 @@ public interface StateMarshalling {
 
     NodeMarshaller<Object> ANY_NODE_MARSHALLER =
             (context, node) -> node.getContent().getDefinition();
+
+    NodeUnmarshaller<JsDefinition> JS_DEFINITION__UNMARSHALLER =
+            (context, bean) -> {
+                String id = bean.getId();
+                String name = bean.getName();
+                final Node node = context.addNode(name, bean);
+
+                return node;
+            };
 
     NodeUnmarshaller<State> STATE_UNMARSHALLER =
             (context, state) -> {
