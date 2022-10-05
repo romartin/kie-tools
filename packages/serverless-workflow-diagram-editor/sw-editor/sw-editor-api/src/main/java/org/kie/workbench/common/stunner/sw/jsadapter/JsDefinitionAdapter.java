@@ -16,16 +16,15 @@
 
 package org.kie.workbench.common.stunner.sw.jsadapter;
 
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Optional;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
 import com.google.gwt.core.client.JavaScriptObject;
-import jsinterop.base.Js;
-import jsinterop.base.JsPropertyMap;
+import elemental2.core.Function;
+import elemental2.core.JsObject;
+import elemental2.core.Reflect;
 import org.kie.workbench.common.stunner.core.definition.adapter.DefinitionAdapter;
 import org.kie.workbench.common.stunner.core.definition.adapter.DefinitionId;
 import org.kie.workbench.common.stunner.core.definition.property.PropertyMetaTypes;
@@ -81,11 +80,10 @@ public class JsDefinitionAdapter implements DefinitionAdapter<Object> {
 
     @Override
     public String[] getPropertyFields(Object pojo) {
-        JsPropertyMap<Object> map = Js.asPropertyMap(pojo);
-        List<String> fields = new LinkedList<>();
-        // TODO: Filter out js object's fields - proto,castableTypeMap,$init,functions (getters/setters, equals, notify, etc)
-        map.forEach(fields::add);
-        return fields.toArray(new String[fields.size()]);
+        // Exclude native js object properties
+        return JsObject.getOwnPropertyNames(pojo)
+                .filter((prop, i, jsArray) -> (!(prop.contains("$") || Reflect.get(pojo, prop) instanceof Function)))
+                .asArray(new String[0]);
     }
 
     @Override
