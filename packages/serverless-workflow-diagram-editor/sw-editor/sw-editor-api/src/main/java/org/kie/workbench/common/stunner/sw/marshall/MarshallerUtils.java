@@ -16,9 +16,7 @@
 
 package org.kie.workbench.common.stunner.sw.marshall;
 
-import jsinterop.base.Js;
-import jsinterop.base.JsPropertyMap;
-import org.kie.workbench.common.stunner.core.api.DefinitionManager;
+import elemental2.core.JsObject;
 import org.kie.workbench.common.stunner.core.api.FactoryManager;
 import org.kie.workbench.common.stunner.core.graph.Element;
 import org.kie.workbench.common.stunner.core.graph.Node;
@@ -40,6 +38,7 @@ public class MarshallerUtils {
         return null;
     }
 
+    @SuppressWarnings("all")
     public static <T> T getElementDefinition(Element node) {
         return null != node ? (T) ((Definition) node.getContent()).getDefinition() : null;
     }
@@ -50,52 +49,10 @@ public class MarshallerUtils {
 
     public static <T> T parse(FactoryManager factoryManager, Class<? extends T> type, T jso) {
         T instance = factoryManager.newDefinition(type.getName());
-        // TODO: Check stunner vs native approach here...
-        //instance = stunnerMerge(instance, jso);
-        instance = nativeMerge(instance, jso);
-        return (T) instance;
+        return parse(instance, jso);
     }
 
     public static <T> T parse(T instance, T jso) {
-        return nativeMerge(instance, jso);
+        return (T) JsObject.assign(instance, jso);
     }
-
-    private static <T> T stunnerMerge(DefinitionManager definitionManager, Object instance, Object jso) {
-        JsPropertyMap<Object> instanceMap = Js.asPropertyMap(instance);
-        JsPropertyMap<Object> jsoMap = Js.asPropertyMap(jso);
-        String[] propertyFields = definitionManager.adapters().forDefinition().getPropertyFields(instance);
-        for (String propertyField : propertyFields) {
-            Object value = jsoMap.get(propertyField);
-            if (null != value) {
-                instanceMap.set(propertyField, value);
-            }
-        }
-        return Js.uncheckedCast(instance);
-    }
-
-    public static native <T> T nativeMerge(Object o1, Object o2) /*-{
-        if (typeof Object.assign != 'function') {
-            Object.assign = function (target) {
-                'use strict';
-                if (target == null) {
-                    throw new TypeError('Cannot convert undefined or null to object');
-                }
-
-                target = Object(target);
-                for (var index = 1; index < arguments.length; index++) {
-                    var source = arguments[index];
-                    if (source != null) {
-                        for (var key in source) {
-                            if (Object.prototype.hasOwnProperty.call(source, key)) {
-                                target[key] = source[key];
-                            }
-                        }
-                    }
-                }
-                return target;
-            };
-        }
-        // return Object.assign({}, o1, o2);
-        return Object.assign(o1, o2);
-    }-*/;
 }

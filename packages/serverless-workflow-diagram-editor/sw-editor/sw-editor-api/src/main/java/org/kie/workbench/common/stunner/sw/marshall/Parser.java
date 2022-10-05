@@ -19,6 +19,7 @@ package org.kie.workbench.common.stunner.sw.marshall;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
+import elemental2.core.Reflect;
 import jsinterop.base.Js;
 import org.kie.workbench.common.stunner.core.api.FactoryManager;
 import org.kie.workbench.common.stunner.sw.definition.ActionNode;
@@ -35,6 +36,7 @@ import org.kie.workbench.common.stunner.sw.definition.ForEachState;
 import org.kie.workbench.common.stunner.sw.definition.InjectState;
 import org.kie.workbench.common.stunner.sw.definition.JsDefinition;
 import org.kie.workbench.common.stunner.sw.definition.JsDefinition1;
+import org.kie.workbench.common.stunner.sw.definition.JsDefinition2;
 import org.kie.workbench.common.stunner.sw.definition.ModelUtils;
 import org.kie.workbench.common.stunner.sw.definition.OnEvent;
 import org.kie.workbench.common.stunner.sw.definition.OperationState;
@@ -56,6 +58,7 @@ public class Parser {
     public Workflow parse(Workflow jso) {
         Workflow workflow = parse(Workflow.class, jso);
         loadStates(workflow, jso);
+        loadJsDefinitions(workflow, jso);
 
         return workflow;
     }
@@ -74,7 +77,7 @@ public class Parser {
         JsDefinition jsDefinitionTest1 = jso.jsDefinitionTest1;
         Object result1 = parse(JsDefinition1.class, jsDefinitionTest1);
         JsDefinition jsDefinitionTest2 = jso.jsDefinitionTest2;
-        Object result2 = parse(JsDefinition1.class, jsDefinitionTest2);
+        Object result2 = parse(JsDefinition2.class, jsDefinitionTest2);
         workflow.jsDefinitionTest1 = (JsDefinition) result1;
         workflow.jsDefinitionTest2 = (JsDefinition) result2;
     }
@@ -126,11 +129,11 @@ public class Parser {
 
     private SwitchState parseSwitchState(State jso) {
         SwitchState state = (SwitchState) parse(SwitchState.class, jso);
-        DefaultConditionTransition defaultCondition = Js.uncheckedCast(Js.asPropertyMap(jso).get("defaultCondition"));
+        DefaultConditionTransition defaultCondition = Js.uncheckedCast(Reflect.get(jso, "defaultCondition"));
         if (null != defaultCondition) {
             state.defaultCondition = parse(DefaultConditionTransition.class, defaultCondition);
         }
-        EventConditionTransition[] eventConditions = Js.uncheckedCast(Js.asPropertyMap(jso).get("eventConditions"));
+        EventConditionTransition[] eventConditions = Js.uncheckedCast(Reflect.get(jso, "eventConditions"));
         if (null != eventConditions) {
             state.eventConditions = new EventConditionTransition[eventConditions.length];
             for (int i = 0; i < eventConditions.length; i++) {
@@ -139,7 +142,7 @@ public class Parser {
                 state.eventConditions[i] = eventCondition;
             }
         }
-        DataConditionTransition[] dataConditions = Js.uncheckedCast(Js.asPropertyMap(jso).get("dataConditions"));
+        DataConditionTransition[] dataConditions = Js.uncheckedCast(Reflect.get(jso, "dataConditions"));
         if (null != dataConditions) {
             state.dataConditions = new DataConditionTransition[dataConditions.length];
             for (int i = 0; i < dataConditions.length; i++) {
@@ -178,7 +181,7 @@ public class Parser {
     }
 
     private ActionNode[] parseActions(State jso) {
-        ActionNode[] actions = Js.uncheckedCast(Js.asPropertyMap(jso).get("actions"));
+        ActionNode[] actions = Js.uncheckedCast(Reflect.get(jso, "actions"));
         if (null != actions) {
             ActionNode[] result = new ActionNode[actions.length];
             for (int i = 0; i < actions.length; i++) {
@@ -193,7 +196,7 @@ public class Parser {
 
     private EventState parseEventState(State jso) {
         EventState state = (EventState) parse(EventState.class, jso);
-        OnEvent[] onEvents = Js.uncheckedCast(Js.asPropertyMap(jso).get("onEvents"));
+        OnEvent[] onEvents = Js.uncheckedCast(Reflect.get(jso, "onEvents"));
         if (null != onEvents) {
             state.onEvents = new OnEvent[onEvents.length];
             for (int i = 0; i < onEvents.length; i++) {
@@ -207,7 +210,7 @@ public class Parser {
 
     private OnEvent parseOnEvent(OnEvent jso) {
         OnEvent onEvent = parse(OnEvent.class, jso);
-        ActionNode[] actions = Js.uncheckedCast(Js.asPropertyMap(jso).get("actions"));
+        ActionNode[] actions = Js.uncheckedCast(Reflect.get(jso, "actions"));
         if (null != actions) {
             onEvent.actions = new ActionNode[actions.length];
             for (int i = 0; i < actions.length; i++) {

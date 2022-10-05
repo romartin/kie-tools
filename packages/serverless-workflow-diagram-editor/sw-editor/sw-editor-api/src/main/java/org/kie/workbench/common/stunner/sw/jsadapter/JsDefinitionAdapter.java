@@ -16,16 +16,15 @@
 
 package org.kie.workbench.common.stunner.sw.jsadapter;
 
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Optional;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
 import com.google.gwt.core.client.JavaScriptObject;
-import jsinterop.base.Js;
-import jsinterop.base.JsPropertyMap;
+import elemental2.core.Function;
+import elemental2.core.JsObject;
+import elemental2.core.Reflect;
 import org.kie.workbench.common.stunner.core.definition.adapter.DefinitionAdapter;
 import org.kie.workbench.common.stunner.core.definition.adapter.DefinitionId;
 import org.kie.workbench.common.stunner.core.definition.property.PropertyMetaTypes;
@@ -33,8 +32,6 @@ import org.kie.workbench.common.stunner.core.factory.graph.ElementFactory;
 import org.kie.workbench.common.stunner.core.factory.graph.NodeFactory;
 import org.kie.workbench.common.stunner.core.i18n.StunnerTranslationService;
 import org.kie.workbench.common.stunner.sw.definition.JsDefinition;
-import org.kie.workbench.common.stunner.sw.definition.JsDefinition1;
-import org.kie.workbench.common.stunner.sw.definition.JsDefinition2;
 
 import static org.kie.workbench.common.stunner.core.i18n.AbstractTranslationService.I18N_SEPARATOR;
 
@@ -81,11 +78,10 @@ public class JsDefinitionAdapter implements DefinitionAdapter<Object> {
 
     @Override
     public String[] getPropertyFields(Object pojo) {
-        JsPropertyMap<Object> map = Js.asPropertyMap(pojo);
-        List<String> fields = new LinkedList<>();
-        // TODO: Filter out js object's fields - proto,castableTypeMap,$init,functions (getters/setters, equals, notify, etc)
-        map.forEach(fields::add);
-        return fields.toArray(new String[fields.size()]);
+        // Exclude native js object properties and functions
+        return JsObject.getOwnPropertyNames(pojo)
+                .filter((prop, i, jsArray) -> (!(prop.contains("__") || Reflect.get(pojo, prop) instanceof Function)))
+                .asArray(new String[0]);
     }
 
     @Override
@@ -100,8 +96,8 @@ public class JsDefinitionAdapter implements DefinitionAdapter<Object> {
             String id = getJsDefinitionId(pojo);
             return translationService.getValue(id + I18N_SEPARATOR + "property_name");
         }
-        // TODO: Other property types.
-        return null;
+        // Only Name is supported
+        throw new UnsupportedOperationException("Unsupported PropertyMetaType: " + metaType.name());
     }
 
     @Override
@@ -127,9 +123,7 @@ public class JsDefinitionAdapter implements DefinitionAdapter<Object> {
      */
 
     public static boolean isJsDefinition(Class<?> type) {
-        return "com.google.gwt.core.client.JavaScriptObject$".equals(type.getName()) ||
-                JsDefinition1.class.getName().equals(type.getName()) ||
-                JsDefinition2.class.getName().equals(type.getName());
+        return true;
     }
 
     public static boolean isJsDefinition(Object instance) {

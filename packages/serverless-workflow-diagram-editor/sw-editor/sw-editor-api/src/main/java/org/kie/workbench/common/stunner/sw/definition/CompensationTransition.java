@@ -16,58 +16,15 @@
 
 package org.kie.workbench.common.stunner.sw.definition;
 
-import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
 import jsinterop.annotations.JsIgnore;
 import jsinterop.annotations.JsType;
-import org.jboss.errai.databinding.client.api.Bindable;
-import org.kie.workbench.common.stunner.core.definition.annotation.Definition;
-import org.kie.workbench.common.stunner.core.definition.annotation.Property;
-import org.kie.workbench.common.stunner.core.definition.annotation.definition.Category;
-import org.kie.workbench.common.stunner.core.definition.annotation.definition.Labels;
-import org.kie.workbench.common.stunner.core.factory.graph.EdgeFactory;
-import org.kie.workbench.common.stunner.core.rule.annotation.CanConnect;
-import org.kie.workbench.common.stunner.core.rule.annotation.EdgeOccurrences;
 
-/**
- * Compensation deals with undoing or reversing the work of one or more states which have already successfully completed.
- * This class represents transition in case compensation happens.
- */
-@Bindable
-@Definition(graphFactory = EdgeFactory.class)
-@CanConnect(startRole = State.LABEL_STATE, endRole = State.LABEL_STATE)
-@EdgeOccurrences(role = State.LABEL_STATE, type = EdgeOccurrences.EdgeType.INCOMING, max = -1)
-@EdgeOccurrences(role = State.LABEL_STATE, type = EdgeOccurrences.EdgeType.OUTGOING, max = 1)
-@EdgeOccurrences(role = Start.LABEL_START, type = EdgeOccurrences.EdgeType.INCOMING, max = 0)
-@EdgeOccurrences(role = Start.LABEL_START, type = EdgeOccurrences.EdgeType.OUTGOING, max = 0)
-@EdgeOccurrences(role = End.LABEL_END, type = EdgeOccurrences.EdgeType.OUTGOING, max = 0)
-@EdgeOccurrences(role = End.LABEL_END, type = EdgeOccurrences.EdgeType.INCOMING, max = 0)
 @JsType
 public class CompensationTransition {
 
-    public static final String LABEL_TRANSITION_COMPENSATION = "transition_compensation";
-
-    @Category
-    @JsIgnore
-    public static final transient String category = Categories.TRANSITIONS;
-
-    @Labels
-    @JsIgnore
-    private final Set<String> labels = Stream.of(Transition.LABEL_TRANSITION,
-                                                 LABEL_TRANSITION_COMPENSATION).collect(Collectors.toSet());
-
-    /**
-     * Unique name of the
-     */
-    @Property
     @JsIgnore
     public String name;
 
-    /**
-     * Transition target.
-     */
     @JsIgnore
     public Object transition;
 
@@ -88,13 +45,5 @@ public class CompensationTransition {
 
     public void setTransition(Object transition) {
         this.transition = transition;
-    }
-
-    public Set<String> getLabels() {
-        return labels;
-    }
-
-    public String getCategory() {
-        return category;
     }
 }

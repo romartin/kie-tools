@@ -19,8 +19,7 @@ package org.kie.workbench.common.stunner.sw.jsadapter;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
-import jsinterop.base.Js;
-import jsinterop.base.JsPropertyMap;
+import elemental2.core.Reflect;
 import org.kie.workbench.common.stunner.core.definition.adapter.PropertyAdapter;
 import org.kie.workbench.common.stunner.core.i18n.StunnerTranslationService;
 
@@ -49,15 +48,12 @@ public class JsPropertyAdapter implements PropertyAdapter<JsDefinitionProperty, 
 
     @Override
     public Object getValue(JsDefinitionProperty property) {
-        JsPropertyMap<Object> map = Js.asPropertyMap(property.getPojo());
-        Object value = map.get(property.getField());
-        return value;
+        return Reflect.get(property.getPojo(), property.getField());
     }
 
     @Override
     public void setValue(JsDefinitionProperty property, Object value) {
-        JsPropertyMap<Object> map = Js.asPropertyMap(property.getPojo());
-        map.set(property.getField(), value);
+        Reflect.set(property.getPojo(), property.getField(), value);
     }
 
     @Override

@@ -24,8 +24,6 @@ import javax.inject.Inject;
 import com.google.gwt.core.client.JavaScriptObject;
 import org.kie.workbench.common.stunner.core.api.DefinitionManager;
 import org.kie.workbench.common.stunner.sw.Definitions;
-import org.kie.workbench.common.stunner.sw.definition.JsDefinition1;
-import org.kie.workbench.common.stunner.sw.definition.JsDefinition2;
 
 @ApplicationScoped
 public class JsDefinitionUtils {
@@ -51,12 +49,7 @@ public class JsDefinitionUtils {
     }
 
     public boolean isJsDefinition(String defId) {
-        Set<String> definitions = getDefinitions();
-        // TODO: Filtering only jstypes for now, not all domain.
-        return definitions.stream()
-                .filter(id -> (JsDefinition1.class.getName().equals(id)) ||
-                        (JsDefinition2.class.getName().equals(id)))
-                .anyMatch(id -> id.equals(defId));
+        return true;
     }
 
     @Inject
