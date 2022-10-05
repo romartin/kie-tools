@@ -23,11 +23,21 @@ public class JsDefinition2 extends JsDefinition {
 
     public String var2;
 
+    public JsDefinition1 def1;
+
     public String getVar2() {
         return var2;
     }
 
     public void setVar2(String var2) {
         this.var2 = var2;
+    }
+
+    public JsDefinition1 getDef1() {
+        return def1;
+    }
+
+    public void setDef1(JsDefinition1 def1) {
+        this.def1 = def1;
     }
 }

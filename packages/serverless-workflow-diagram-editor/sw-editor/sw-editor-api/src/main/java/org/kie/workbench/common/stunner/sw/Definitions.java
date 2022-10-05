@@ -22,8 +22,6 @@ import org.jboss.errai.databinding.client.api.Bindable;
 import org.kie.workbench.common.stunner.core.definition.annotation.DefinitionSet;
 import org.kie.workbench.common.stunner.core.definition.builder.Builder;
 import org.kie.workbench.common.stunner.core.factory.graph.GraphFactory;
-import org.kie.workbench.common.stunner.core.rule.annotation.CanContain;
-import org.kie.workbench.common.stunner.core.rule.annotation.Occurrences;
 import org.kie.workbench.common.stunner.sw.definition.ActionTransition;
 import org.kie.workbench.common.stunner.sw.definition.ActionsContainer;
 import org.kie.workbench.common.stunner.sw.definition.CallFunctionAction;
@@ -92,10 +90,7 @@ import org.kie.workbench.common.stunner.sw.definition.Workflow;
         },
         builder = Definitions.DefinitionsBuilder.class
 )
-@CanContain(roles = {Workflow.LABEL_WORKFLOW})
-@Occurrences(role = Workflow.LABEL_WORKFLOW, max = 1)
-@Occurrences(role = Start.LABEL_START, max = 1)
-@Occurrences(role = End.LABEL_END, max = 1)
+
 public class Definitions {
 
     public Definitions() {

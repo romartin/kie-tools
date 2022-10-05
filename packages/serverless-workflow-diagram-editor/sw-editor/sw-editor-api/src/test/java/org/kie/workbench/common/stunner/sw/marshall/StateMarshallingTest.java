@@ -63,7 +63,7 @@ public class StateMarshallingTest extends BaseMarshallingTest {
         assertTrue(workflow.getStates()[0].getEnd() instanceof StateEnd);
         final StateEnd end = (StateEnd) workflow.getStates()[0].getEnd();
         assertTrue(end.getTerminate());
-        assertEquals("{}",end.getContinueAs());
+        assertEquals("{}", end.getContinueAs());
         assertFalse(end.getCompensate());
         //assertTrue(end.get("produceEvents").equals("[]"));
     }
