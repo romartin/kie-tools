@@ -36,6 +36,7 @@ import org.kie.workbench.common.stunner.sw.definition.ForEachState;
 import org.kie.workbench.common.stunner.sw.definition.InjectState;
 import org.kie.workbench.common.stunner.sw.definition.JsDefinition;
 import org.kie.workbench.common.stunner.sw.definition.JsDefinition1;
+import org.kie.workbench.common.stunner.sw.definition.JsDefinition2;
 import org.kie.workbench.common.stunner.sw.definition.ModelUtils;
 import org.kie.workbench.common.stunner.sw.definition.OnEvent;
 import org.kie.workbench.common.stunner.sw.definition.OperationState;
@@ -76,7 +77,7 @@ public class Parser {
         JsDefinition jsDefinitionTest1 = jso.jsDefinitionTest1;
         Object result1 = parse(JsDefinition1.class, jsDefinitionTest1);
         JsDefinition jsDefinitionTest2 = jso.jsDefinitionTest2;
-        Object result2 = parse(JsDefinition1.class, jsDefinitionTest2);
+        Object result2 = parse(JsDefinition2.class, jsDefinitionTest2);
         workflow.jsDefinitionTest1 = (JsDefinition) result1;
         workflow.jsDefinitionTest2 = (JsDefinition) result2;
     }
