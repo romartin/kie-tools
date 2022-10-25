@@ -66,8 +66,14 @@ import org.kie.workbench.common.stunner.core.graph.Edge;
 import org.kie.workbench.common.stunner.core.graph.Element;
 import org.kie.workbench.common.stunner.core.graph.Node;
 import org.kie.workbench.common.stunner.core.graph.content.view.View;
+import org.kie.workbench.common.stunner.sw.client.js.JsStunnerEditor;
+import org.kie.workbench.common.stunner.sw.client.js.SWWindowJSType;
 import org.kie.workbench.common.stunner.sw.client.services.ClientDiagramService;
 import org.kie.workbench.common.stunner.sw.client.services.IncrementalMarshaller;
+import org.kie.workbench.common.stunner.sw.factory.RulesFactory;
+import org.kie.workbench.common.stunner.sw.jsadapter.JsDefinitionAdapter;
+import org.kie.workbench.common.stunner.sw.jsadapter.JsPropertyAdapter;
+import org.kie.workbench.common.stunner.sw.jsadapter.JsRuleAdapter;
 import org.kie.workbench.common.stunner.sw.marshall.Message;
 import org.kie.workbench.common.stunner.sw.marshall.ParseResult;
 import org.uberfire.backend.vfs.Path;
@@ -181,6 +187,10 @@ public class DiagramEditor {
                                      new ServiceCallback<ParseResult>() {
                                          @Override
                                          public void onSuccess(final ParseResult parseResult) {
+
+                                             // TODO: Call here?
+                                             initRules();
+
                                              stunnerEditor
                                                      .close()
                                                      .open(parseResult.getDiagram(), new SessionPresenter.SessionPresenterCallback() {
@@ -350,10 +360,25 @@ public class DiagramEditor {
         return found;
     }
 
+    @Inject
+    private JsDefinitionAdapter jsDefinitionAdapter;
+    @Inject
+    private JsPropertyAdapter jsPropertyAdapter;
+    @Inject
+    private JsRuleAdapter jsRuleAdapter;
+    @Inject
+    private RulesFactory rulesFactory;
+
+    @SuppressWarnings("all")
+    private void initRules() {
+        rulesFactory.buildSWFRules();
+    }
+
     @SuppressWarnings("all")
     private void initJsTypes() {
-        LienzoCanvas canvas = (LienzoCanvas) stunnerEditor.getCanvasHandler().getCanvas();
-        if (canvas != null) {
+        ViewerSession session = sessionManager.getCurrentSession();
+        if (null != session && null != session.getCanvasHandler()) {
+            LienzoCanvas canvas = (LienzoCanvas) stunnerEditor.getCanvasHandler().getCanvas();
             LienzoPanel panel = (LienzoPanel) canvas.getView().getPanel();
             LienzoBoundsPanel lienzoPanel = panel.getView();
 
@@ -364,7 +389,15 @@ public class DiagramEditor {
                 }
             });
 
+            // Preserve this for legacy API.
             WindowJSType.linkCanvasJS(jsCanvas);
+
+            JsStunnerEditor editor = new JsStunnerEditor(jsDefinitionAdapter,
+                                                         jsPropertyAdapter,
+                                                         jsRuleAdapter,
+                                                         jsCanvas,
+                                                         session);
+            SWWindowJSType.linkEditor(editor);
         }
     }
 
