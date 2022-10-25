@@ -21,7 +21,6 @@ import java.util.Optional;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
-import com.google.gwt.core.client.JavaScriptObject;
 import elemental2.core.Function;
 import elemental2.core.JsObject;
 import elemental2.core.Reflect;
@@ -31,7 +30,6 @@ import org.kie.workbench.common.stunner.core.definition.property.PropertyMetaTyp
 import org.kie.workbench.common.stunner.core.factory.graph.ElementFactory;
 import org.kie.workbench.common.stunner.core.factory.graph.NodeFactory;
 import org.kie.workbench.common.stunner.core.i18n.StunnerTranslationService;
-import org.kie.workbench.common.stunner.sw.definition.JsDefinition;
 
 import static org.kie.workbench.common.stunner.core.i18n.AbstractTranslationService.I18N_SEPARATOR;
 
@@ -110,23 +108,13 @@ public class JsDefinitionAdapter implements DefinitionAdapter<Object> {
         return 0;
     }
 
-    // TODO
     @Override
     public boolean accepts(Class<?> type) {
-        return isJsDefinition(type);
+        return isJsDefinitionType(type);
     }
 
-    /*
-        TODO:
-        - When parsing an object from js -> it's a JavaScriptObject
-        - When creating from the tool -> it's the concrete Js Type
-     */
-
-    public static boolean isJsDefinition(Class<?> type) {
+    // Actually only jstypes expected as for definitions. No other types of domains are expected/supported.
+    public static boolean isJsDefinitionType(Class<?> type) {
         return true;
-    }
-
-    public static boolean isJsDefinition(Object instance) {
-        return (instance instanceof JavaScriptObject) || (instance instanceof JsDefinition);
     }
 }

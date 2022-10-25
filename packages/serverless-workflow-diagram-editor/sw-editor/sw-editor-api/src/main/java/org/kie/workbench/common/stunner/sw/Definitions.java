@@ -16,91 +16,14 @@
 
 package org.kie.workbench.common.stunner.sw;
 
-import javax.enterprise.context.ApplicationScoped;
+import jsinterop.annotations.JsType;
 
-import org.jboss.errai.databinding.client.api.Bindable;
-import org.kie.workbench.common.stunner.core.definition.annotation.DefinitionSet;
-import org.kie.workbench.common.stunner.core.definition.builder.Builder;
-import org.kie.workbench.common.stunner.core.factory.graph.GraphFactory;
-import org.kie.workbench.common.stunner.sw.definition.ActionTransition;
-import org.kie.workbench.common.stunner.sw.definition.ActionsContainer;
-import org.kie.workbench.common.stunner.sw.definition.CallFunctionAction;
-import org.kie.workbench.common.stunner.sw.definition.CallSubflowAction;
-import org.kie.workbench.common.stunner.sw.definition.CallbackState;
-import org.kie.workbench.common.stunner.sw.definition.CompensationTransition;
-import org.kie.workbench.common.stunner.sw.definition.DataConditionTransition;
-import org.kie.workbench.common.stunner.sw.definition.DefaultConditionTransition;
-import org.kie.workbench.common.stunner.sw.definition.End;
-import org.kie.workbench.common.stunner.sw.definition.ErrorTransition;
-import org.kie.workbench.common.stunner.sw.definition.EventConditionTransition;
-import org.kie.workbench.common.stunner.sw.definition.EventRef;
-import org.kie.workbench.common.stunner.sw.definition.EventState;
-import org.kie.workbench.common.stunner.sw.definition.EventTimeout;
-import org.kie.workbench.common.stunner.sw.definition.ForEachState;
-import org.kie.workbench.common.stunner.sw.definition.InjectState;
-import org.kie.workbench.common.stunner.sw.definition.JsDefinition1;
-import org.kie.workbench.common.stunner.sw.definition.JsDefinition2;
-import org.kie.workbench.common.stunner.sw.definition.OnEvent;
-import org.kie.workbench.common.stunner.sw.definition.OperationState;
-import org.kie.workbench.common.stunner.sw.definition.ParallelState;
-import org.kie.workbench.common.stunner.sw.definition.SleepState;
-import org.kie.workbench.common.stunner.sw.definition.Start;
-import org.kie.workbench.common.stunner.sw.definition.StartTransition;
-import org.kie.workbench.common.stunner.sw.definition.SwitchState;
-import org.kie.workbench.common.stunner.sw.definition.Transition;
-import org.kie.workbench.common.stunner.sw.definition.Workflow;
-
-/**
- * Domain Model definitions supported by the serverless workflow editor.
- * New domain classes have to be referenced here in order to be part of the editor's SWF domain.
- */
-@ApplicationScoped
-@Bindable
-@DefinitionSet(
-        graphFactory = GraphFactory.class,
-        qualifier = SWEditor.class,
-        definitions = {
-                Workflow.class,
-                Start.class,
-                End.class,
-                InjectState.class,
-                SwitchState.class,
-                EventState.class,
-                OperationState.class,
-                SleepState.class,
-                ParallelState.class,
-                ForEachState.class,
-                CallbackState.class,
-                ActionsContainer.class,
-                OnEvent.class,
-                EventRef.class,
-                CallFunctionAction.class,
-                CallSubflowAction.class,
-                EventTimeout.class,
-                StartTransition.class,
-                ErrorTransition.class,
-                EventConditionTransition.class,
-                DataConditionTransition.class,
-                DefaultConditionTransition.class,
-                ActionTransition.class,
-                CompensationTransition.class,
-                Transition.class,
-                JsDefinition1.class,
-                JsDefinition2.class
-        },
-        builder = Definitions.DefinitionsBuilder.class
-)
-
+@JsType
 public class Definitions {
 
+    public String definitions;
+
     public Definitions() {
-    }
-
-    public static class DefinitionsBuilder implements Builder<Definitions> {
-
-        @Override
-        public Definitions build() {
-            return new Definitions();
-        }
+        definitions = "org.kie.workbench.common.stunner.sw.definition.Workflow,org.kie.workbench.common.stunner.sw.definition.Start,org.kie.workbench.common.stunner.sw.definition.End,org.kie.workbench.common.stunner.sw.definition.InjectState,org.kie.workbench.common.stunner.sw.definition.SwitchState,org.kie.workbench.common.stunner.sw.definition.EventState,org.kie.workbench.common.stunner.sw.definition.OperationState,org.kie.workbench.common.stunner.sw.definition.SleepState,org.kie.workbench.common.stunner.sw.definition.ParallelState,org.kie.workbench.common.stunner.sw.definition.ForEachState,org.kie.workbench.common.stunner.sw.definition.CallbackState,org.kie.workbench.common.stunner.sw.definition.ActionsContainer,org.kie.workbench.common.stunner.sw.definition.OnEvent,org.kie.workbench.common.stunner.sw.definition.EventRef,org.kie.workbench.common.stunner.sw.definition.CallFunctionAction,org.kie.workbench.common.stunner.sw.definition.CallSubflowAction,org.kie.workbench.common.stunner.sw.definition.EventTimeout,org.kie.workbench.common.stunner.sw.definition.StartTransition,org.kie.workbench.common.stunner.sw.definition.ErrorTransition,org.kie.workbench.common.stunner.sw.definition.EventConditionTransition,org.kie.workbench.common.stunner.sw.definition.DataConditionTransition,org.kie.workbench.common.stunner.sw.definition.DefaultConditionTransition,org.kie.workbench.common.stunner.sw.definition.ActionTransition,org.kie.workbench.common.stunner.sw.definition.CompensationTransition,org.kie.workbench.common.stunner.sw.definition.Transition";
     }
 }

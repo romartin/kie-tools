@@ -54,8 +54,6 @@ import org.kie.workbench.common.stunner.sw.definition.EventConditionTransition;
 import org.kie.workbench.common.stunner.sw.definition.EventState;
 import org.kie.workbench.common.stunner.sw.definition.ForEachState;
 import org.kie.workbench.common.stunner.sw.definition.InjectState;
-import org.kie.workbench.common.stunner.sw.definition.JsDefinition1;
-import org.kie.workbench.common.stunner.sw.definition.JsDefinition2;
 import org.kie.workbench.common.stunner.sw.definition.OnEvent;
 import org.kie.workbench.common.stunner.sw.definition.OperationState;
 import org.kie.workbench.common.stunner.sw.definition.ParallelState;
@@ -75,7 +73,6 @@ import static org.kie.workbench.common.stunner.sw.marshall.StateMarshalling.ANY_
 import static org.kie.workbench.common.stunner.sw.marshall.StateMarshalling.CALLBACK_STATE_UNMARSHALLER;
 import static org.kie.workbench.common.stunner.sw.marshall.StateMarshalling.EVENT_STATE_UNMARSHALLER;
 import static org.kie.workbench.common.stunner.sw.marshall.StateMarshalling.FOREACH_STATE_UNMARSHALLER;
-import static org.kie.workbench.common.stunner.sw.marshall.StateMarshalling.JS_DEFINITION__UNMARSHALLER;
 import static org.kie.workbench.common.stunner.sw.marshall.StateMarshalling.ONEVENTS_UNMARSHALLER;
 import static org.kie.workbench.common.stunner.sw.marshall.StateMarshalling.OPERATION_STATE_UNMARSHALLER;
 import static org.kie.workbench.common.stunner.sw.marshall.StateMarshalling.STATE_MARSHALLER;
@@ -376,10 +373,6 @@ public class Marshaller {
             return (NodeUnmarshaller<T>) ACTIONS_UNMARSHALLER;
         } else if (OnEvent[].class.equals(type)) {
             return (NodeUnmarshaller<T>) ONEVENTS_UNMARSHALLER;
-        } else if (JsDefinition1.class.equals(type)) {
-            return (NodeUnmarshaller<T>) JS_DEFINITION__UNMARSHALLER;
-        } else if (JsDefinition2.class.equals(type)) {
-            return (NodeUnmarshaller<T>) JS_DEFINITION__UNMARSHALLER;
         }
         throw new UnsupportedOperationException("No NodeUnmarshaller found for " + type.getName());
     }

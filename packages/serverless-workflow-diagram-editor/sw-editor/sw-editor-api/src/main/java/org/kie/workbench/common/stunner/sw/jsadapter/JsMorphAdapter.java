@@ -55,6 +55,6 @@ public class JsMorphAdapter implements MorphAdapter<Object> {
 
     @Override
     public boolean accepts(Class<?> type) {
-        return JsDefinitionAdapter.isJsDefinition(type);
+        return JsDefinitionAdapter.isJsDefinitionType(type);
     }
 }

@@ -88,9 +88,6 @@ public class Workflow {
 
     private Retry[] retries;
 
-    public JsDefinition jsDefinitionTest1;
-    public JsDefinition jsDefinitionTest2;
-
     public Workflow() {
     }
 

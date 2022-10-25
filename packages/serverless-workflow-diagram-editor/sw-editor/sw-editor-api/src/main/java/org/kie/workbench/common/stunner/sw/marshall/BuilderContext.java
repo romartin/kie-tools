@@ -52,8 +52,6 @@ import org.kie.workbench.common.stunner.sw.definition.EventState;
 import org.kie.workbench.common.stunner.sw.definition.EventTimeout;
 import org.kie.workbench.common.stunner.sw.definition.ForEachState;
 import org.kie.workbench.common.stunner.sw.definition.InjectState;
-import org.kie.workbench.common.stunner.sw.definition.JsDefinition1;
-import org.kie.workbench.common.stunner.sw.definition.JsDefinition2;
 import org.kie.workbench.common.stunner.sw.definition.OnEvent;
 import org.kie.workbench.common.stunner.sw.definition.OperationState;
 import org.kie.workbench.common.stunner.sw.definition.ParallelState;
@@ -257,10 +255,6 @@ public class BuilderContext {
             return new double[]{154d, 51d};
         } else if (EventTimeout.class.equals(type)) {
             return new double[]{56d, 56d};
-        } else if (JsDefinition1.class.equals(type)) {
-            return new double[]{154d, 51d};
-        } else if (JsDefinition2.class.equals(type)) {
-            return new double[]{154d, 51d};
         }
         return new double[]{0d, 0d};
     }

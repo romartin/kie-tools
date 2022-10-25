@@ -16,22 +16,35 @@
 
 package org.kie.workbench.common.stunner.sw.jsadapter;
 
-import org.kie.workbench.common.stunner.core.definition.adapter.AbstractDefinitionSetRuleAdapter;
+import javax.enterprise.context.ApplicationScoped;
+
+import org.kie.workbench.common.stunner.core.definition.adapter.DefinitionSetRuleAdapter;
 import org.kie.workbench.common.stunner.core.rule.EmptyRuleSet;
 import org.kie.workbench.common.stunner.core.rule.RuleSet;
+import org.kie.workbench.common.stunner.sw.Definitions;
 
-import static org.kie.workbench.common.stunner.sw.jsadapter.JsDefinitionAdapter.isJsDefinition;
+// TODO: PoC - Decouple from SWF domain and move to core.
+@ApplicationScoped
+public class JsRuleAdapter implements DefinitionSetRuleAdapter<Object> {
 
-// TODO
-public class JsRuleAdapter extends AbstractDefinitionSetRuleAdapter<Object> {
+    private RuleSet ruleSet;
 
     @Override
     public RuleSet getRuleSet(Object pojo) {
-        return new EmptyRuleSet();
+        return null != ruleSet ? ruleSet : new EmptyRuleSet();
+    }
+
+    public void setRuleSet(RuleSet ruleSet) {
+        this.ruleSet = ruleSet;
     }
 
     @Override
     public boolean accepts(Class<?> type) {
-        return isJsDefinition(type);
+        return Definitions.class.equals(type);
+    }
+
+    @Override
+    public int getPriority() {
+        return 0;
     }
 }
