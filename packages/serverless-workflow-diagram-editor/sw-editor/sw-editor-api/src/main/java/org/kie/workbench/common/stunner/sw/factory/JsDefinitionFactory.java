@@ -20,6 +20,7 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
 import org.kie.workbench.common.stunner.core.factory.definition.DefinitionFactory;
+import org.kie.workbench.common.stunner.sw.Definitions;
 import org.kie.workbench.common.stunner.sw.definition.ActionNode;
 import org.kie.workbench.common.stunner.sw.definition.ActionTransition;
 import org.kie.workbench.common.stunner.sw.definition.ActionsContainer;
@@ -37,8 +38,6 @@ import org.kie.workbench.common.stunner.sw.definition.EventState;
 import org.kie.workbench.common.stunner.sw.definition.EventTimeout;
 import org.kie.workbench.common.stunner.sw.definition.ForEachState;
 import org.kie.workbench.common.stunner.sw.definition.InjectState;
-import org.kie.workbench.common.stunner.sw.definition.JsDefinition1;
-import org.kie.workbench.common.stunner.sw.definition.JsDefinition2;
 import org.kie.workbench.common.stunner.sw.definition.OnEvent;
 import org.kie.workbench.common.stunner.sw.definition.OperationState;
 import org.kie.workbench.common.stunner.sw.definition.ParallelState;
@@ -65,13 +64,6 @@ public class JsDefinitionFactory implements DefinitionFactory<Object> {
     @Override
     public Object build(String identifier) {
         // TODO: Refactor this by j2cl usage or the use of builder methods.
-        if (JsDefinition1.class.getName().equals(identifier)) {
-            return new JsDefinition1();
-        }
-        if (JsDefinition2.class.getName().equals(identifier)) {
-            return new JsDefinition2();
-        }
-
         if (Workflow.class.getName().equals(identifier)) {
             return new Workflow();
         }
@@ -178,6 +170,11 @@ public class JsDefinitionFactory implements DefinitionFactory<Object> {
 
         if (EventTimeout.class.getName().equals(identifier)) {
             return new EventTimeout();
+        }
+
+        if (Definitions.class.getName().equals(identifier)) {
+
+            return new org.kie.workbench.common.stunner.sw.Definitions();
         }
 
         return null;

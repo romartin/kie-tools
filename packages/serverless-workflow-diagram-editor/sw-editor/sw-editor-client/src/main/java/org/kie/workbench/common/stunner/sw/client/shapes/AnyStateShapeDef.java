@@ -47,8 +47,6 @@ import org.kie.workbench.common.stunner.sw.definition.EventState;
 import org.kie.workbench.common.stunner.sw.definition.EventTimeout;
 import org.kie.workbench.common.stunner.sw.definition.ForEachState;
 import org.kie.workbench.common.stunner.sw.definition.InjectState;
-import org.kie.workbench.common.stunner.sw.definition.JsDefinition1;
-import org.kie.workbench.common.stunner.sw.definition.JsDefinition2;
 import org.kie.workbench.common.stunner.sw.definition.OnEvent;
 import org.kie.workbench.common.stunner.sw.definition.OperationState;
 import org.kie.workbench.common.stunner.sw.definition.ParallelState;
@@ -56,8 +54,6 @@ import org.kie.workbench.common.stunner.sw.definition.SleepState;
 import org.kie.workbench.common.stunner.sw.definition.Start;
 import org.kie.workbench.common.stunner.sw.definition.SwitchState;
 import org.kie.workbench.common.stunner.sw.definition.Workflow;
-
-import static org.kie.workbench.common.stunner.sw.jsadapter.JsDefinitionAdapter.isJsDefinition;
 
 public class AnyStateShapeDef<W> implements ShapeViewDef<W, SVGShapeView>,
                                             SVGShapeViewDef<W, ShapeViewFactory> {
@@ -113,9 +109,7 @@ public class AnyStateShapeDef<W> implements ShapeViewDef<W, SVGShapeView>,
                     .put(EventRef.class, ShapeViewFactory::event)
                     .put(EventTimeout.class, ShapeViewFactory::eventTimeout)
                     .put(CallFunctionAction.class, ShapeViewFactory::action)
-                    .put(CallSubflowAction.class, ShapeViewFactory::action)
-                    .put(JsDefinition1.class, ShapeViewFactory::action)
-                    .put(JsDefinition2.class, ShapeViewFactory::action);
+                    .put(CallSubflowAction.class, ShapeViewFactory::action);
 
     // TODO: Refactor this, no need for storing state...
     public static final Map<Class<?>, Glyph> GLYPHS =
@@ -137,24 +131,10 @@ public class AnyStateShapeDef<W> implements ShapeViewDef<W, SVGShapeView>,
                 put(EventTimeout.class, GlyphFactory.EVENT_TIMEOUT);
                 put(CallFunctionAction.class, GlyphFactory.CALL_FUNCTION);
                 put(CallSubflowAction.class, GlyphFactory.CALL_SUBFLOW);
-                put(JsDefinition1.class, GlyphFactory.CALL_FUNCTION);
-                put(JsDefinition2.class, GlyphFactory.CALL_SUBFLOW);
             }};
 
     @Override
     public SVGShapeView<?> newViewInstance(ShapeViewFactory factory, W instance) {
-        /*if (instance instanceof OnEvent) {
-            return VIEW_RESOURCES.getResource(factory, instance).build(295d,100d, false);
-        }
-        if (instance instanceof ActionsContainer) {
-            return VIEW_RESOURCES.getResource(factory, instance).build(185d, 160d, false);
-        }
-        if (instance instanceof Timeout) {
-            return VIEW_RESOURCES.getResource(factory, instance).build(28d, 28d, false);
-        }*/
-        if (isJsDefinition(instance)) {
-            return factory.action().build(false);
-        }
         return VIEW_RESOURCES.getResource(factory, instance).build(false);
     }
 

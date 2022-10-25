@@ -36,9 +36,6 @@ public class Workflow {
 
     // missing specVersion, functions
 
-    public JsDefinition jsDefinitionTest1;
-    public JsDefinition jsDefinitionTest2;
-
     public Workflow() {
     }
 

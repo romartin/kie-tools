@@ -103,14 +103,6 @@ public interface WorkflowMarshalling {
                 // End state.
                 END_NODE_UNMARSHALLER.unmarshall(context, workflow);
 
-                // TODO: Just for testing
-                if (null != workflow.jsDefinitionTest1) {
-                    StateMarshalling.JS_DEFINITION__UNMARSHALLER.unmarshall(context, workflow.jsDefinitionTest1);
-                }
-                if (null != workflow.jsDefinitionTest2) {
-                    StateMarshalling.JS_DEFINITION__UNMARSHALLER.unmarshall(context, workflow.jsDefinitionTest2);
-                }
-
                 // States.
                 final State[] states = workflow.states;
                 for (int i = 0; i < states.length; i++) {

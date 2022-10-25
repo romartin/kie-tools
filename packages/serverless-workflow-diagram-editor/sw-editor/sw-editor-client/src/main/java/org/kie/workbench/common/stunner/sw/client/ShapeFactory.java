@@ -47,8 +47,6 @@ import org.kie.workbench.common.stunner.sw.definition.EventState;
 import org.kie.workbench.common.stunner.sw.definition.EventTimeout;
 import org.kie.workbench.common.stunner.sw.definition.ForEachState;
 import org.kie.workbench.common.stunner.sw.definition.InjectState;
-import org.kie.workbench.common.stunner.sw.definition.JsDefinition1;
-import org.kie.workbench.common.stunner.sw.definition.JsDefinition2;
 import org.kie.workbench.common.stunner.sw.definition.OnEvent;
 import org.kie.workbench.common.stunner.sw.definition.OperationState;
 import org.kie.workbench.common.stunner.sw.definition.ParallelState;
@@ -60,7 +58,6 @@ import org.kie.workbench.common.stunner.sw.definition.Transition;
 import org.kie.workbench.common.stunner.sw.definition.Workflow;
 
 import static org.kie.workbench.common.stunner.core.definition.adapter.binding.BindableAdapterUtils.getDefinitionId;
-import static org.kie.workbench.common.stunner.sw.jsadapter.JsDefinitionAdapter.isJsDefinition;
 
 @ApplicationScoped
 public class ShapeFactory
@@ -94,8 +91,6 @@ public class ShapeFactory
         put(ActionTransition.class, new TransitionShapeDef());
         put(CompensationTransition.class, new TransitionShapeDef());
         put(EventTimeout.class, new AnyStateShapeDef(AnyStateShapeDef.FontStyle.OUTSIDE_CENTER_BOTTOM, true));
-        put(JsDefinition1.class, new AnyStateShapeDef());
-        put(JsDefinition2.class, new AnyStateShapeDef());
     }};
 
     private final SVGShapeFactory svgShapeFactory;
@@ -108,9 +103,6 @@ public class ShapeFactory
     @Override
     @SuppressWarnings("all")
     public Shape newShape(Object instance) {
-        if (isJsDefinition(instance)) {
-            return svgShapeFactory.newShape(instance, new AnyStateShapeDef());
-        }
         ShapeViewDef def = typeViewDefinitions.get(instance.getClass());
         if (def instanceof TransitionShapeDef) {
             return new TransitionShape((TransitionShapeDef) def, new TransitionView());
