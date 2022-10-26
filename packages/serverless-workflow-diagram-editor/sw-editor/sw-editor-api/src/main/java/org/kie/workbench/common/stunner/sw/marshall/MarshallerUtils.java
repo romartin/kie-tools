@@ -38,6 +38,7 @@ public class MarshallerUtils {
         return null;
     }
 
+    @SuppressWarnings("all")
     public static <T> T getElementDefinition(Element node) {
         return null != node ? (T) ((Definition) node.getContent()).getDefinition() : null;
     }
@@ -48,11 +49,10 @@ public class MarshallerUtils {
 
     public static <T> T parse(FactoryManager factoryManager, Class<? extends T> type, T jso) {
         T instance = factoryManager.newDefinition(type.getName());
-        return (T) JsObject.assign(instance,jso);
+        return parse(instance, jso);
     }
 
     public static <T> T parse(T instance, T jso) {
-        return (T) JsObject.assign(instance,jso);
+        return (T) JsObject.assign(instance, jso);
     }
-
 }

@@ -67,6 +67,7 @@ public class ShapeFactory
         implements org.kie.workbench.common.stunner.core.client.shape.factory.ShapeFactory<Object, Shape> {
 
     // TODO: Refactor this, no need for storing state...
+    @SuppressWarnings("all")
     private final Map<Class<?>, ShapeViewDef> typeViewDefinitions = new HashMap<Class<?>, ShapeViewDef>() {{
         put(Workflow.class, new AnyStateShapeDef());
         put(Start.class, new AnyStateShapeDef(AnyStateShapeDef.FontStyle.INSIDE_CENTER_WITH_AlPHA, true));

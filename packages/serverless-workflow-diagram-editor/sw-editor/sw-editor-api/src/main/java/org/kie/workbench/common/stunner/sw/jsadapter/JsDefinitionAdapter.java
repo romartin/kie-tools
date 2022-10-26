@@ -32,8 +32,6 @@ import org.kie.workbench.common.stunner.core.factory.graph.ElementFactory;
 import org.kie.workbench.common.stunner.core.factory.graph.NodeFactory;
 import org.kie.workbench.common.stunner.core.i18n.StunnerTranslationService;
 import org.kie.workbench.common.stunner.sw.definition.JsDefinition;
-import org.kie.workbench.common.stunner.sw.definition.JsDefinition1;
-import org.kie.workbench.common.stunner.sw.definition.JsDefinition2;
 
 import static org.kie.workbench.common.stunner.core.i18n.AbstractTranslationService.I18N_SEPARATOR;
 
@@ -80,9 +78,9 @@ public class JsDefinitionAdapter implements DefinitionAdapter<Object> {
 
     @Override
     public String[] getPropertyFields(Object pojo) {
-        // Exclude native js object properties
+        // Exclude native js object properties and functions
         return JsObject.getOwnPropertyNames(pojo)
-                .filter((prop, i, jsArray) -> (!(prop.contains("$") || Reflect.get(pojo, prop) instanceof Function)))
+                .filter((prop, i, jsArray) -> (!(prop.contains("__") || Reflect.get(pojo, prop) instanceof Function)))
                 .asArray(new String[0]);
     }
 
@@ -98,8 +96,8 @@ public class JsDefinitionAdapter implements DefinitionAdapter<Object> {
             String id = getJsDefinitionId(pojo);
             return translationService.getValue(id + I18N_SEPARATOR + "property_name");
         }
-        // TODO: Other property types.
-        return null;
+        // Only Name is supported
+        throw new UnsupportedOperationException("Unsupported PropertyMetaType: " + metaType.name());
     }
 
     @Override
@@ -125,9 +123,7 @@ public class JsDefinitionAdapter implements DefinitionAdapter<Object> {
      */
 
     public static boolean isJsDefinition(Class<?> type) {
-        return "com.google.gwt.core.client.JavaScriptObject$".equals(type.getName()) ||
-                JsDefinition1.class.getName().equals(type.getName()) ||
-                JsDefinition2.class.getName().equals(type.getName());
+        return true;
     }
 
     public static boolean isJsDefinition(Object instance) {

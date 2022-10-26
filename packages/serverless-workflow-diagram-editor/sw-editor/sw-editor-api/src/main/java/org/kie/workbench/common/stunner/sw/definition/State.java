@@ -16,81 +16,25 @@
 
 package org.kie.workbench.common.stunner.sw.definition;
 
-import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
-import jsinterop.annotations.JsIgnore;
 import jsinterop.annotations.JsType;
-import org.jboss.errai.databinding.client.api.Bindable;
-import org.kie.workbench.common.stunner.core.definition.annotation.Definition;
-import org.kie.workbench.common.stunner.core.definition.annotation.Property;
-import org.kie.workbench.common.stunner.core.definition.annotation.definition.Category;
-import org.kie.workbench.common.stunner.core.definition.annotation.definition.Labels;
-import org.kie.workbench.common.stunner.core.definition.annotation.morph.MorphBase;
-import org.kie.workbench.common.stunner.core.definition.property.PropertyMetaTypes;
-import org.kie.workbench.common.stunner.core.rule.annotation.CanDock;
 
-/**
- * This class defines workflow states define building blocks of the workflow execution instructions.
- * They define the control flow logic instructions on what the workflow is supposed to do.
- *
- * Type of the state is specified by its category, which is set in constructor for all its descendants.
- */
-@Bindable
-@Definition
-@CanDock(roles = {Timeout.LABEL_TIMEOUT})
-@MorphBase(defaultType = InjectState.class)
 @JsType
 public class State {
 
-    public static final String LABEL_STATE = "state";
-
-    @Category
-    @JsIgnore
-    public static final transient String category = Categories.STATES;
-
-    @Labels
-    @JsIgnore
-    public static final Set<String> labels = Stream.of(Workflow.LABEL_ROOT_NODE,
-                                                       LABEL_STATE).collect(Collectors.toSet());
-
-    /**
-     * Unique state name, can't be null.
-     */
-    @Property(meta = PropertyMetaTypes.NAME)
     public String name;
 
-    /**
-     * Type of the state, can't be null.
-     */
     public String type;
 
-    /**
-     * Next transition of the workflow.
-     */
     // TODO: Not all states supports this (eg: switch state)
     public Object transition;
 
-    /**
-     * Whether this State is a last state in the workflow.
-     */
     // TODO: Not all states supports this (eg: switch state)
     public Object end;
 
-    /**
-     * Definitions of states error handling.
-     */
     public ErrorTransition[] onErrors;
 
-    /**
-     * State specific timeouts.
-     */
     public String eventTimeout;
 
-    /**
-     * Unique name of a workflow state which is responsible for compensation of this state.
-     */
     public String compensatedBy;
 
     public State() {
@@ -158,13 +102,5 @@ public class State {
     public State setCompensatedBy(String compensatedBy) {
         this.compensatedBy = compensatedBy;
         return this;
-    }
-
-    public Set<String> getLabels() {
-        return labels;
-    }
-
-    public String getCategory() {
-        return category;
     }
 }

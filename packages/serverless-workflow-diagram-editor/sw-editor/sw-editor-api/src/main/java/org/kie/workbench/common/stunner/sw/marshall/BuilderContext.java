@@ -98,6 +98,7 @@ public class BuilderContext {
         return addNodeByUUID(obtainUUID(name), bean);
     }
 
+    @SuppressWarnings("all")
     public Node addNodeByUUID(String uuid,
                               Object bean) {
         final ElementFactory elementFactory = factoryManager.registry().getElementFactory(NodeFactory.class);
