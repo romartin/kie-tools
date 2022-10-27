@@ -17,7 +17,6 @@
 package org.kie.workbench.common.stunner.sw.client.shapes;
 
 import com.ait.lienzo.client.core.shape.MultiPath;
-import elemental2.dom.DomGlobal;
 
 public class StartShapeView extends ServerlessWorkflowBasicShape<StartShapeView> {
 

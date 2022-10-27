@@ -108,7 +108,7 @@ public class Parser {
                     state.onErrors[i] = et;
                 }
             }
-            Metadata metadata = Js.uncheckedCast(Js.asPropertyMap(jso).get("metadata"));
+            Metadata metadata = Js.uncheckedCast(Reflect.get(jso, "metadata"));
             if (null != metadata) {
                 state.metadata = metadata;
             }

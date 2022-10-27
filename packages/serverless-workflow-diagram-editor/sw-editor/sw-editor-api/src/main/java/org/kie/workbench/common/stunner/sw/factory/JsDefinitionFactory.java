@@ -38,6 +38,7 @@ import org.kie.workbench.common.stunner.sw.definition.EventState;
 import org.kie.workbench.common.stunner.sw.definition.EventTimeout;
 import org.kie.workbench.common.stunner.sw.definition.ForEachState;
 import org.kie.workbench.common.stunner.sw.definition.InjectState;
+import org.kie.workbench.common.stunner.sw.definition.Metadata;
 import org.kie.workbench.common.stunner.sw.definition.OnEvent;
 import org.kie.workbench.common.stunner.sw.definition.OperationState;
 import org.kie.workbench.common.stunner.sw.definition.ParallelState;
@@ -74,6 +75,10 @@ public class JsDefinitionFactory implements DefinitionFactory<Object> {
 
         if (End.class.getName().equals(identifier)) {
             return new End();
+        }
+
+        if (Metadata.class.getName().equals(identifier)) {
+            return new Metadata();
         }
 
         if (State.class.getName().equals(identifier)) {
