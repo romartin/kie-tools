@@ -46,6 +46,7 @@ import org.kie.workbench.common.stunner.core.client.canvas.AbstractCanvasHandler
 import org.kie.workbench.common.stunner.core.client.canvas.CanvasHandler;
 import org.kie.workbench.common.stunner.core.client.canvas.controls.SelectionControl;
 import org.kie.workbench.common.stunner.core.client.canvas.util.CanvasFileExport;
+import org.kie.workbench.common.stunner.core.client.command.CanvasCommandFactory;
 import org.kie.workbench.common.stunner.core.client.command.CanvasCommandManager;
 import org.kie.workbench.common.stunner.core.client.command.ClearAllCommand;
 import org.kie.workbench.common.stunner.core.client.service.ClientRuntimeError;
@@ -60,6 +61,8 @@ import org.kie.workbench.common.stunner.core.definition.property.PropertyMetaTyp
 import org.kie.workbench.common.stunner.core.diagram.Diagram;
 import org.kie.workbench.common.stunner.core.diagram.DiagramParsingException;
 import org.kie.workbench.common.stunner.core.diagram.Metadata;
+import org.kie.workbench.common.stunner.core.factory.graph.EdgeFactory;
+import org.kie.workbench.common.stunner.core.factory.graph.NodeFactory;
 import org.kie.workbench.common.stunner.core.graph.Edge;
 import org.kie.workbench.common.stunner.core.graph.Element;
 import org.kie.workbench.common.stunner.core.graph.Node;
@@ -371,6 +374,12 @@ public class DiagramEditor {
     private JsRuleAdapter jsRuleAdapter;
     @Inject
     private RulesFactory rulesFactory;
+    @Inject
+    private CanvasCommandFactory factory;
+    @Inject
+    private NodeFactory nodeFactory;
+    @Inject
+    private EdgeFactory edgeFactory;
 
     @SuppressWarnings("all")
     private void initRules() {
@@ -399,6 +408,9 @@ public class DiagramEditor {
                                                          jsPropertyAdapter,
                                                          jsRuleAdapter,
                                                          jsCanvas,
+                                                         factory,
+                                                         nodeFactory,
+                                                         edgeFactory,
                                                          session);
             SWWindowJSType.linkEditor(editor);
         }

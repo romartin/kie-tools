@@ -1,9 +1,14 @@
 package org.kie.workbench.common.stunner.sw.client.js;
 
+import java.util.Optional;
+
 import jsinterop.annotations.JsIgnore;
 import jsinterop.annotations.JsType;
+import jsinterop.base.Js;
 import org.kie.workbench.common.stunner.core.definition.adapter.DefinitionId;
+import org.kie.workbench.common.stunner.core.definition.property.PropertyMetaTypes;
 import org.kie.workbench.common.stunner.sw.jsadapter.JsDefinitionAdapter;
+import org.kie.workbench.common.stunner.sw.jsadapter.JsDefinitionProperty;
 import org.kie.workbench.common.stunner.sw.jsadapter.JsPropertyAdapter;
 import org.kie.workbench.common.stunner.sw.jsadapter.JsRuleAdapter;
 
@@ -35,6 +40,16 @@ public class JsDefinitionManager {
 
     public String getTitle(Object pojo) {
         return definitionAdapter.getTitle(pojo);
+    }
+
+    public String getName(Object pojo) {
+        String field = definitionAdapter.getMetaPropertyField(pojo, PropertyMetaTypes.NAME);
+        Optional<?> property = definitionAdapter.getProperty(pojo, field);
+        if (property.isPresent()) {
+            String name = Js.uncheckedCast(propertyAdapter.getValue((JsDefinitionProperty) property.get()));
+            return name;
+        }
+        return null;
     }
 
     public String getDescription(Object pojo) {

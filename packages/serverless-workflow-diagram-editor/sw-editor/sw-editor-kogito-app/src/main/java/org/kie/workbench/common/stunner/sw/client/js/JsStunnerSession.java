@@ -1,13 +1,16 @@
 package org.kie.workbench.common.stunner.sw.client.js;
 
 import java.util.Collection;
+import java.util.stream.StreamSupport;
 
+import com.ait.lienzo.client.core.types.JsCanvas;
 import jsinterop.annotations.JsIgnore;
 import jsinterop.annotations.JsType;
 import org.kie.workbench.common.stunner.core.client.canvas.AbstractCanvasHandler;
 import org.kie.workbench.common.stunner.core.client.session.impl.ViewerSession;
 import org.kie.workbench.common.stunner.core.graph.Edge;
 import org.kie.workbench.common.stunner.core.graph.Node;
+import org.kie.workbench.common.stunner.core.graph.content.definition.Definition;
 import org.kie.workbench.common.stunner.core.graph.content.view.View;
 import org.kie.workbench.common.stunner.core.graph.processing.index.Index;
 
@@ -18,8 +21,18 @@ public class JsStunnerSession {
     @JsIgnore
     private ViewerSession session;
 
-    public JsStunnerSession(ViewerSession session) {
+    private JsDefinitionManager definitionManager;
+    public JsCanvas canvas;
+    public JsStunnerCommands commands;
+
+    public JsStunnerSession(JsDefinitionManager definitionManager,
+                            ViewerSession session,
+                            JsCanvas canvas,
+                            JsStunnerCommands commands) {
+        this.definitionManager = definitionManager;
         this.session = session;
+        this.canvas = canvas;
+        this.commands = commands;
     }
 
     public String getSelectedElementUUID() {
@@ -29,12 +42,12 @@ public class JsStunnerSession {
 
     public Node getSelectedNode() {
         String selectedUUID = getSelectedElementUUID();
-        return getNode(selectedUUID);
+        return getNodeByUUID(selectedUUID);
     }
 
     public Edge getSelectedEdge() {
         String selectedUUID = getSelectedElementUUID();
-        return getEdge(selectedUUID);
+        return getEdgeByUUID(selectedUUID);
     }
 
     public Object getSelectedDefinition() {
@@ -44,11 +57,45 @@ public class JsStunnerSession {
         return definition;
     }
 
-    public Node getNode(String uuid) {
+    // TODO: Multiple selection / center selection.
+    public void selectByUUID(String uuid) {
+        session.getSelectionControl().clearSelection().addSelection(uuid);
+        canvas.center(uuid);
+    }
+
+    public void selectByName(String name) {
+        Node node = getNodeByName(name);
+        if (null != node) {
+            selectByUUID(node.getUUID());
+        }
+    }
+
+    public void clearSelection() {
+        session.getSelectionControl().clearSelection();
+    }
+
+    public Node getNodeByUUID(String uuid) {
         return getGraphIndex().getNode(uuid);
     }
 
-    public Edge getEdge(String uuid) {
+    public Node getNodeByName(String name) {
+        Iterable<Node> nodes = getGraphIndex().getGraph().nodes();
+        return StreamSupport.stream(nodes.spliterator(), false)
+                .filter(node -> name.equals(getNodeName(node)))
+                .findAny()
+                .orElse(null);
+    }
+
+    public String getNodeName(Node node) {
+        Object definition = ((Node<Definition, Edge>) node).getContent().getDefinition();
+        return getName(definition);
+    }
+
+    public String getName(Object bean) {
+        return definitionManager.getName(bean);
+    }
+
+    public Edge getEdgeByUUID(String uuid) {
         return getGraphIndex().getEdge(uuid);
     }
 

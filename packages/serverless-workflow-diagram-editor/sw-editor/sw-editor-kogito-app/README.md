@@ -96,12 +96,45 @@ Navigate to the test page in your root context path, eg: `http://localhost:8080/
         var s = jsl.getWiresShape('_A9481DBC-3E87-40EE-9925-733B24404BC0')
         s.getChild(1).fillColor = "red"
 
-        // Stunner - Js Editor (low-level) API
-        var jse = window.frames.editorFrame.contentWindow.editor;
-        var jsdm = jse.definitionManager;
-        var jssession = jse.session;
-        var jscanvas = jse.canvas;
-        jssession.getSelectedElementUUID()
-        jssession.getSelectedNode()
-        jssession.getSelectedDefinition()
-        jsdm.getId(jssession.getSelectedDefinition())
+# TODO: FOR DEMO
+
+++++ INIT
+var cw = window.frames.editorFrame.contentWindow;
+var jse = cw.editor;
+var session = jse.session;
+var canvas = jse.session.canvas;
+
+++ VIEWPORT
+canvas.getScaleX()
+canvas.getScaleY()
+canvas.scale(2)
+canvas.translate(50, 50)
+
+++ GRAPH - QUERY
+session.getNodeByUUID(uuid)
+session.getNodeByName(name)
+
+++ SELECTION - QUERY
+session.getSelectedElementUUID()
+session.getSelectedNode()
+session.getSelectedEdge()
+session.getSelectedDefinition()
+session.getName(session.getSelectedDefinition())
+
+++ SELECTION - UPDATE
+session.selectByUUID(uuid)
+session.selectByName('node name')
+session.clearSelection()
+
+++++ UPDATE STATE NAME
+session.commands.updateFieldValue(session.getSelectedNode(), 'name', 'Inject State2')
+
+++++ SWF - ROTATE SHAPE
+var uuid = session.getSelectedElementUUID()
+var shape = canvas.getWiresShape(uuid)
+var iconGroup = shape.getChild(2).getChildren()[1]
+canvas.rotateGroupOverCenter(iconGroup, 360, 1500)
+
+++++ SWF - CHANGE / ADD STATE ICON/S
+var shape = canvas.getWiresShape('UUID')
+var iconGroup = shape.getChild(2).getChildren()[1]
