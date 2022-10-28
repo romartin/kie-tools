@@ -209,7 +209,7 @@ public class BuilderContext {
         return context;
     }
 
-    private void updateNodeBounds(Node<View, Edge> node) {
+    public static void updateNodeBounds(Node<View, Edge> node) {
         final Bounds bounds = node.getContent().getBounds();
         final Bound upperLeft = bounds.getUpperLeft();
         final double[] beanSize = getBeanSize(node.getContent().getDefinition());

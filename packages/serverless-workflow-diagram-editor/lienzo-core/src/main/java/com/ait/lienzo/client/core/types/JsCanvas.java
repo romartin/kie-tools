@@ -20,7 +20,11 @@ import java.util.Set;
 
 import com.ait.lienzo.client.core.Context2D;
 import com.ait.lienzo.client.core.NativeContext2D;
+import com.ait.lienzo.client.core.animation.AnimationProperties;
+import com.ait.lienzo.client.core.animation.AnimationProperty;
+import com.ait.lienzo.client.core.animation.AnimationTweener;
 import com.ait.lienzo.client.core.shape.ContainerNode;
+import com.ait.lienzo.client.core.shape.Group;
 import com.ait.lienzo.client.core.shape.IPrimitive;
 import com.ait.lienzo.client.core.shape.Layer;
 import com.ait.lienzo.client.core.shape.Viewport;
@@ -30,6 +34,7 @@ import com.ait.lienzo.client.core.shape.wires.types.JsWiresShape;
 import com.ait.lienzo.client.widget.panel.Bounds;
 import com.ait.lienzo.client.widget.panel.LienzoPanel;
 import com.ait.lienzo.client.widget.panel.impl.ScrollablePanel;
+import com.ait.lienzo.client.widget.panel.util.PanelTransformUtils;
 import com.ait.lienzo.tools.client.collection.NFastArrayList;
 import elemental2.dom.HTMLCanvasElement;
 import jsinterop.annotations.JsType;
@@ -64,10 +69,70 @@ public class JsCanvas implements JsCanvasNodeLister {
         return getLayer().getViewport();
     }
 
+    public void translate(double x, double y) {
+        getViewport().setTransform(new Transform()
+                                           .translate(x, y)
+                                           .scaleWithXY(getScaleX(), getScaleY()));
+    }
+
+    public double getTranslateX() {
+        return getViewport().getTransform().getTranslateX();
+    }
+
+    public double getTranslateY() {
+        return getViewport().getTransform().getTranslateY();
+    }
+
+    public void scale(int factor) {
+        getViewport().setTransform(new Transform()
+                                           .translate(getTranslateX(), getTranslateY())
+                                           .scale(factor));
+    }
+
+    public double getScaleX() {
+        return getViewport().getTransform().getScaleX();
+    }
+
+    public double getScaleY() {
+        return getViewport().getTransform().getScaleY();
+    }
+
+    public void scaleToFitWindow() {
+        // TODO: Copy/Pasted from DiagramEditor.
+        ScrollablePanel lienzoPanel = (ScrollablePanel) panel;
+        lienzoPanel.setPostResizeCallback((panel -> {
+            double scale = PanelTransformUtils.computeZoomLevelFitToWidth(lienzoPanel);
+            // Do not scale if workflow fits in the panel
+            if (scale < 1) {
+                PanelTransformUtils.scale(lienzoPanel, scale);
+            }
+            lienzoPanel.setPostResizeCallback(null);
+        }));
+    }
     public NativeContext2D getNativeContent() {
         Context2D context = getLayer().getContext();
         NativeContext2D nativeContext = context.getNativeContext();
         return nativeContext;
+    }
+
+    public void rotateGroupOverCenter(Group group, double degrees, double duration) {
+        BoundingBox boundingBox = group.getBoundingBox();
+        NFastArrayList<IPrimitive<?>> childNodes = group.getChildNodes();
+        for (int i = 0; i < childNodes.size(); i++) {
+            IPrimitive<?> child = childNodes.get(i);
+            if (null != child) {
+                child.setOffset(boundingBox.getWidth() / 2, boundingBox.getHeight() / 2);
+                if (duration > 0) {
+                    child.animate(AnimationTweener.LINEAR, AnimationProperties.toPropertyList(
+                                    AnimationProperty.Properties.ROTATION_DEGREES(degrees)
+                            ), duration)
+                            .run();
+                } else {
+                    child.setRotationDegrees(degrees);
+                }
+            }
+        }
+        draw();
     }
 
     public JsCanvasEvents events() {
