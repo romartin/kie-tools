@@ -21,11 +21,6 @@ import javax.inject.Inject;
 
 import org.kie.workbench.common.stunner.core.factory.definition.DefinitionFactory;
 import org.kie.workbench.common.stunner.sw.Definitions;
-import org.kie.workbench.common.stunner.sw.definition.ActionNode;
-import org.kie.workbench.common.stunner.sw.definition.ActionTransition;
-import org.kie.workbench.common.stunner.sw.definition.ActionsContainer;
-import org.kie.workbench.common.stunner.sw.definition.CallFunctionAction;
-import org.kie.workbench.common.stunner.sw.definition.CallSubflowAction;
 import org.kie.workbench.common.stunner.sw.definition.CallbackState;
 import org.kie.workbench.common.stunner.sw.definition.CompensationTransition;
 import org.kie.workbench.common.stunner.sw.definition.DataConditionTransition;
@@ -136,28 +131,8 @@ public class JsDefinitionFactory implements DefinitionFactory<Object> {
             return new DefaultConditionTransition();
         }
 
-        if (ActionTransition.class.getName().equals(identifier)) {
-            return new ActionTransition();
-        }
-
         if (CompensationTransition.class.getName().equals(identifier)) {
             return new CompensationTransition();
-        }
-
-        if (ActionsContainer.class.getName().equals(identifier)) {
-            return new ActionsContainer();
-        }
-
-        if (ActionNode.class.getName().equals(identifier)) {
-            return new ActionNode();
-        }
-
-        if (CallFunctionAction.class.getName().equals(identifier)) {
-            return new CallFunctionAction();
-        }
-
-        if (CallSubflowAction.class.getName().equals(identifier)) {
-            return new CallSubflowAction();
         }
 
         if (EventRef.class.getName().equals(identifier)) {

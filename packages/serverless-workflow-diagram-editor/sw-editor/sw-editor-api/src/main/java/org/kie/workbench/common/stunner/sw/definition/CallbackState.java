@@ -27,8 +27,6 @@ public class CallbackState extends State {
 
     public String eventRef;
 
-    public ActionNode action;
-
     public CallbackState() {
         this.type = TYPE_CALLBACK;
     }
@@ -39,13 +37,5 @@ public class CallbackState extends State {
 
     public void setEventRef(String eventRef) {
         this.eventRef = eventRef;
-    }
-
-    public ActionNode getAction() {
-        return action;
-    }
-
-    public void setAction(ActionNode action) {
-        this.action = action;
     }
 }

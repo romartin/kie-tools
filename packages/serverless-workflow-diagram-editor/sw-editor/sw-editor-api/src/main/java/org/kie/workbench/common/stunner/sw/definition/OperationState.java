@@ -27,8 +27,6 @@ public class OperationState extends State {
 
     public String actionMode;
 
-    public ActionNode[] actions;
-
     public Boolean usedForCompensation;
 
     public OperationState() {
@@ -41,15 +39,6 @@ public class OperationState extends State {
 
     public OperationState setActionMode(String actionMode) {
         this.actionMode = actionMode;
-        return this;
-    }
-
-    public ActionNode[] getActions() {
-        return actions;
-    }
-
-    public OperationState setActions(ActionNode[] actions) {
-        this.actions = actions;
         return this;
     }
 

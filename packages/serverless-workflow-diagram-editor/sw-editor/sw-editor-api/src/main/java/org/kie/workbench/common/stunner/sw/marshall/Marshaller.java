@@ -43,7 +43,6 @@ import org.kie.workbench.common.stunner.core.graph.impl.GraphImpl;
 import org.kie.workbench.common.stunner.core.graph.processing.index.Index;
 import org.kie.workbench.common.stunner.core.graph.processing.index.map.MapIndexBuilder;
 import org.kie.workbench.common.stunner.sw.autolayout.AutoLayout;
-import org.kie.workbench.common.stunner.sw.definition.ActionNode;
 import org.kie.workbench.common.stunner.sw.definition.CallbackState;
 import org.kie.workbench.common.stunner.sw.definition.CompensationTransition;
 import org.kie.workbench.common.stunner.sw.definition.DataConditionTransition;
@@ -68,7 +67,6 @@ import org.kie.workbench.common.stunner.sw.definition.Workflow_JsonMapperImpl;
 import org.kie.workbench.common.stunner.sw.factory.DiagramFactory;
 import org.uberfire.client.promise.Promises;
 
-import static org.kie.workbench.common.stunner.sw.marshall.StateMarshalling.ACTIONS_UNMARSHALLER;
 import static org.kie.workbench.common.stunner.sw.marshall.StateMarshalling.ANY_NODE_MARSHALLER;
 import static org.kie.workbench.common.stunner.sw.marshall.StateMarshalling.CALLBACK_STATE_UNMARSHALLER;
 import static org.kie.workbench.common.stunner.sw.marshall.StateMarshalling.EVENT_STATE_UNMARSHALLER;
@@ -369,8 +367,6 @@ public class Marshaller {
             return (NodeUnmarshaller<T>) CALLBACK_STATE_UNMARSHALLER;
         } else if (State.class.equals(type)) {
             return (NodeUnmarshaller<T>) STATE_UNMARSHALLER;
-        } else if (ActionNode[].class.equals(type)) {
-            return (NodeUnmarshaller<T>) ACTIONS_UNMARSHALLER;
         } else if (OnEvent[].class.equals(type)) {
             return (NodeUnmarshaller<T>) ONEVENTS_UNMARSHALLER;
         }

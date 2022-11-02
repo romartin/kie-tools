@@ -17,8 +17,6 @@
 package org.kie.workbench.common.stunner.sw.marshall;
 
 import org.junit.Test;
-import org.kie.workbench.common.stunner.sw.definition.ActionNode;
-import org.kie.workbench.common.stunner.sw.definition.CallFunctionAction;
 import org.kie.workbench.common.stunner.sw.definition.OperationState;
 import org.kie.workbench.common.stunner.sw.definition.State;
 import org.kie.workbench.common.stunner.sw.definition.Workflow;
@@ -30,6 +28,7 @@ public class OperationStateMarshallingTest extends BaseMarshallingTest {
 
     private static final String WORKFLOW_ID = "workflow1";
     private static final String WORKFLOW_NAME = "Workflow1";
+
     @Override
     protected Workflow createWorkflow() {
         return new Workflow()
@@ -38,12 +37,6 @@ public class OperationStateMarshallingTest extends BaseMarshallingTest {
                 .setStart("State1")
                 .setStates(new State[]{
                         new OperationState()
-                                .setActions(new ActionNode[]{
-                                        new CallFunctionAction()
-                                                .setId("callFunction1")
-                                                .setName("Call Function 1")
-                                                .setFunctionRef("function1")
-                                })
                                 .setName("State1")
                                 .setEnd(true)
                 });
@@ -61,6 +54,5 @@ public class OperationStateMarshallingTest extends BaseMarshallingTest {
         assertTrue(hasOutgoingEdges("State1"));
         assertTrue(hasIncomingEdgeFrom("State1", Marshaller.STATE_START));
         assertTrue(hasOutgoingEdgeTo("State1", Marshaller.STATE_END));
-        assertDefinitionReferencedInNode(state.getActions()[0], "Call Function 1");
     }
 }
