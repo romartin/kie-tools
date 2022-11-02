@@ -46,7 +46,7 @@ public class OperationStateMarshallingTest extends BaseMarshallingTest {
     public void testUnmarshallWorkflow() {
         unmarshallWorkflow();
         assertDefinitionReferencedInNode(workflow, WORKFLOW_ID);
-        assertEquals(4, countChildren(WORKFLOW_ID));
+        assertEquals(3, countChildren(WORKFLOW_ID));
         OperationState state = (OperationState) workflow.getStates()[0];
         assertDefinitionReferencedInNode(state, "State1");
         assertParentOf(WORKFLOW_ID, "State1");
