@@ -42,6 +42,8 @@ import org.kie.workbench.common.stunner.client.widgets.canvas.ScrollableLienzoPa
 import org.kie.workbench.common.stunner.client.widgets.editor.StunnerEditor;
 import org.kie.workbench.common.stunner.client.widgets.presenters.session.SessionPresenter;
 import org.kie.workbench.common.stunner.core.api.DefinitionManager;
+import org.kie.workbench.common.stunner.core.client.api.JsStunnerEditor;
+import org.kie.workbench.common.stunner.core.client.api.SWWindowJSType;
 import org.kie.workbench.common.stunner.core.client.api.SessionManager;
 import org.kie.workbench.common.stunner.core.client.canvas.AbstractCanvasHandler;
 import org.kie.workbench.common.stunner.core.client.canvas.CanvasHandler;
@@ -75,8 +77,6 @@ import org.kie.workbench.common.stunner.core.graph.content.view.View;
 import org.kie.workbench.common.stunner.core.i18n.StunnerTranslationService;
 import org.kie.workbench.common.stunner.sw.Definitions;
 import org.kie.workbench.common.stunner.sw.SWEditor;
-import org.kie.workbench.common.stunner.sw.client.js.JsStunnerEditor;
-import org.kie.workbench.common.stunner.sw.client.js.SWWindowJSType;
 import org.kie.workbench.common.stunner.sw.client.services.ClientDiagramService;
 import org.kie.workbench.common.stunner.sw.client.services.IncrementalMarshaller;
 import org.kie.workbench.common.stunner.sw.factory.RulesFactory;

@@ -1,4 +1,4 @@
-package org.kie.workbench.common.stunner.sw.client.js;
+package org.kie.workbench.common.stunner.core.client.api;
 
 import com.ait.lienzo.client.core.types.JsCanvas;
 import jsinterop.annotations.JsType;
@@ -10,7 +10,7 @@ import org.kie.workbench.common.stunner.core.definition.jsadapter.JsRuleAdapter;
 import org.kie.workbench.common.stunner.core.factory.graph.EdgeFactory;
 import org.kie.workbench.common.stunner.core.factory.graph.NodeFactory;
 
-// TODO: Move to stunner core
+//TODO Remove lienzo-core dependency (JsCanvas)
 @JsType
 public class JsStunnerEditor {
 

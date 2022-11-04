@@ -183,6 +183,12 @@
       <scope>test</scope>
     </dependency>
 
+    <!-- TODO Remove lienzo-core dependency (JsCanvas) -->
+    <dependency>
+      <groupId>org.kie.kogito.stunner.serverless.editor</groupId>
+      <artifactId>lienzo-core</artifactId>
+    </dependency>
+
   </dependencies>
 
   <build>

@@ -1,4 +1,4 @@
-package org.kie.workbench.common.stunner.sw.client.js;
+package org.kie.workbench.common.stunner.core.client.api;
 
 import java.util.Collection;
 import java.util.stream.StreamSupport;
@@ -14,7 +14,7 @@ import org.kie.workbench.common.stunner.core.graph.content.definition.Definition
 import org.kie.workbench.common.stunner.core.graph.content.view.View;
 import org.kie.workbench.common.stunner.core.graph.processing.index.Index;
 
-// TODO: Move to stunner core
+//TODO Remove lienzo-core dependency (JsCanvas)
 @JsType
 public class JsStunnerSession {
 

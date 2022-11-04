@@ -1,4 +1,4 @@
-package org.kie.workbench.common.stunner.sw.client.js;
+package org.kie.workbench.common.stunner.core.client.api;
 
 import elemental2.dom.DomGlobal;
 import jsinterop.annotations.JsIgnore;
@@ -13,9 +13,7 @@ import org.kie.workbench.common.stunner.core.graph.Edge;
 import org.kie.workbench.common.stunner.core.graph.Node;
 import org.kie.workbench.common.stunner.core.graph.content.view.Point2D;
 import org.kie.workbench.common.stunner.core.util.UUID;
-import org.kie.workbench.common.stunner.sw.marshall.BuilderContext;
 
-// TODO: Move to stunner core
 // TODO: Allow composition of commands at API level?
 @JsType
 public class JsStunnerCommands {
@@ -38,7 +36,8 @@ public class JsStunnerCommands {
 
     public Node buildNode(Object def) {
         Node node = (Node) nodeFactory.build(UUID.uuid(), def);
-        BuilderContext.updateNodeBounds(node);
+        //TODO Do we need BuilderContext here?
+        //BuilderContext.updateNodeBounds(node);
         return node;
     }
 

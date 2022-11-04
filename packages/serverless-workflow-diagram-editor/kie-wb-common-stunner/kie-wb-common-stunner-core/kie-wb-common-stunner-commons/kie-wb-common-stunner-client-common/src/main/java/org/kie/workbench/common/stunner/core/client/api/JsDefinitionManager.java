@@ -1,4 +1,4 @@
-package org.kie.workbench.common.stunner.sw.client.js;
+package org.kie.workbench.common.stunner.core.client.api;
 
 import java.util.Optional;
 
@@ -12,7 +12,6 @@ import org.kie.workbench.common.stunner.core.definition.jsadapter.JsPropertyAdap
 import org.kie.workbench.common.stunner.core.definition.jsadapter.JsRuleAdapter;
 import org.kie.workbench.common.stunner.core.definition.property.PropertyMetaTypes;
 
-// TODO: Move to stunner core
 // TODO: Can this class use a generic type, instead of Object?
 @JsType
 public class JsDefinitionManager {
