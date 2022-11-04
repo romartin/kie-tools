@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.kie.workbench.common.stunner.sw.jsadapter;
+package org.kie.workbench.common.stunner.core.definition.jsadapter;
 
 import java.util.ArrayList;
 
@@ -55,6 +55,6 @@ public class JsMorphAdapter implements MorphAdapter<Object> {
 
     @Override
     public boolean accepts(Class<?> type) {
-        return JsDefinitionAdapter.isJsDefinitionType(type);
+        return true;
     }
 }

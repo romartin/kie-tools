@@ -6,11 +6,11 @@ import jsinterop.annotations.JsIgnore;
 import jsinterop.annotations.JsType;
 import jsinterop.base.Js;
 import org.kie.workbench.common.stunner.core.definition.adapter.DefinitionId;
+import org.kie.workbench.common.stunner.core.definition.jsadapter.JsDefinitionAdapter;
+import org.kie.workbench.common.stunner.core.definition.jsadapter.JsDefinitionProperty;
+import org.kie.workbench.common.stunner.core.definition.jsadapter.JsPropertyAdapter;
+import org.kie.workbench.common.stunner.core.definition.jsadapter.JsRuleAdapter;
 import org.kie.workbench.common.stunner.core.definition.property.PropertyMetaTypes;
-import org.kie.workbench.common.stunner.sw.jsadapter.JsDefinitionAdapter;
-import org.kie.workbench.common.stunner.sw.jsadapter.JsDefinitionProperty;
-import org.kie.workbench.common.stunner.sw.jsadapter.JsPropertyAdapter;
-import org.kie.workbench.common.stunner.sw.jsadapter.JsRuleAdapter;
 
 // TODO: Move to stunner core
 // TODO: Can this class use a generic type, instead of Object?

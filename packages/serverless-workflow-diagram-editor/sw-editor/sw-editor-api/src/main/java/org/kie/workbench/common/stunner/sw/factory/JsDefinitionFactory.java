@@ -17,7 +17,6 @@
 package org.kie.workbench.common.stunner.sw.factory;
 
 import javax.enterprise.context.ApplicationScoped;
-import javax.inject.Inject;
 
 import org.kie.workbench.common.stunner.core.factory.definition.DefinitionFactory;
 import org.kie.workbench.common.stunner.sw.Definitions;
@@ -43,17 +42,13 @@ import org.kie.workbench.common.stunner.sw.definition.State;
 import org.kie.workbench.common.stunner.sw.definition.SwitchState;
 import org.kie.workbench.common.stunner.sw.definition.Transition;
 import org.kie.workbench.common.stunner.sw.definition.Workflow;
-import org.kie.workbench.common.stunner.sw.jsadapter.JsDefinitionUtils;
 
 @ApplicationScoped
 public class JsDefinitionFactory implements DefinitionFactory<Object> {
 
-    @Inject
-    private JsDefinitionUtils definitionUtils;
-
     @Override
     public boolean accepts(String identifier) {
-        return definitionUtils.isJsDefinition(identifier);
+        return true;
     }
 
     @Override

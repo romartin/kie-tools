@@ -14,23 +14,22 @@
  * limitations under the License.
  */
 
-package org.kie.workbench.common.stunner.sw.jsadapter;
+package org.kie.workbench.common.stunner.core.definition.jsadapter;
 
 import javax.enterprise.context.ApplicationScoped;
-import javax.inject.Inject;
 
 import elemental2.core.Reflect;
 import org.kie.workbench.common.stunner.core.definition.adapter.PropertyAdapter;
 import org.kie.workbench.common.stunner.core.i18n.StunnerTranslationService;
 
-import static org.kie.workbench.common.stunner.core.i18n.AbstractTranslationService.I18N_SEPARATOR;
-import static org.kie.workbench.common.stunner.sw.jsadapter.JsDefinitionAdapter.getJsDefinitionId;
+import static org.kie.workbench.common.stunner.core.definition.jsadapter.JsDefinitionAdapter.getJsDefinitionId;
 
 @ApplicationScoped
 public class JsPropertyAdapter implements PropertyAdapter<JsDefinitionProperty, Object> {
 
-    @Inject
     private StunnerTranslationService translationService;
+
+    private String i18nSeparator;
 
     @Override
     public String getId(JsDefinitionProperty property) {
@@ -43,7 +42,7 @@ public class JsPropertyAdapter implements PropertyAdapter<JsDefinitionProperty, 
         Object pojo = property.getPojo();
         String id = getJsDefinitionId(pojo);
         String field = property.getField();
-        return translationService.getValue(id + I18N_SEPARATOR + "property" + I18N_SEPARATOR + field);
+        return translationService.getValue(id + i18nSeparator + "property" + i18nSeparator + field);
     }
 
     @Override
@@ -64,5 +63,13 @@ public class JsPropertyAdapter implements PropertyAdapter<JsDefinitionProperty, 
     @Override
     public boolean accepts(Class<?> type) {
         return JsDefinitionProperty.class.equals(type);
+    }
+
+    public void setI18nSeparator(String i18nSeparator) {
+        this.i18nSeparator = i18nSeparator;
+    }
+
+    public void setTranslationService(StunnerTranslationService translationService) {
+        this.translationService = translationService;
     }
 }

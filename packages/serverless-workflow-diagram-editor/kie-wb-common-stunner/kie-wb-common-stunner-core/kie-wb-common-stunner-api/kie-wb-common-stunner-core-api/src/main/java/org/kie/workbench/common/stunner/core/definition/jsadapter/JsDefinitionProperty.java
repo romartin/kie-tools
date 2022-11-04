@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.kie.workbench.common.stunner.sw.jsadapter;
+package org.kie.workbench.common.stunner.core.definition.jsadapter;
 
 public class JsDefinitionProperty {
 

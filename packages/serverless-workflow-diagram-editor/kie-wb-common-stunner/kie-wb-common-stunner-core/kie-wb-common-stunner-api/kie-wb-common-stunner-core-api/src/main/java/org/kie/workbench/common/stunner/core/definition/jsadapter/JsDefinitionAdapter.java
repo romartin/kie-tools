@@ -14,12 +14,11 @@
  * limitations under the License.
  */
 
-package org.kie.workbench.common.stunner.sw.jsadapter;
+package org.kie.workbench.common.stunner.core.definition.jsadapter;
 
 import java.util.Optional;
 
 import javax.enterprise.context.ApplicationScoped;
-import javax.inject.Inject;
 
 import elemental2.core.Function;
 import elemental2.core.JsObject;
@@ -31,13 +30,11 @@ import org.kie.workbench.common.stunner.core.factory.graph.ElementFactory;
 import org.kie.workbench.common.stunner.core.factory.graph.NodeFactory;
 import org.kie.workbench.common.stunner.core.i18n.StunnerTranslationService;
 
-import static org.kie.workbench.common.stunner.core.i18n.AbstractTranslationService.I18N_SEPARATOR;
-
 @ApplicationScoped
 public class JsDefinitionAdapter implements DefinitionAdapter<Object> {
 
-    @Inject
     private StunnerTranslationService translationService;
+    private String i18nSeparator;
 
     @Override
     public DefinitionId getId(Object pojo) {
@@ -52,7 +49,7 @@ public class JsDefinitionAdapter implements DefinitionAdapter<Object> {
     @Override
     public String getCategory(Object pojo) {
         String id = getJsDefinitionId(pojo);
-        return translationService.getValue(id + I18N_SEPARATOR + "category");
+        return translationService.getValue(id + i18nSeparator + "category");
     }
 
     @Override
@@ -70,7 +67,7 @@ public class JsDefinitionAdapter implements DefinitionAdapter<Object> {
     @Override
     public String[] getLabels(Object pojo) {
         String id = getJsDefinitionId(pojo);
-        String labels = translationService.getValue(id + I18N_SEPARATOR + "labels");
+        String labels = translationService.getValue(id + i18nSeparator + "labels");
         return labels.isEmpty() ? new String[0] : labels.split(",");
     }
 
@@ -92,7 +89,7 @@ public class JsDefinitionAdapter implements DefinitionAdapter<Object> {
     public String getMetaPropertyField(Object pojo, PropertyMetaTypes metaType) {
         if (metaType == PropertyMetaTypes.NAME) {
             String id = getJsDefinitionId(pojo);
-            return translationService.getValue(id + I18N_SEPARATOR + "property_name");
+            return translationService.getValue(id + i18nSeparator + "property_name");
         }
         // Only Name is supported
         throw new UnsupportedOperationException("Unsupported PropertyMetaType: " + metaType.name());
@@ -110,11 +107,14 @@ public class JsDefinitionAdapter implements DefinitionAdapter<Object> {
 
     @Override
     public boolean accepts(Class<?> type) {
-        return isJsDefinitionType(type);
+        return true;
     }
 
-    // Actually only jstypes expected as for definitions. No other types of domains are expected/supported.
-    public static boolean isJsDefinitionType(Class<?> type) {
-        return true;
+    public void setTranslationService(StunnerTranslationService translationService) {
+        this.translationService = translationService;
+    }
+
+    public void setI18nSeparator(String i18nSeparator) {
+        this.i18nSeparator = i18nSeparator;
     }
 }

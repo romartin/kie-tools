@@ -8,6 +8,7 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
 import elemental2.dom.DomGlobal;
+import org.kie.workbench.common.stunner.core.definition.jsadapter.JsRuleAdapter;
 import org.kie.workbench.common.stunner.core.rule.Rule;
 import org.kie.workbench.common.stunner.core.rule.RuleSetImpl;
 import org.kie.workbench.common.stunner.core.rule.context.EdgeCardinalityContext;
@@ -16,7 +17,6 @@ import org.kie.workbench.common.stunner.core.rule.impl.CanContain;
 import org.kie.workbench.common.stunner.core.rule.impl.CanDock;
 import org.kie.workbench.common.stunner.core.rule.impl.EdgeOccurrences;
 import org.kie.workbench.common.stunner.core.rule.impl.Occurrences;
-import org.kie.workbench.common.stunner.sw.jsadapter.JsRuleAdapter;
 
 // TODO: PoC
 @ApplicationScoped

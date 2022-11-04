@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.kie.workbench.common.stunner.sw.jsadapter;
+package org.kie.workbench.common.stunner.core.definition.jsadapter;
 
 import java.lang.annotation.Annotation;
 import java.util.Arrays;
@@ -23,7 +23,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import javax.enterprise.context.ApplicationScoped;
-import javax.inject.Inject;
 
 import jsinterop.base.Js;
 import jsinterop.base.JsPropertyMap;
@@ -33,18 +32,17 @@ import org.kie.workbench.common.stunner.core.factory.graph.ElementFactory;
 import org.kie.workbench.common.stunner.core.factory.graph.GraphFactory;
 import org.kie.workbench.common.stunner.core.i18n.StunnerTranslationService;
 
-import static org.kie.workbench.common.stunner.core.i18n.AbstractTranslationService.I18N_SEPARATOR;
-
-// TODO: PoC - Decouple from SWF domain and move to core.
 @ApplicationScoped
 public class JsDefinitionSetAdapter implements DefinitionSetAdapter<Object> {
 
-    @Inject
     private StunnerTranslationService translationService;
+    private Annotation editorQualifier;
+    private String i18nSeparator;
+    private String definitionClassName;
 
     @Override
     public String getId(Object pojo) {
-        return org.kie.workbench.common.stunner.sw.Definitions.class.getName();
+        return definitionClassName;
     }
 
     @Override
@@ -59,7 +57,7 @@ public class JsDefinitionSetAdapter implements DefinitionSetAdapter<Object> {
 
     @Override
     public Set<String> getDefinitions(Object pojo) {
-        String field = translationService.getValue(getId(pojo) + I18N_SEPARATOR + "field_definitions");
+        String field = translationService.getValue(getId(pojo) + i18nSeparator + "field_definitions");
         JsPropertyMap<Object> map = Js.asPropertyMap(pojo);
         String definitions = Js.uncheckedCast(map.get(field));
         String[] split = definitions.split(",");
@@ -73,12 +71,7 @@ public class JsDefinitionSetAdapter implements DefinitionSetAdapter<Object> {
 
     @Override
     public Annotation getQualifier(Object pojo) {
-        return new org.kie.workbench.common.stunner.sw.SWEditor() {
-            @Override
-            public Class<? extends Annotation> annotationType() {
-                return org.kie.workbench.common.stunner.sw.SWEditor.class;
-            }
-        };
+        return editorQualifier;
     }
 
     @Override
@@ -93,6 +86,22 @@ public class JsDefinitionSetAdapter implements DefinitionSetAdapter<Object> {
 
     @Override
     public boolean accepts(Class<?> type) {
-        return org.kie.workbench.common.stunner.sw.Definitions.class.getName().equals(type.getName());
+        return true;
+    }
+
+    public void setEditorQualifier(Annotation editorQualifier) {
+        this.editorQualifier = editorQualifier;
+    }
+
+    public void setI18nSeparator(String i18nSeparator) {
+        this.i18nSeparator = i18nSeparator;
+    }
+
+    public void setTranslationService(StunnerTranslationService translationService) {
+        this.translationService = translationService;
+    }
+
+    public void setDefinitionClassName(String definitionClassName) {
+        this.definitionClassName = definitionClassName;
     }
 }

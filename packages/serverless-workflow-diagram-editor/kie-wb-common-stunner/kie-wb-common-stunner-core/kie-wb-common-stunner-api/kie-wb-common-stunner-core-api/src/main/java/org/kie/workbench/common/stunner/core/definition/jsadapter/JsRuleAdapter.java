@@ -14,16 +14,17 @@
  * limitations under the License.
  */
 
-package org.kie.workbench.common.stunner.sw.jsadapter;
+package org.kie.workbench.common.stunner.core.definition.jsadapter;
+
+import java.util.Collection;
+import java.util.Collections;
 
 import javax.enterprise.context.ApplicationScoped;
 
 import org.kie.workbench.common.stunner.core.definition.adapter.DefinitionSetRuleAdapter;
-import org.kie.workbench.common.stunner.core.rule.EmptyRuleSet;
+import org.kie.workbench.common.stunner.core.rule.Rule;
 import org.kie.workbench.common.stunner.core.rule.RuleSet;
-import org.kie.workbench.common.stunner.sw.Definitions;
 
-// TODO: PoC - Decouple from SWF domain and move to core.
 @ApplicationScoped
 public class JsRuleAdapter implements DefinitionSetRuleAdapter<Object> {
 
@@ -31,7 +32,17 @@ public class JsRuleAdapter implements DefinitionSetRuleAdapter<Object> {
 
     @Override
     public RuleSet getRuleSet(Object pojo) {
-        return null != ruleSet ? ruleSet : new EmptyRuleSet();
+        return null != ruleSet ? ruleSet : new RuleSet() {
+            @Override
+            public String getName() {
+                return "Empty rule set.";
+            }
+
+            @Override
+            public Collection<Rule> getRules() {
+                return Collections.emptyList();
+            }
+        };
     }
 
     public void setRuleSet(RuleSet ruleSet) {
@@ -40,7 +51,7 @@ public class JsRuleAdapter implements DefinitionSetRuleAdapter<Object> {
 
     @Override
     public boolean accepts(Class<?> type) {
-        return Definitions.class.equals(type);
+        return true;
     }
 
     @Override

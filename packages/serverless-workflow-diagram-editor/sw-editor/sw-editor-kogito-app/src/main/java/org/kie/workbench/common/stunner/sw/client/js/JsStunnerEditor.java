@@ -4,11 +4,11 @@ import com.ait.lienzo.client.core.types.JsCanvas;
 import jsinterop.annotations.JsType;
 import org.kie.workbench.common.stunner.core.client.command.CanvasCommandFactory;
 import org.kie.workbench.common.stunner.core.client.session.impl.ViewerSession;
+import org.kie.workbench.common.stunner.core.definition.jsadapter.JsDefinitionAdapter;
+import org.kie.workbench.common.stunner.core.definition.jsadapter.JsPropertyAdapter;
+import org.kie.workbench.common.stunner.core.definition.jsadapter.JsRuleAdapter;
 import org.kie.workbench.common.stunner.core.factory.graph.EdgeFactory;
 import org.kie.workbench.common.stunner.core.factory.graph.NodeFactory;
-import org.kie.workbench.common.stunner.sw.jsadapter.JsDefinitionAdapter;
-import org.kie.workbench.common.stunner.sw.jsadapter.JsPropertyAdapter;
-import org.kie.workbench.common.stunner.sw.jsadapter.JsRuleAdapter;
 
 // TODO: Move to stunner core
 @JsType

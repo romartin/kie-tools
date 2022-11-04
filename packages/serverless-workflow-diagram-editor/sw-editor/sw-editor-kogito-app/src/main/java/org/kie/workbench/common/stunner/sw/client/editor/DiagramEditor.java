@@ -15,6 +15,7 @@
  */
 package org.kie.workbench.common.stunner.sw.client.editor;
 
+import java.lang.annotation.Annotation;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
@@ -57,6 +58,10 @@ import org.kie.workbench.common.stunner.core.client.util.WindowJSType;
 import org.kie.workbench.common.stunner.core.command.CommandResult;
 import org.kie.workbench.common.stunner.core.command.util.CommandUtils;
 import org.kie.workbench.common.stunner.core.definition.adapter.DefinitionId;
+import org.kie.workbench.common.stunner.core.definition.jsadapter.JsDefinitionAdapter;
+import org.kie.workbench.common.stunner.core.definition.jsadapter.JsDefinitionSetAdapter;
+import org.kie.workbench.common.stunner.core.definition.jsadapter.JsPropertyAdapter;
+import org.kie.workbench.common.stunner.core.definition.jsadapter.JsRuleAdapter;
 import org.kie.workbench.common.stunner.core.definition.property.PropertyMetaTypes;
 import org.kie.workbench.common.stunner.core.diagram.Diagram;
 import org.kie.workbench.common.stunner.core.diagram.DiagramParsingException;
@@ -67,14 +72,14 @@ import org.kie.workbench.common.stunner.core.graph.Edge;
 import org.kie.workbench.common.stunner.core.graph.Element;
 import org.kie.workbench.common.stunner.core.graph.Node;
 import org.kie.workbench.common.stunner.core.graph.content.view.View;
+import org.kie.workbench.common.stunner.core.i18n.StunnerTranslationService;
+import org.kie.workbench.common.stunner.sw.Definitions;
+import org.kie.workbench.common.stunner.sw.SWEditor;
 import org.kie.workbench.common.stunner.sw.client.js.JsStunnerEditor;
 import org.kie.workbench.common.stunner.sw.client.js.SWWindowJSType;
 import org.kie.workbench.common.stunner.sw.client.services.ClientDiagramService;
 import org.kie.workbench.common.stunner.sw.client.services.IncrementalMarshaller;
 import org.kie.workbench.common.stunner.sw.factory.RulesFactory;
-import org.kie.workbench.common.stunner.sw.jsadapter.JsDefinitionAdapter;
-import org.kie.workbench.common.stunner.sw.jsadapter.JsPropertyAdapter;
-import org.kie.workbench.common.stunner.sw.jsadapter.JsRuleAdapter;
 import org.kie.workbench.common.stunner.sw.marshall.Message;
 import org.kie.workbench.common.stunner.sw.marshall.ParseResult;
 import org.uberfire.backend.vfs.Path;
@@ -83,6 +88,8 @@ import org.uberfire.client.promise.Promises;
 import org.uberfire.mvp.ParameterizedCommand;
 import org.uberfire.mvp.PlaceRequest;
 import org.uberfire.workbench.model.bridge.Notification;
+
+import static org.kie.workbench.common.stunner.core.i18n.AbstractTranslationService.I18N_SEPARATOR;
 
 @ApplicationScoped
 public class DiagramEditor {
@@ -186,6 +193,7 @@ public class DiagramEditor {
     }
 
     public Promise<Void> setNewContent(final String path, final String value) {
+        iniJsDefinitionsSettings();
         return promises.create((success, failure) -> {
             stunnerEditor.clearAlerts();
             diagramService.transform(path,
@@ -193,10 +201,6 @@ public class DiagramEditor {
                                      new ServiceCallback<ParseResult>() {
                                          @Override
                                          public void onSuccess(final ParseResult parseResult) {
-
-                                             // TODO: Call here?
-                                             initRules();
-
                                              stunnerEditor
                                                      .close()
                                                      .open(parseResult.getDiagram(), new SessionPresenter.SessionPresenterCallback() {
@@ -380,11 +384,10 @@ public class DiagramEditor {
     private NodeFactory nodeFactory;
     @Inject
     private EdgeFactory edgeFactory;
-
-    @SuppressWarnings("all")
-    private void initRules() {
-        rulesFactory.buildSWFRules();
-    }
+    @Inject
+    private StunnerTranslationService translationService;
+    @Inject
+    private JsDefinitionSetAdapter jsDefinitionSetAdapter;
 
     @SuppressWarnings("all")
     private void initJsTypes() {
@@ -414,6 +417,30 @@ public class DiagramEditor {
                                                          session);
             SWWindowJSType.linkEditor(editor);
         }
+    }
+
+    private void iniJsDefinitionsSettings() {
+        // DefinitionAdapter
+        jsDefinitionAdapter.setI18nSeparator(I18N_SEPARATOR);
+        jsDefinitionAdapter.setTranslationService(translationService);
+
+        // PropertyAdapter
+        jsPropertyAdapter.setI18nSeparator(I18N_SEPARATOR);
+        jsPropertyAdapter.setTranslationService(translationService);
+
+        // DefinitionSetAdapter
+        jsDefinitionSetAdapter.setI18nSeparator(I18N_SEPARATOR);
+        jsDefinitionSetAdapter.setTranslationService(translationService);
+        jsDefinitionSetAdapter.setDefinitionClassName(Definitions.class.getName());
+        jsDefinitionSetAdapter.setEditorQualifier(new SWEditor() {
+            @Override
+            public Class<? extends Annotation> annotationType() {
+                return SWEditor.class;
+            }
+        });
+
+        // Rules
+        rulesFactory.buildSWFRules();
     }
 
     private void handleParseErrors(ClientRuntimeError error, StunnerEditor stunnerEditor) {
