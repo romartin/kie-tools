@@ -1,6 +1,5 @@
 package org.kie.workbench.common.stunner.core.client.api;
 
-import com.ait.lienzo.client.core.types.JsCanvas;
 import jsinterop.annotations.JsType;
 import org.kie.workbench.common.stunner.core.client.command.CanvasCommandFactory;
 import org.kie.workbench.common.stunner.core.client.session.impl.ViewerSession;
@@ -20,12 +19,11 @@ public class JsStunnerEditor {
     public JsStunnerEditor(JsDefinitionAdapter definitionAdapter,
                            JsPropertyAdapter propertyAdapter,
                            JsRuleAdapter ruleAdapter,
-                           JsCanvas canvas,
                            CanvasCommandFactory factory,
                            NodeFactory nodeFactory,
                            EdgeFactory edgeFactory,
                            ViewerSession session) {
         this.definitionManager = new JsDefinitionManager(definitionAdapter, propertyAdapter, ruleAdapter);
-        this.session = new JsStunnerSession(definitionManager, session, canvas, new JsStunnerCommands(factory, nodeFactory, edgeFactory, session));
+        this.session = new JsStunnerSession(definitionManager, session, new JsStunnerCommands(factory, nodeFactory, edgeFactory, session));
     }
 }

@@ -410,7 +410,6 @@ public class DiagramEditor {
             JsStunnerEditor editor = new JsStunnerEditor(jsDefinitionAdapter,
                                                          jsPropertyAdapter,
                                                          jsRuleAdapter,
-                                                         jsCanvas,
                                                          factory,
                                                          nodeFactory,
                                                          edgeFactory,

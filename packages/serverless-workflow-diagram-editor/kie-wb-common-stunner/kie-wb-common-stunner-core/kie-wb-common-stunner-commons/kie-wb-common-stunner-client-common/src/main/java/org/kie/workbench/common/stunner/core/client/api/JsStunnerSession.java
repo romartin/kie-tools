@@ -3,7 +3,6 @@ package org.kie.workbench.common.stunner.core.client.api;
 import java.util.Collection;
 import java.util.stream.StreamSupport;
 
-import com.ait.lienzo.client.core.types.JsCanvas;
 import jsinterop.annotations.JsIgnore;
 import jsinterop.annotations.JsType;
 import org.kie.workbench.common.stunner.core.client.canvas.AbstractCanvasHandler;
@@ -22,16 +21,13 @@ public class JsStunnerSession {
     private ViewerSession session;
 
     private JsDefinitionManager definitionManager;
-    public JsCanvas canvas;
     public JsStunnerCommands commands;
 
     public JsStunnerSession(JsDefinitionManager definitionManager,
                             ViewerSession session,
-                            JsCanvas canvas,
                             JsStunnerCommands commands) {
         this.definitionManager = definitionManager;
         this.session = session;
-        this.canvas = canvas;
         this.commands = commands;
     }
 
@@ -60,7 +56,6 @@ public class JsStunnerSession {
     // TODO: Multiple selection / center selection.
     public void selectByUUID(String uuid) {
         session.getSelectionControl().clearSelection().addSelection(uuid);
-        canvas.center(uuid);
     }
 
     public void selectByName(String name) {
