@@ -103,13 +103,6 @@ public class RulesFactory {
         );
         rules.add(transitionConnectionRule);
 
-        CanConnect actionTransitionConnectionRule = new CanConnect("actionTransitionConnectionRule", "org.kie.workbench.common.stunner.sw.definition.ActionTransition",
-                                                                   new ArrayList<CanConnect.PermittedConnection>(1) {{
-                                                                       add(new CanConnect.PermittedConnection("event", "action"));
-                                                                   }}
-        );
-        rules.add(actionTransitionConnectionRule);
-
         CanConnect compensationTransitionConnectionRule = new CanConnect("compensationTransitionConnectionRule", "org.kie.workbench.common.stunner.sw.definition.CompensationTransition",
                                                                          new ArrayList<CanConnect.PermittedConnection>(1) {{
                                                                              add(new CanConnect.PermittedConnection("state", "state"));
@@ -142,34 +135,6 @@ public class RulesFactory {
     }
 
     private static void buildEdgeOccurrencesRules(Collection<Rule> rules) {
-        EdgeOccurrences ActionTransition0EdgeCardinalityRule = new EdgeOccurrences("ActionTransition0EdgeCardinalityRule", "org.kie.workbench.common.stunner.sw.definition.ActionTransition",
-                                                                                   "event", EdgeCardinalityContext.Direction.INCOMING, 0, 0);
-        rules.add(ActionTransition0EdgeCardinalityRule);
-
-        EdgeOccurrences ActionTransition1EdgeCardinalityRule = new EdgeOccurrences("ActionTransition1EdgeCardinalityRule", "org.kie.workbench.common.stunner.sw.definition.ActionTransition",
-                                                                                   "event", EdgeCardinalityContext.Direction.OUTGOING, 0, -1);
-        rules.add(ActionTransition1EdgeCardinalityRule);
-
-        EdgeOccurrences ActionTransition2EdgeCardinalityRule = new EdgeOccurrences("ActionTransition2EdgeCardinalityRule", "org.kie.workbench.common.stunner.sw.definition.ActionTransition",
-                                                                                   "action", EdgeCardinalityContext.Direction.INCOMING, 0, -1);
-        rules.add(ActionTransition2EdgeCardinalityRule);
-
-        EdgeOccurrences ActionTransition3EdgeCardinalityRule = new EdgeOccurrences("ActionTransition3EdgeCardinalityRule", "org.kie.workbench.common.stunner.sw.definition.ActionTransition",
-                                                                                   "action", EdgeCardinalityContext.Direction.OUTGOING, 0, 0);
-        rules.add(ActionTransition3EdgeCardinalityRule);
-
-        EdgeOccurrences ActionTransition4EdgeCardinalityRule = new EdgeOccurrences("ActionTransition4EdgeCardinalityRule", "org.kie.workbench.common.stunner.sw.definition.ActionTransition",
-                                                                                   "start", EdgeCardinalityContext.Direction.INCOMING, 0, 0);
-        rules.add(ActionTransition4EdgeCardinalityRule);
-
-        EdgeOccurrences ActionTransition5EdgeCardinalityRule = new EdgeOccurrences("ActionTransition5EdgeCardinalityRule", "org.kie.workbench.common.stunner.sw.definition.ActionTransition",
-                                                                                   "start", EdgeCardinalityContext.Direction.OUTGOING, 0, 0);
-        rules.add(ActionTransition5EdgeCardinalityRule);
-
-        EdgeOccurrences ActionTransition6EdgeCardinalityRule = new EdgeOccurrences("ActionTransition6EdgeCardinalityRule", "org.kie.workbench.common.stunner.sw.definition.ActionTransition",
-                                                                                   "end", EdgeCardinalityContext.Direction.OUTGOING, 0, 0);
-        rules.add(ActionTransition6EdgeCardinalityRule);
-
         EdgeOccurrences CompensationTransition0EdgeCardinalityRule = new EdgeOccurrences("CompensationTransition0EdgeCardinalityRule", "org.kie.workbench.common.stunner.sw.definition.CompensationTransition",
                                                                                          "state", EdgeCardinalityContext.Direction.INCOMING, 0, -1);
         rules.add(CompensationTransition0EdgeCardinalityRule);
