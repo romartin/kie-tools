@@ -17,13 +17,15 @@
 package org.kie.workbench.common.stunner.sw.definition;
 
 import jsinterop.annotations.JsType;
+import org.kie.workbench.common.stunner.client.json.mapper.annotation.JSONMapper;
 
+@JSONMapper
 @JsType
 public class EventState extends State {
 
     public static final String TYPE_EVENT = "event";
 
-    public boolean exclusive;
+    public Boolean exclusive;
 
     public OnEvent[] onEvents;
 

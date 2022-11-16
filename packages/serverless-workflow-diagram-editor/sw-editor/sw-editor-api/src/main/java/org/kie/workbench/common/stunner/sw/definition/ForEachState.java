@@ -25,8 +25,6 @@ public class ForEachState extends State {
 
     public static final String TYPE_FOR_EACH = "foreach";
 
-    public ActionNode[] actions;
-
     public String inputCollection;
 
     public String outputCollection;
@@ -35,10 +33,6 @@ public class ForEachState extends State {
 
     public ForEachState() {
         this.type = TYPE_FOR_EACH;
-    }
-
-    public ActionNode[] getActions() {
-        return actions;
     }
 
     public String getInputCollection() {
@@ -63,9 +57,5 @@ public class ForEachState extends State {
 
     public void setIterationParam(String iterationParam) {
         this.iterationParam = iterationParam;
-    }
-
-    public void setActions(ActionNode[] actions) {
-        this.actions = actions;
     }
 }

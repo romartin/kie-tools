@@ -16,8 +16,6 @@
 
 package org.kie.workbench.common.stunner.sw.definition;
 
-import java.util.Set;
-
 import jakarta.json.bind.annotation.JsonbTypeDeserializer;
 import jakarta.json.bind.annotation.JsonbTypeSerializer;
 import jsinterop.annotations.JsType;
@@ -47,8 +45,6 @@ public class Workflow {
     public String key;
 
     public String name;
-
-    public String description;
 
     public String specVersion;
 
@@ -143,22 +139,6 @@ public class Workflow {
     public Workflow setStates(State[] states) {
         this.states = states;
         return this;
-    }
-
-    public Set<String> getLabels() {
-        return labels;
-    }
-
-    public String getCategory() {
-        return category;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
     }
 
     public String getSpecVersion() {
