@@ -15,7 +15,7 @@
  */
 
 import { Position, TextDocument } from "vscode-languageserver-textdocument";
-import { CompletionItemKind, Range } from "vscode-languageserver-types";
+import { CompletionItemKind, MarkupContent, Range } from "vscode-languageserver-types";
 import { SwfLanguageServiceCommandTypes } from "../api";
 
 // types SwfJsonPath, SwfLsNode, SwfLsNodeType need to be compatible with jsonc types
@@ -76,4 +76,8 @@ export interface CodeCompletionStrategy {
   shouldComplete(args: ShouldCompleteArgs): boolean;
   getStartNodeValuePosition(document: TextDocument, node: SwfLsNode): Position | undefined;
   shouldCreateCodelens(args: ShouldCreateCodelensArgs): boolean;
+}
+
+export interface LsHover {
+  contents: string;
 }

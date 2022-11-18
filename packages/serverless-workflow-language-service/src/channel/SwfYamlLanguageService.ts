@@ -53,6 +53,7 @@ import { matchNodeWithLocation } from "./matchNodeWithLocation";
 import { findNodeAtOffset, positions_equals, SwfLanguageService, SwfLanguageServiceArgs } from "./SwfLanguageService";
 import {
   CodeCompletionStrategy,
+  LsHover,
   ShouldCompleteArgs,
   ShouldCreateCodelensArgs,
   SwfLsNode,
@@ -88,6 +89,19 @@ export class SwfYamlLanguageService {
     }
 
     return astConvert(ast);
+  }
+
+  public async getHoverItems(args: {
+    content: string;
+    uri: string;
+    cursorPosition: Position;
+    cursorWordRange: Range;
+  }): Promise<LsHover[]> {
+    return this.ls.getHoverItems({
+      ...args,
+      rootNode: this.parseContent(args.content),
+      codeCompletionStrategy: this.codeCompletionStrategy,
+    });
   }
 
   public async getCompletionItems(args: {

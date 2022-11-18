@@ -16,13 +16,14 @@
 
 import {
   SwfServiceCatalogFunction,
+  SwfServiceCatalogFunctionArgumentData,
   SwfServiceCatalogFunctionSourceType,
   SwfServiceCatalogService,
   SwfServiceCatalogServiceSourceType,
 } from "@kie-tools/serverless-workflow-service-catalog/dist/api";
 import { Specification } from "@severlessworkflow/sdk-typescript";
 import { CompletionItem, CompletionItemKind, InsertTextFormat, Position, Range } from "vscode-languageserver-types";
-import { getNodePath } from "./SwfLanguageService";
+import { findNodeAtLocation, getNodePath, SwfLanguageServiceConfig } from "./SwfLanguageService";
 import { SwfLanguageServiceCommandExecution } from "../api";
 import {
   eventCompletion,
@@ -35,7 +36,6 @@ import {
 } from "../assets/code-completions";
 import * as swfModelQueries from "./modelQueries";
 import { nodeUpUntilType } from "./nodeUpUntilType";
-import { findNodeAtLocation, SwfLanguageServiceConfig } from "./SwfLanguageService";
 import { CodeCompletionStrategy, SwfLsNode } from "./types";
 import { TextDocument } from "vscode-languageserver-textdocument";
 
@@ -76,9 +76,34 @@ function toCompletionItemLabelPrefix(
         swfServiceCatalogFunction.source.serviceId,
         swfServiceCatalogFunction.name
       );
+    case SwfServiceCatalogFunctionSourceType.REMOTE:
+      return toCompletionItemLabel(
+        swfServiceCatalogFunction.source.registry,
+        swfServiceCatalogFunction.source.resource,
+        swfServiceCatalogFunction.name
+      );
     default:
       return "";
   }
+}
+
+function toCompletionItemDetail(
+  swfServiceCatalogService: SwfCompletionItemServiceCatalogService,
+  swfServiceCatalogFunc: SwfCompletionItemServiceCatalogFunction
+) {
+  if (swfServiceCatalogFunc.description) {
+    return swfServiceCatalogFunc.description;
+  }
+
+  if (swfServiceCatalogService.source.type === SwfServiceCatalogServiceSourceType.SERVICE_REGISTRY) {
+    return swfServiceCatalogService.source.url;
+  }
+
+  if (swfServiceCatalogService.source.type === SwfServiceCatalogServiceSourceType.REMOTE) {
+    return `${swfServiceCatalogService.source.url}/${swfServiceCatalogFunc.operation}`;
+  }
+
+  return swfServiceCatalogFunc.operation ?? "";
 }
 
 function createCompletionItem(args: {
@@ -128,6 +153,49 @@ function getStateNameCompletion(
       }),
     ];
   });
+}
+
+function toCompletionFunctionRefArgs(swfServiceCatalogFunc: SwfCompletionItemServiceCatalogFunction) {
+  const swfFunctionRefArgs: Record<string, any> = {};
+
+  const singleArgs: string[] = [];
+  const argGroups: Record<string, Record<string, SwfServiceCatalogFunctionArgumentData>> = {};
+
+  Object.entries(swfServiceCatalogFunc.arguments).forEach((entry) => {
+    const [argName, arg] = entry;
+    const argGroup = (<SwfServiceCatalogFunctionArgumentData>arg).group;
+    if (argGroup) {
+      const argData = <SwfServiceCatalogFunctionArgumentData>arg;
+      argGroups[argGroup] = {
+        ...argGroups[argGroup],
+      };
+      argGroups[argGroup][argName] = argData;
+    } else {
+      singleArgs.push(argName);
+    }
+  });
+
+  let argIndex = 1;
+
+  singleArgs.forEach((argName) => {
+    const argData = <SwfServiceCatalogFunctionArgumentData>swfServiceCatalogFunc.arguments[argName];
+    swfFunctionRefArgs[argName] = argData.defaultValue || `$\{${argIndex++}:}`;
+  });
+
+  Object.entries(argGroups).forEach((entry) => {
+    const [groupName, groupArgs] = entry;
+
+    swfFunctionRefArgs[groupName] = Object.entries(groupArgs).reduce(
+      (swfFunctionArgGroup: Record<string, any>, groupArg) => {
+        const [arg, argData] = groupArg;
+        swfFunctionArgGroup[arg] = argData.defaultValue || `$\{${argIndex++}:}`;
+        return swfFunctionArgGroup;
+      },
+      {}
+    );
+  });
+
+  return swfFunctionRefArgs;
 }
 
 /**
@@ -249,10 +317,7 @@ export const SwfLanguageServiceCodeCompletion = {
             completion: swfFunction,
             kind,
             label,
-            detail:
-              swfServiceCatalogService.source.type === SwfServiceCatalogServiceSourceType.SERVICE_REGISTRY
-                ? swfServiceCatalogService.source.url
-                : swfServiceCatalogFunc.operation,
+            detail: toCompletionItemDetail(swfServiceCatalogService, swfServiceCatalogFunc),
             extraOptions: {
               command: {
                 command: command.name,
@@ -325,11 +390,7 @@ export const SwfLanguageServiceCodeCompletion = {
         return [];
       }
 
-      let argIndex = 1;
-      const swfFunctionRefArgs: Record<string, string> = {};
-      Object.keys(swfServiceCatalogFunc.arguments).forEach((argName) => {
-        swfFunctionRefArgs[argName] = `$\{${argIndex++}:}`;
-      });
+      const swfFunctionRefArgs: Record<string, any> = toCompletionFunctionRefArgs(swfServiceCatalogFunc);
 
       const swfFunctionRef: Omit<Specification.Functionref, "normalize"> = {
         refName: swfFunction.name,
@@ -345,7 +406,7 @@ export const SwfLanguageServiceCodeCompletion = {
           completion: swfFunctionRef,
           kind,
           label,
-          detail: `${swfServiceCatalogFunc.operation}`,
+          detail: swfServiceCatalogFunc.description || swfServiceCatalogFunc.operation,
         }),
       ];
     });
@@ -408,11 +469,7 @@ export const SwfLanguageServiceCodeCompletion = {
       return Promise.resolve([]);
     }
 
-    let argIndex = 1;
-    const swfFunctionRefArgs: Record<string, string> = {};
-    Object.keys(swfServiceCatalogFunc.arguments).forEach((argName) => {
-      swfFunctionRefArgs[argName] = `$\{${argIndex++}:}`;
-    });
+    const swfFunctionRefArgs: Record<string, any> = toCompletionFunctionRefArgs(swfServiceCatalogFunc);
 
     const kind = CompletionItemKind.Module;
     const label = `'${swfFunctionRefName}' arguments`;
@@ -423,7 +480,7 @@ export const SwfLanguageServiceCodeCompletion = {
         completion: swfFunctionRefArgs,
         kind,
         label,
-        detail: swfFunction.operation,
+        detail: swfServiceCatalogFunc.description || swfFunction.operation,
       }),
     ]);
   },

@@ -45,6 +45,7 @@ import {
   WorkspaceEdit,
 } from "@kie-tools-core/workspace/dist/api";
 import { SharedValueProvider } from "@kie-tools-core/envelope-bus/dist/api";
+import { LsHover } from "@kie-tools/serverless-workflow-language-service/dist/channel";
 
 export class StandaloneServerlessWorkflowCombinedEditorChannelApi
   implements ServerlessWorkflowCombinedEditorChannelApi
@@ -55,8 +56,7 @@ export class StandaloneServerlessWorkflowCombinedEditorChannelApi
     private readonly swfServiceCatalogApiImpl?: SwfServiceCatalogChannelApi,
     private readonly swfLanguageServiceChannelApiImpl?: SwfLanguageServiceChannelApi,
     private readonly swfPreviewOptionsChannelApiImpl?: SwfPreviewOptionsChannelApi,
-    private readonly swfStaticEnvelopeContentProviderChannelApi?: SwfStaticEnvelopeContentProviderChannelApi,
-    private readonly NoOpSwfStaticEnvelopeContentProviderChannelApiImpl?: SwfStaticEnvelopeContentProviderChannelApi
+    private readonly swfStaticEnvelopeContentProviderChannelApi?: SwfStaticEnvelopeContentProviderChannelApi
   ) {}
 
   public kogitoEditor_contentRequest(): Promise<EditorContent> {
@@ -152,6 +152,15 @@ export class StandaloneServerlessWorkflowCombinedEditorChannelApi
 
   public async kogitoSwfLanguageService__getCodeLenses(args: { uri: string; content: string }): Promise<CodeLens[]> {
     return this.swfLanguageServiceChannelApiImpl?.kogitoSwfLanguageService__getCodeLenses(args) ?? [];
+  }
+
+  public async kogitoSwfLanguageService__getHovers(args: {
+    content: string;
+    uri: string;
+    cursorPosition: Position;
+    cursorWordRange: Range;
+  }): Promise<LsHover[]> {
+    return (await this.swfLanguageServiceChannelApiImpl?.kogitoSwfLanguageService__getHovers(args)) ?? [];
   }
 
   public kogitoSwfServiceCatalog_serviceRegistriesSettings(): SharedValueProvider<SwfServiceRegistriesSettings> {

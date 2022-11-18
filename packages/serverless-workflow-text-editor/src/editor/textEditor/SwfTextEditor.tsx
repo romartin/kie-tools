@@ -25,6 +25,7 @@ import { useSharedValue, useSubscription } from "@kie-tools-core/envelope-bus/di
 import { getFileLanguage } from "@kie-tools/serverless-workflow-language-service/dist/api";
 import { ServerlessWorkflowTextEditorChannelApi } from "../../api";
 import { editor } from "monaco-editor";
+import { initHovers } from "./augmentation/hovers";
 
 interface Props {
   content: string;
@@ -86,11 +87,13 @@ const RefForwardingSwfTextEditor: React.ForwardRefRenderFunction<SwfTextEditorAp
 
     const completion = initCompletion(commands, editorEnvelopeCtx.channelApi);
     const codeLenses = initJsonCodeLenses(commands, editorEnvelopeCtx.channelApi);
+    const hovers = initHovers(editorEnvelopeCtx.channelApi);
 
     return () => {
       controller.dispose();
       codeLenses.dispose();
       completion.dispose();
+      hovers.dispose();
     };
   }, [
     content,

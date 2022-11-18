@@ -27,13 +27,13 @@ import {
   NoOpSwfStaticEnvelopeContentProviderChannelApiImpl,
   SwfFeatureToggleChannelApiImpl,
   SwfPreviewOptionsChannelApiImpl,
-  SwfServiceCatalogChannelApiImpl,
   SwfStaticEnvelopeContentProviderChannelApiImpl,
 } from "@kie-tools/serverless-workflow-combined-editor/dist/impl";
-import { MessageBusClientApi } from "@kie-tools-core/envelope-bus/dist/api";
-import { SwfServiceCatalogChannelApi } from "@kie-tools/serverless-workflow-service-catalog/dist/api";
+import { SwfServiceCatalogService } from "@kie-tools/serverless-workflow-service-catalog/dist/api";
 import { StandaloneServerlessWorkflowCombinedEditorChannelApi } from "./channel";
-import { getLanguageServiceChannelApi } from "./languageService";
+import { StandaloneSwfLanguageServiceChannelApiImpl } from "./languageService";
+import { StandaloneSwfServiceCatalogStore, SwfServiceCatalogProvider } from "./serviceCatalog";
+import { StandaloneSwfServiceCatalogChannelApiImpl } from "./serviceCatalog";
 
 declare global {
   interface Window {
@@ -79,6 +79,7 @@ export const open = (args: {
   origin?: string;
   onError?: () => any;
   isDiagramOnly?: boolean;
+  serviceCatalogProvider?: () => Promise<SwfServiceCatalogService[]>;
 }): StandaloneEditorApi => {
   const iframe = document.createElement("iframe");
   iframe.srcdoc = swfCombinedEditorEnvelopeIndex;
@@ -92,8 +93,15 @@ export const open = (args: {
 
   let receivedSetContentError = false;
 
-  const languageServiceChannelApiImpl = getLanguageServiceChannelApi({
-    workflowType: args.languageType ?? "json",
+  const serviceCatalogStore = new StandaloneSwfServiceCatalogStore({
+    serviceCatalogProvider: new SwfServiceCatalogProvider({
+      provider: args.serviceCatalogProvider,
+    }),
+  });
+
+  const languageServiceChannelApiImpl = new StandaloneSwfLanguageServiceChannelApiImpl({
+    serviceCatalogStore,
+    workflowType: args.languageType,
   });
 
   const channelApiImpl = new StandaloneServerlessWorkflowCombinedEditorChannelApi(
@@ -116,19 +124,14 @@ export const open = (args: {
       }
     ),
     new SwfFeatureToggleChannelApiImpl({ stunnerEnabled: true }),
-    new SwfServiceCatalogChannelApiImpl(
-      envelopeServer.envelopeApi as unknown as MessageBusClientApi<SwfServiceCatalogChannelApi>,
-      [],
-      { registries: [] }
-    ),
+    new StandaloneSwfServiceCatalogChannelApiImpl(serviceCatalogStore),
     languageServiceChannelApiImpl,
     new SwfPreviewOptionsChannelApiImpl(args.isDiagramOnly ? { diagramDefaultWidth: "100%" } : undefined),
     new SwfStaticEnvelopeContentProviderChannelApiImpl({
       diagramEditorEnvelopeContent: swfDiagramEditorEnvelopeIndex,
       mermaidEnvelopeContent: swfMermaidViewerEnvelopeIndex,
       textEditorEnvelopeContent: swfTextEditorEnvelopeIndex,
-    }),
-    new NoOpSwfStaticEnvelopeContentProviderChannelApiImpl()
+    })
   );
 
   const listener = (message: MessageEvent) => {

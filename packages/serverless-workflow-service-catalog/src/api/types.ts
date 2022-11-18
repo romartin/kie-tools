@@ -53,6 +53,10 @@ export type SwfServiceCatalogServiceSource =
   | {
       type: SwfServiceCatalogServiceSourceType.LOCAL_FS;
       absoluteFilePath: string;
+    }
+  | {
+      type: SwfServiceCatalogServiceSourceType.REMOTE;
+      url: string;
     };
 
 export enum SwfServiceCatalogFunctionType {
@@ -71,13 +75,15 @@ export enum SwfServiceCatalogFunctionArgumentType {
 }
 
 export enum SwfServiceCatalogFunctionSourceType {
-  SERVICE_REGISTRY,
-  LOCAL_FS,
+  SERVICE_REGISTRY = "service_registry",
+  LOCAL_FS = "local_fs",
+  REMOTE = "remote",
 }
 
 export enum SwfServiceCatalogServiceSourceType {
-  SERVICE_REGISTRY,
-  LOCAL_FS,
+  SERVICE_REGISTRY = "service_registry",
+  LOCAL_FS = "local_fs",
+  REMOTE = "remote",
 }
 
 export type SwfServiceCatalogFunctionSource =
@@ -89,11 +95,25 @@ export type SwfServiceCatalogFunctionSource =
   | {
       type: SwfServiceCatalogFunctionSourceType.LOCAL_FS;
       serviceFileAbsolutePath: string;
+    }
+  | {
+      type: SwfServiceCatalogFunctionSourceType.REMOTE;
+      registry: string;
+      resource: string;
+      operation: string;
     };
+
+export interface SwfServiceCatalogFunctionArgumentData {
+  type: SwfServiceCatalogServiceSourceType;
+  group?: string;
+  defaultValue?: string;
+  description?: string;
+}
 
 export interface SwfServiceCatalogFunction {
   source: SwfServiceCatalogFunctionSource;
   name: string;
-  arguments: Record<string, SwfServiceCatalogFunctionArgumentType>;
+  arguments: Record<string, SwfServiceCatalogFunctionArgumentType | SwfServiceCatalogFunctionArgumentData>;
   type: SwfServiceCatalogFunctionType;
+  description?: string;
 }

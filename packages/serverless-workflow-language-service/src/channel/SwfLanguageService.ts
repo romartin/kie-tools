@@ -16,6 +16,7 @@
 
 import {
   SwfServiceCatalogFunction,
+  SwfServiceCatalogFunctionArgumentData,
   SwfServiceCatalogFunctionSourceType,
   SwfServiceCatalogService,
   SwfServiceCatalogServiceSourceType,
@@ -25,6 +26,7 @@ import { posix as posixPath } from "path";
 import { TextDocument } from "vscode-languageserver-textdocument";
 import { CodeLens, CompletionItem, Diagnostic, Position, Range } from "vscode-languageserver-types";
 import { FileLanguage } from "../api";
+import * as swfModelQueries from "./modelQueries";
 import { findNodesAtLocation } from "./findNodesAtLocation";
 import { doRefValidation } from "./refValidation";
 import {
@@ -35,7 +37,7 @@ import {
   SwfLanguageServiceCodeLenses,
   SwfLanguageServiceCodeLensesFunctionsArgs,
 } from "./SwfLanguageServiceCodeLenses";
-import { CodeCompletionStrategy, SwfJsonPath, SwfLsNode } from "./types";
+import { CodeCompletionStrategy, LsHover, SwfJsonPath, SwfLsNode } from "./types";
 
 export type SwfLanguageServiceConfig = {
   shouldConfigureServiceRegistries: () => boolean; //TODO: See https://issues.redhat.com/browse/KOGITO-7107
@@ -72,6 +74,73 @@ export type SwfLanguageServiceArgs = {
 
 export class SwfLanguageService {
   constructor(private readonly args: SwfLanguageServiceArgs) {}
+
+  public async getHoverItems(args: {
+    content: string;
+    uri: string;
+    cursorPosition: Position;
+    cursorWordRange: Range;
+    rootNode: SwfLsNode | undefined;
+    codeCompletionStrategy: CodeCompletionStrategy;
+  }): Promise<LsHover[]> {
+    if (!args.rootNode) {
+      return [];
+    }
+
+    const doc = TextDocument.create(args.uri, this.args.lang.fileLanguage, 0, args.content);
+    const cursorOffset = doc.offsetAt(args.cursorPosition);
+
+    const currentNode = findNodeAtOffset(args.rootNode, cursorOffset, true);
+    if (!currentNode) {
+      return [];
+    }
+
+    const currentNodePosition = {
+      start: doc.positionAt(currentNode.offset),
+      end: doc.positionAt(currentNode.offset + currentNode.length),
+    };
+
+    const swfCompletionItemServiceCatalogServices = await Promise.all(
+      [
+        ...(await this.args.serviceCatalog.global.getServices()),
+        ...(await this.args.serviceCatalog.relative.getServices(doc)),
+      ].map(async (service) => ({
+        ...service,
+        functions: await Promise.all(
+          service.functions.map(async (func) => ({
+            ...func,
+            operation: await this.getSwfCompletionItemServiceCatalogFunctionOperation(service, func, doc),
+          }))
+        ),
+      }))
+    );
+    const result = await Promise.all(
+      Array.from(hovers.entries())
+        .filter(([path, _]) =>
+          args.codeCompletionStrategy.shouldComplete({
+            root: args.rootNode,
+            node: currentNode,
+            path: path,
+            content: args.content,
+            cursorOffset: cursorOffset,
+            cursorPosition: args.cursorPosition,
+          })
+        )
+        .map(([_, hoversDelegate]) => {
+          return hoversDelegate({
+            document: doc,
+            cursorPosition: args.cursorPosition,
+            currentNode,
+            currentNodePosition,
+            rootNode: args.rootNode!,
+            swfCompletionItemServiceCatalogServices,
+            langServiceConfig: this.args.config,
+          });
+        })
+    );
+
+    return result.flat();
+  }
 
   public async getCompletionItems(args: {
     content: string;
@@ -207,9 +276,12 @@ export class SwfLanguageService {
     return [
       ...(displayRhhccIntegration ? SwfLanguageServiceCodeLenses.setupServiceRegistries(codeLensesFunctionsArgs) : []),
       ...(displayRhhccIntegration ? SwfLanguageServiceCodeLenses.logInServiceRegistries(codeLensesFunctionsArgs) : []),
+      /*
+     TODO: maybe make refresh registries a single config
       ...(displayRhhccIntegration
         ? SwfLanguageServiceCodeLenses.refreshServiceRegistries(codeLensesFunctionsArgs)
-        : []),
+        : []),*/
+      ...SwfLanguageServiceCodeLenses.refreshServiceRegistries(codeLensesFunctionsArgs),
       ...SwfLanguageServiceCodeLenses.addFunction(codeLensesFunctionsArgs),
       ...SwfLanguageServiceCodeLenses.addEvent(codeLensesFunctionsArgs),
       ...SwfLanguageServiceCodeLenses.addState(codeLensesFunctionsArgs),
@@ -226,6 +298,10 @@ export class SwfLanguageService {
     document: TextDocument
   ): Promise<string> {
     const { specsDirRelativePosixPath } = await this.args.config.getSpecsDirPosixPaths(document);
+
+    if (func.source.type === SwfServiceCatalogFunctionSourceType.REMOTE) {
+      return `${func.source.operation}`;
+    }
 
     if (func.source.type === SwfServiceCatalogFunctionSourceType.LOCAL_FS) {
       const serviceFileName = posixPath.basename(func.source.serviceFileAbsolutePath);
@@ -252,6 +328,68 @@ export class SwfLanguageService {
     }
   }
 }
+
+const hovers = new Map<
+  SwfJsonPath,
+  (args: {
+    swfCompletionItemServiceCatalogServices: SwfCompletionItemServiceCatalogService[];
+    document: TextDocument;
+    cursorPosition: Position;
+    currentNode: SwfLsNode;
+    currentNodePosition: { start: Position; end: Position };
+    rootNode: SwfLsNode;
+    langServiceConfig: SwfLanguageServiceConfig;
+  }) => Promise<LsHover[]>
+>([
+  [
+    ["states", "*", "actions", "*", "functionRef", "arguments", "*"],
+    ({ currentNode, rootNode, swfCompletionItemServiceCatalogServices }) => {
+      if (currentNode.type !== "string") {
+        console.debug("Cannot hover: item should be a string.");
+        return Promise.resolve([]);
+      }
+
+      if (!currentNode.parent?.parent?.parent?.parent) {
+        return Promise.resolve([]);
+      }
+
+      const swfFunctionRefName: string = findNodeAtLocation(currentNode.parent.parent.parent.parent, [
+        "refName",
+      ])?.value;
+
+      return getFunctionRefArgHovers({
+        currentNode,
+        rootNode,
+        swfFunctionRefName,
+        swfCompletionItemServiceCatalogServices,
+      });
+    },
+  ],
+  [
+    ["states", "*", "actions", "*", "functionRef", "arguments", "*", "*"],
+    ({ currentNode, rootNode, swfCompletionItemServiceCatalogServices }) => {
+      if (currentNode.type !== "string") {
+        console.debug("Cannot hover: item should be a string.");
+        return Promise.resolve([]);
+      }
+
+      if (!currentNode.parent?.parent?.parent?.parent?.parent?.parent) {
+        return Promise.resolve([]);
+      }
+
+      const swfFunctionRefName: string = findNodeAtLocation(currentNode.parent.parent.parent.parent.parent.parent, [
+        "refName",
+      ])?.value;
+
+      return getFunctionRefArgHovers({
+        currentNode,
+        rootNode,
+        swfFunctionRefName,
+        swfCompletionItemServiceCatalogServices,
+      });
+    },
+  ],
+]);
 
 const completions = new Map<
   SwfJsonPath,
@@ -288,6 +426,49 @@ const completions = new Map<
   [["states", "*", "defaultCondition", "transition"], SwfLanguageServiceCodeCompletion.getTransitionCompletions],
   [["states", "*", "eventConditions", "*", "transition"], SwfLanguageServiceCodeCompletion.getTransitionCompletions],
 ]);
+
+function getFunctionRefArgHovers(args: {
+  swfFunctionRefName: string;
+  currentNode: SwfLsNode;
+  rootNode: SwfLsNode;
+  swfCompletionItemServiceCatalogServices: SwfCompletionItemServiceCatalogService[];
+}): Promise<LsHover[]> {
+  if (!args.swfFunctionRefName) {
+    return Promise.resolve([]);
+  }
+
+  const swfFunction = swfModelQueries
+    .getFunctions(args.rootNode)
+    ?.filter((f) => f.name === args.swfFunctionRefName)
+    .pop();
+
+  if (!swfFunction) {
+    return Promise.resolve([]);
+  }
+
+  const swfServiceCatalogFunc = args.swfCompletionItemServiceCatalogServices
+    .flatMap((f) => f.functions)
+    .filter((f) => {
+      return f.operation === swfFunction.operation;
+    })
+    .pop()!;
+
+  if (!swfServiceCatalogFunc) {
+    return Promise.resolve([]);
+  }
+
+  const argument = <SwfServiceCatalogFunctionArgumentData>swfServiceCatalogFunc.arguments[args.currentNode.value];
+
+  if (!argument || !argument.description) {
+    return Promise.resolve([]);
+  }
+
+  const result: LsHover[] = [
+    { contents: `Argument: \`${args.currentNode.value}\`` },
+    { contents: argument.description },
+  ];
+  return Promise.resolve(result);
+}
 
 export function findNodeAtLocation(root: SwfLsNode, path: SwfJsonPath): SwfLsNode | undefined {
   return findNodesAtLocation({ root, path })[0];

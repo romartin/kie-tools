@@ -23,6 +23,7 @@ import { SW_SPEC_WORKFLOW_SCHEMA } from "../schemas";
 import { SwfLanguageService, SwfLanguageServiceArgs } from "./SwfLanguageService";
 import {
   CodeCompletionStrategy,
+  LsHover,
   ShouldCompleteArgs,
   ShouldCreateCodelensArgs,
   SwfLsNode,
@@ -72,6 +73,19 @@ export class SwfJsonLanguageService {
 
   parseContent(content: string): SwfLsNode | undefined {
     return jsonc.parseTree(content);
+  }
+
+  public async getHoverItems(args: {
+    content: string;
+    uri: string;
+    cursorPosition: Position;
+    cursorWordRange: Range;
+  }): Promise<LsHover[]> {
+    return this.ls.getHoverItems({
+      ...args,
+      rootNode: this.parseContent(args.content),
+      codeCompletionStrategy: this.codeCompletionStrategy,
+    });
   }
 
   public async getCompletionItems(args: {

@@ -18,6 +18,7 @@ import { MessageBusClientApi } from "@kie-tools-core/envelope-bus/dist/api";
 import { SwfLanguageServiceChannelApi } from "@kie-tools/serverless-workflow-language-service/dist/api";
 import { CodeLens, CompletionItem, Position, Range } from "vscode-languageserver-types";
 import { ServerlessWorkflowCombinedEditorChannelApi } from "../api";
+import { LsHover } from "@kie-tools/serverless-workflow-language-service/dist/channel";
 
 export class SwfLanguageServiceChannelApiImpl implements SwfLanguageServiceChannelApi {
   constructor(private readonly channelApi: MessageBusClientApi<ServerlessWorkflowCombinedEditorChannelApi>) {}
@@ -33,5 +34,14 @@ export class SwfLanguageServiceChannelApiImpl implements SwfLanguageServiceChann
 
   public async kogitoSwfLanguageService__getCodeLenses(args: { uri: string; content: string }): Promise<CodeLens[]> {
     return this.channelApi.requests.kogitoSwfLanguageService__getCodeLenses(args);
+  }
+
+  public kogitoSwfLanguageService__getHovers(args: {
+    content: string;
+    uri: string;
+    cursorPosition: Position;
+    cursorWordRange: Range;
+  }): Promise<LsHover[]> {
+    return this.channelApi.requests.kogitoSwfLanguageService__getHovers(args);
   }
 }

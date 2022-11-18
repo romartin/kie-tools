@@ -16,6 +16,7 @@
 
 import { CodeLens, CompletionItem, Position, Range } from "vscode-languageserver-types";
 import { SwfServiceCatalogService } from "@kie-tools/serverless-workflow-service-catalog/dist/api";
+import { LsHover } from "../channel";
 
 export interface SwfLanguageServiceChannelApi {
   kogitoSwfLanguageService__getCompletionItems(args: {
@@ -26,6 +27,13 @@ export interface SwfLanguageServiceChannelApi {
   }): Promise<CompletionItem[]>;
 
   kogitoSwfLanguageService__getCodeLenses(args: { uri: string; content: string }): Promise<CodeLens[]>;
+
+  kogitoSwfLanguageService__getHovers(args: {
+    content: string;
+    uri: string;
+    cursorPosition: Position;
+    cursorWordRange: Range;
+  }): Promise<LsHover[]>;
 }
 
 export type SwfLanguageServiceCommandTypes =
