@@ -55,6 +55,10 @@ export type SwfServiceCatalogServiceSource =
   | {
       type: SwfCatalogSourceType.LOCAL_FS;
       absoluteFilePath: string;
+    }
+  | {
+      type: SwfCatalogSourceType.REMOTE;
+      url: string;
     };
 
 export enum SwfServiceCatalogFunctionType {
@@ -86,11 +90,24 @@ export enum SwfServiceCatalogFunctionArgumentType {
 export enum SwfCatalogSourceType {
   SERVICE_REGISTRY = "SERVICE_REGISTRY",
   LOCAL_FS = "LOCAL_FS",
+  REMOTE = "REMOTE",
 }
 
 export enum SwfServiceCatalogEventKind {
   CONSUMED = "consumed",
   PRODUCED = "produced",
+}
+
+export enum SwfServiceCatalogFunctionSourceType {
+  SERVICE_REGISTRY = "SERVICE_REGISTRY",
+  LOCAL_FS = "LOCAL_FS",
+  REMOTE = "remote",
+}
+
+export enum SwfServiceCatalogServiceSourceType {
+  SERVICE_REGISTRY = "SERVICE_REGISTRY",
+  LOCAL_FS = "LOCAL_FS",
+  REMOTE = "remote",
 }
 
 export type SwfServiceCatalogFunctionSource =
@@ -102,6 +119,12 @@ export type SwfServiceCatalogFunctionSource =
   | {
       type: SwfCatalogSourceType.LOCAL_FS;
       serviceFileAbsolutePath: string;
+    }
+  | {
+      type: SwfCatalogSourceType.REMOTE;
+      registry: string;
+      resource: string;
+      operation: string;
     };
 
 export type SwfServiceCatalogEventSource =
@@ -113,13 +136,27 @@ export type SwfServiceCatalogEventSource =
   | {
       type: SwfCatalogSourceType.LOCAL_FS;
       serviceFileAbsolutePath: string;
+    }
+  | {
+      type: SwfCatalogSourceType.REMOTE;
+      registry: string;
+      resource: string;
+      operation: string;
     };
+
+export interface SwfServiceCatalogFunctionArgumentData {
+  type: SwfServiceCatalogServiceSourceType;
+  group?: string;
+  defaultValue?: string;
+  description?: string;
+}
 
 export interface SwfServiceCatalogFunction {
   source: SwfServiceCatalogFunctionSource;
   name: string;
-  arguments: Record<string, SwfServiceCatalogFunctionArgumentType>;
+  arguments: Record<string, SwfServiceCatalogFunctionArgumentType | SwfServiceCatalogFunctionArgumentData>;
   type: SwfServiceCatalogFunctionType;
+  description?: string;
 }
 
 export interface SwfServiceCatalogEvent {

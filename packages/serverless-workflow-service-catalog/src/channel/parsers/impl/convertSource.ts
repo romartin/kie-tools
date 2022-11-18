@@ -24,9 +24,20 @@ export function convertSource(catalogSource: SwfServiceCatalogServiceSource): Sw
     };
   }
 
+  if (catalogSource?.type === SwfCatalogSourceType.SERVICE_REGISTRY) {
+    return {
+      type: catalogSource.type,
+      registry: catalogSource.registry,
+      serviceId: catalogSource.id,
+    };
+  }
+
+  // TODO: Ansible pere changes skipped - see: https://github.com/romartin/kie-tools/commit/1d31ae4c7d949fe4fef7671a3a7ab65962633951#diff-675c2ac487230b0753810fe60314f185abea23245fa8e183dd9ae91d31fe3c01
+  // TODO: field catalogSource.url used for all params.
   return {
     type: catalogSource.type,
-    registry: catalogSource.registry,
-    serviceId: catalogSource.id,
+    registry: catalogSource.url,
+    resource: catalogSource.url,
+    operation: catalogSource.url,
   };
 }

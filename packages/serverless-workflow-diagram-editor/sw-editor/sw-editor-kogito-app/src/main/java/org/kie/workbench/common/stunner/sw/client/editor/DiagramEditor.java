@@ -111,6 +111,7 @@ public class DiagramEditor {
 
     public void onStartup(final PlaceRequest place) {
         domainInitializer.initialize();
+
         stunnerEditor.setReadOnly(false);
         JsWindow.editor.domainInitializer.injectScript(JsDomainInitializerBundle.INSTANCE.initialize().getText());
     }

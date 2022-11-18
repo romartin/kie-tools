@@ -29,12 +29,15 @@ import {
   SwfCatalogSourceType,
   SwfServiceCatalogFunction,
   SwfServiceCatalogEvent,
+  SwfServiceCatalogFunctionArgumentData,
+  SwfServiceCatalogFunctionSourceType,
   SwfServiceCatalogService,
   SwfServiceCatalogServiceType,
 } from "@kie-tools/serverless-workflow-service-catalog/dist/api";
 import { Specification } from "@severlessworkflow/sdk-typescript";
 import { TextDocument } from "vscode-json-languageservice";
 import { CompletionItem, CompletionItemKind, InsertTextFormat, Position, Range } from "vscode-languageserver-types";
+import { findNodeAtLocation, getNodePath, SwfLanguageServiceConfig } from "./SwfLanguageService";
 import { SwfLanguageServiceCommandExecution } from "../api";
 import {
   emptyWorkflowCompletion,
@@ -49,8 +52,9 @@ import {
   ansibleWorkflowCompletion,
 } from "../assets/code-completions";
 import * as swfModelQueries from "./modelQueries";
-import { SwfLanguageServiceConfig } from "./SwfLanguageService";
-import { JqCompletions } from "./types";
+import { nodeUpUntilType } from "./nodeUpUntilType";
+import { CodeCompletionStrategy, JqCompletions, SwfLsNode } from "./types";
+import { TextDocument } from "vscode-languageserver-textdocument";
 
 type SwfCompletionItemServiceCatalogFunction = SwfServiceCatalogFunction & { operation: string };
 type SwfCompletionItemServiceCatalogEvent = SwfServiceCatalogEvent;
@@ -99,9 +103,64 @@ function toCompletionItemLabelPrefix(
         swfServiceCatalogFunction.source.serviceId,
         swfServiceCatalogFunction.name
       );
+    case SwfServiceCatalogFunctionSourceType.REMOTE:
+      return toCompletionItemLabel(
+        swfServiceCatalogFunction.source.registry,
+        swfServiceCatalogFunction.source.resource,
+        swfServiceCatalogFunction.name
+      );
     default:
       return "";
   }
+}
+
+function toCompletionItemDetail(
+  swfServiceCatalogService: SwfCompletionItemServiceCatalogService,
+  swfServiceCatalogFunc: SwfCompletionItemServiceCatalogFunction
+) {
+  if (swfServiceCatalogFunc.description) {
+    return swfServiceCatalogFunc.description;
+  }
+
+  if (swfServiceCatalogService.source.type === SwfServiceCatalogServiceSourceType.SERVICE_REGISTRY) {
+    return swfServiceCatalogService.source.url;
+  }
+
+  if (swfServiceCatalogService.source.type === SwfServiceCatalogServiceSourceType.REMOTE) {
+    return `${swfServiceCatalogService.source.url}/${swfServiceCatalogFunc.operation}`;
+  }
+
+  return swfServiceCatalogFunc.operation ?? "";
+}
+
+function createCompletionItem(args: {
+  codeCompletionStrategy: CodeCompletionStrategy;
+  completion: object | string;
+  currentNodeRange: Range;
+  cursorOffset: number;
+  document: TextDocument;
+  detail: string;
+  extraOptions?: Partial<CompletionItem>;
+  kind: CompletionItemKind;
+  label: string;
+  overwriteRange: Range;
+}): CompletionItem {
+  return {
+    kind: args.kind,
+    label: args.label,
+    sortText: `100_${args.label}`, //place the completion on top in the menu
+    filterText: args.label,
+    detail: args.detail,
+    textEdit: {
+      newText: args.codeCompletionStrategy.translate({
+        ...args,
+        completionItemKind: args.kind,
+      }),
+      range: args.overwriteRange,
+    },
+    insertTextFormat: InsertTextFormat.Snippet,
+    ...args.extraOptions,
+  };
 }
 
 function getStateNameCompletion(
@@ -313,6 +372,50 @@ async function getJqFunctionCompletions(
   const wordToSearch = getJqCompletionWordToSearch(slicedValue);
   return await getJqBuiltInFunctions({ ...args, wordToSearch });
 }
+
+function toCompletionFunctionRefArgs(swfServiceCatalogFunc: SwfCompletionItemServiceCatalogFunction) {
+  const swfFunctionRefArgs: Record<string, any> = {};
+
+  const singleArgs: string[] = [];
+  const argGroups: Record<string, Record<string, SwfServiceCatalogFunctionArgumentData>> = {};
+
+  Object.entries(swfServiceCatalogFunc.arguments).forEach((entry) => {
+    const [argName, arg] = entry;
+    const argGroup = (<SwfServiceCatalogFunctionArgumentData>arg).group;
+    if (argGroup) {
+      const argData = <SwfServiceCatalogFunctionArgumentData>arg;
+      argGroups[argGroup] = {
+        ...argGroups[argGroup],
+      };
+      argGroups[argGroup][argName] = argData;
+    } else {
+      singleArgs.push(argName);
+    }
+  });
+
+  let argIndex = 1;
+
+  singleArgs.forEach((argName) => {
+    const argData = <SwfServiceCatalogFunctionArgumentData>swfServiceCatalogFunc.arguments[argName];
+    swfFunctionRefArgs[argName] = argData.defaultValue || `$\{${argIndex++}:}`;
+  });
+
+  Object.entries(argGroups).forEach((entry) => {
+    const [groupName, groupArgs] = entry;
+
+    swfFunctionRefArgs[groupName] = Object.entries(groupArgs).reduce(
+      (swfFunctionArgGroup: Record<string, any>, groupArg) => {
+        const [arg, argData] = groupArg;
+        swfFunctionArgGroup[arg] = argData.defaultValue || `$\{${argIndex++}:}`;
+        return swfFunctionArgGroup;
+      },
+      {}
+    );
+  });
+
+  return swfFunctionRefArgs;
+}
+
 /**
  * SwfLanguageService CodeCompletion functions
  */
@@ -540,6 +643,8 @@ export const SwfLanguageServiceCodeCompletion: EditorLanguageServiceCodeCompleti
             completion: swfFunction,
             kind,
             label,
+            // TODO: Ansible pere changes skipped - see:
+            // https://github.com/romartin/kie-tools/commit/1d31ae4c7d949fe4fef7671a3a7ab65962633951#diff-675c2ac487230b0753810fe60314f185abea23245fa8e183dd9ae91d31fe3c01
             detail:
               swfServiceCatalogService.source.type === SwfCatalogSourceType.SERVICE_REGISTRY
                 ? swfServiceCatalogService.source.url
@@ -620,11 +725,7 @@ export const SwfLanguageServiceCodeCompletion: EditorLanguageServiceCodeCompleti
         return [];
       }
 
-      let argIndex = 1;
-      const swfFunctionRefArgs: Record<string, string> = {};
-      Object.keys(swfServiceCatalogFunc.arguments).forEach((argName) => {
-        swfFunctionRefArgs[argName] = `$\{${argIndex++}:}`;
-      });
+      const swfFunctionRefArgs: Record<string, any> = toCompletionFunctionRefArgs(swfServiceCatalogFunc);
 
       const swfFunctionRef: Omit<Specification.Functionref, "normalize"> = {
         refName: swfFunction.name,
@@ -640,7 +741,7 @@ export const SwfLanguageServiceCodeCompletion: EditorLanguageServiceCodeCompleti
           completion: swfFunctionRef,
           kind,
           label,
-          detail: `${swfServiceCatalogFunc.operation}`,
+          detail: swfServiceCatalogFunc.description || swfServiceCatalogFunc.operation,
         }),
       ];
     });
@@ -703,11 +804,7 @@ export const SwfLanguageServiceCodeCompletion: EditorLanguageServiceCodeCompleti
       return Promise.resolve([]);
     }
 
-    let argIndex = 1;
-    const swfFunctionRefArgs: Record<string, string> = {};
-    Object.keys(swfServiceCatalogFunc.arguments).forEach((argName) => {
-      swfFunctionRefArgs[argName] = `$\{${argIndex++}:}`;
-    });
+    const swfFunctionRefArgs: Record<string, any> = toCompletionFunctionRefArgs(swfServiceCatalogFunc);
 
     const kind = CompletionItemKind.Module;
     const label = `'${swfFunctionRefName}' arguments`;
@@ -718,7 +815,7 @@ export const SwfLanguageServiceCodeCompletion: EditorLanguageServiceCodeCompleti
         completion: swfFunctionRefArgs,
         kind,
         label,
-        detail: swfFunction.operation,
+        detail: swfServiceCatalogFunc.description || swfFunction.operation,
       }),
     ]);
   },

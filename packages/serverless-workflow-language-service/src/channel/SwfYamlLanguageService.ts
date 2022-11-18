@@ -27,8 +27,19 @@ import { TextDocument } from "vscode-languageserver-textdocument";
 import { CodeLens, CompletionItem, CompletionItemKind, Diagnostic, Position, Range } from "vscode-languageserver-types";
 import { FileLanguage } from "../api";
 import { SW_SPEC_WORKFLOW_SCHEMA } from "../schemas";
-import { SwfLanguageService, SwfLanguageServiceArgs } from "./SwfLanguageService";
-import { CodeCompletionStrategy, ShouldCreateCodelensArgs } from "./types";
+import { getLineContentFromOffset } from "./getLineContentFromOffset";
+import { getNodeFormat } from "./getNodeFormat";
+import { indentText } from "./indentText";
+import { matchNodeWithLocation } from "./matchNodeWithLocation";
+import { findNodeAtOffset, positions_equals, SwfLanguageService, SwfLanguageServiceArgs } from "./SwfLanguageService";
+import {
+  CodeCompletionStrategy,
+  LsHover,
+  // TODO: Duplicated import, remove? - ShouldCompleteArgs,
+  ShouldCreateCodelensArgs,
+  SwfLsNode,
+  // TODO: Duplicated import, remove? - TranslateArgs,
+} from "./types";
 
 export class SwfYamlLanguageService implements IEditorLanguageService {
   private readonly ls: SwfLanguageService;
@@ -47,6 +58,19 @@ export class SwfYamlLanguageService implements IEditorLanguageService {
     this.codeCompletionStrategy = new SwfYamlCodeCompletionStrategy();
     this.yamlELs = new EditorYamlLanguageService({
       ls: this.ls,
+      codeCompletionStrategy: this.codeCompletionStrategy,
+    });
+  }
+
+  public async getHoverItems(args: {
+    content: string;
+    uri: string;
+    cursorPosition: Position;
+    cursorWordRange: Range;
+  }): Promise<LsHover[]> {
+    return this.ls.getHoverItems({
+      ...args,
+      rootNode: this.parseContent(args.content),
       codeCompletionStrategy: this.codeCompletionStrategy,
     });
   }

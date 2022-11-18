@@ -14,4 +14,6 @@
  * limitations under the License.
  */
 
-export * from "./StandaloneSwfLanguageServiceChannelApiImpl";
+export * from "./StandaloneSwfServiceCatalogChannelApiImpl";
+export * from "./StandaloneSwfServiceCatalogStore";
+export * from "./SwfServiceCatalogProvider";

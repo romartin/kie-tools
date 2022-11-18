@@ -38,6 +38,7 @@ import {
 import { CodeLens, CompletionItem, Position, Range } from "vscode-languageserver-types";
 import { ServerlessWorkflowCombinedEditorChannelApi, SwfPreviewOptions, SwfPreviewOptionsChannelApi } from "../api";
 import { SwfStaticEnvelopeContentProviderChannelApi } from "../api/SwfStaticEnvelopeContentProviderChannelApi";
+import { LsHover } from "@kie-tools/serverless-workflow-language-service/dist/channel";
 
 export class SwfCombinedEditorChannelApiImpl implements ServerlessWorkflowCombinedEditorChannelApi {
   constructor(
@@ -126,6 +127,15 @@ export class SwfCombinedEditorChannelApiImpl implements ServerlessWorkflowCombin
 
   public async kogitoSwfLanguageService__getCodeLenses(args: { uri: string; content: string }): Promise<CodeLens[]> {
     return this.swfLanguageServiceChannelApiImpl?.kogitoSwfLanguageService__getCodeLenses(args) ?? [];
+  }
+
+  public async kogitoSwfLanguageService__getHovers(args: {
+    content: string;
+    uri: string;
+    cursorPosition: Position;
+    cursorWordRange: Range;
+  }): Promise<LsHover[]> {
+    return this.swfLanguageServiceChannelApiImpl?.kogitoSwfLanguageService__getHovers(args) ?? [];
   }
 
   public kogitoSwfServiceCatalog_serviceRegistriesSettings(): SharedValueProvider<SwfServiceRegistriesSettings> {

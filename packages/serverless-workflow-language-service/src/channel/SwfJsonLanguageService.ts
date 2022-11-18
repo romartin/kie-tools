@@ -20,6 +20,7 @@ import {
   ELsNode,
   ELsShouldCreateCodelensArgs,
   IEditorLanguageService,
+  parseJsonContent,
   ShouldCompleteArgs,
   TranslateArgs,
 } from "@kie-tools/json-yaml-language-service/dist/channel";
@@ -28,7 +29,7 @@ import { CodeLens, CompletionItem, CompletionItemKind, Diagnostic, Position, Ran
 import { FileLanguage } from "../api";
 import { SW_SPEC_WORKFLOW_SCHEMA } from "../schemas";
 import { SwfLanguageService, SwfLanguageServiceArgs } from "./SwfLanguageService";
-import { CodeCompletionStrategy, ShouldCreateCodelensArgs } from "./types";
+import { CodeCompletionStrategy, LsHover, ShouldCreateCodelensArgs } from "./types";
 
 export class SwfJsonLanguageService implements IEditorLanguageService {
   private readonly ls: SwfLanguageService;
@@ -47,6 +48,19 @@ export class SwfJsonLanguageService implements IEditorLanguageService {
     this.codeCompletionStrategy = new JsonCodeCompletionStrategy();
     this.jsonELs = new EditorJsonLanguageService({
       ls: this.ls,
+      codeCompletionStrategy: this.codeCompletionStrategy,
+    });
+  }
+
+  public async getHoverItems(args: {
+    content: string;
+    uri: string;
+    cursorPosition: Position;
+    cursorWordRange: Range;
+  }): Promise<LsHover[]> {
+    return this.ls.getHoverItems({
+      ...args,
+      rootNode: parseJsonContent(args.content),
       codeCompletionStrategy: this.codeCompletionStrategy,
     });
   }

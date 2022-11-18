@@ -14,4 +14,20 @@
  * limitations under the License.
  */
 
-export * from "./StandaloneSwfLanguageServiceChannelApiImpl";
+import { SwfServiceCatalogService } from "@kie-tools/serverless-workflow-service-catalog/dist/api";
+
+export class SwfServiceCatalogProvider {
+  constructor(
+    private readonly args: {
+      provider?: () => Promise<SwfServiceCatalogService[]>;
+    }
+  ) {}
+
+  public async get(): Promise<SwfServiceCatalogService[]> {
+    return this.args.provider?.() ?? [];
+  }
+
+  public canRefreshServices(): boolean {
+    return this.args.provider !== undefined;
+  }
+}

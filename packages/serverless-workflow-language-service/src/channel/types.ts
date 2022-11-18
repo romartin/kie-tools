@@ -18,7 +18,8 @@ import {
   ELsCodeCompletionStrategy,
   ELsShouldCreateCodelensArgs,
 } from "@kie-tools/json-yaml-language-service/dist/channel";
-import { TextDocument } from "vscode-languageserver-textdocument";
+import { Position, TextDocument } from "vscode-languageserver-textdocument";
+import { CompletionItemKind, MarkupContent, Range } from "vscode-languageserver-types";
 import { SwfLanguageServiceCommandTypes } from "../api";
 
 export interface ShouldCreateCodelensArgs extends ELsShouldCreateCodelensArgs<SwfLanguageServiceCommandTypes> {}
@@ -38,4 +39,8 @@ export interface JqCompletions {
       schemaPaths: string[];
     }): Promise<Record<string, string>[]>;
   };
+}
+
+export interface LsHover {
+  contents: string;
 }

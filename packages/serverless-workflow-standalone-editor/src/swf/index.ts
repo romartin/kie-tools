@@ -28,8 +28,11 @@ import {
   SwfStaticEnvelopeContentProviderChannelApiImpl,
 } from "@kie-tools/serverless-workflow-combined-editor/dist/impl";
 import { StandaloneServerlessWorkflowCombinedEditorChannelApi } from "./channel";
-import { getLanguageServiceChannelApi } from "./languageService";
+import { StandaloneSwfLanguageServiceChannelApiImpl, getLanguageServiceChannelApi } from "./languageService";
 import { SwfPreviewOptions } from "@kie-tools/serverless-workflow-combined-editor/dist/api";
+import { SwfServiceCatalogService } from "@kie-tools/serverless-workflow-service-catalog/dist/api";
+import { StandaloneSwfServiceCatalogStore, SwfServiceCatalogProvider } from "./serviceCatalog";
+import { StandaloneSwfServiceCatalogChannelApiImpl } from "./serviceCatalog";
 
 declare global {
   interface Window {
@@ -74,6 +77,8 @@ export const open = (args: {
   readOnly?: boolean;
   origin?: string;
   onError?: () => any;
+  // TODO: Ansible pere changes skipped - see:
+  // https://github.com/romartin/kie-tools/commit/1d31ae4c7d949fe4fef7671a3a7ab65962633951#diff-675c2ac487230b0753810fe60314f185abea23245fa8e183dd9ae91d31fe3c01
   swfPreviewOptions?: SwfPreviewOptions;
 }): StandaloneEditorApi => {
   if (!args.languageType.match(/^(json|yaml|yml)$/)) {
@@ -98,8 +103,15 @@ export const open = (args: {
 
   let receivedSetContentError = false;
 
-  const languageServiceChannelApiImpl = getLanguageServiceChannelApi({
-    workflowType: args.languageType ?? "json",
+  const serviceCatalogStore = new StandaloneSwfServiceCatalogStore({
+    serviceCatalogProvider: new SwfServiceCatalogProvider({
+      provider: args.serviceCatalogProvider,
+    }),
+  });
+
+  const languageServiceChannelApiImpl = new StandaloneSwfLanguageServiceChannelApiImpl({
+    serviceCatalogStore,
+    workflowType: args.languageType,
   });
 
   const channelApiImpl = new StandaloneServerlessWorkflowCombinedEditorChannelApi(
@@ -121,6 +133,8 @@ export const open = (args: {
         },
       }
     ),
+    // TODO: Ansible pere changes skipped - see:
+    // https://github.com/romartin/kie-tools/commit/1d31ae4c7d949fe4fef7671a3a7ab65962633951#diff-675c2ac487230b0753810fe60314f185abea23245fa8e183dd9ae91d31fe3c01
     new NoOpSwfServiceCatalogChannelApiImpl(),
     languageServiceChannelApiImpl,
     new SwfPreviewOptionsChannelApiImpl(args.swfPreviewOptions ?? undefined),

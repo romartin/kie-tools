@@ -14,6 +14,9 @@
  * limitations under the License.
  */
 
+// TODO: Ansible pere changes skipped - see: https://github.com/romartin/kie-tools/commit/1d31ae4c7d949fe4fef7671a3a7ab65962633951#diff-675c2ac487230b0753810fe60314f185abea23245fa8e183dd9ae91d31fe3c01
+// TODO: This file was deleted by Pere....
+
 import { ServerlessWorkflowType } from "../../common/Editor";
 import { SwfLanguageServiceChannelApi } from "@kie-tools/serverless-workflow-language-service/dist/api";
 import {
