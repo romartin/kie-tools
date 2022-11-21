@@ -206,8 +206,6 @@ public class StunnerEditorTest {
             ((SessionPresenter.SessionPresenterCallback) invocation.getArguments()[1]).onSuccess();
             return null;
         }).when(sessionEditorPresenter).open(eq(diagram), any(SessionPresenter.SessionPresenterCallback.class));
-        Consumer<Integer> hashConsumer = mock(Consumer.class);
-        tested.setOnResetContentHashProcessor(hashConsumer);
         SessionPresenter.SessionPresenterCallback callback = mock(SessionPresenter.SessionPresenterCallback.class);
         tested.open(diagram, callback);
         verify(callback, times(1)).onSuccess();

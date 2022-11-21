@@ -5,30 +5,57 @@ import java.util.stream.StreamSupport;
 
 import jsinterop.annotations.JsIgnore;
 import jsinterop.annotations.JsType;
+import jsinterop.base.Js;
 import org.kie.workbench.common.stunner.core.client.canvas.AbstractCanvasHandler;
-import org.kie.workbench.common.stunner.core.client.session.impl.ViewerSession;
+import org.kie.workbench.common.stunner.core.client.command.CanvasCommand;
+import org.kie.workbench.common.stunner.core.client.command.CanvasCommandManager;
+import org.kie.workbench.common.stunner.core.client.command.CanvasViolation;
+import org.kie.workbench.common.stunner.core.client.session.impl.AbstractSession;
+import org.kie.workbench.common.stunner.core.command.CommandResult;
+import org.kie.workbench.common.stunner.core.diagram.Diagram;
 import org.kie.workbench.common.stunner.core.graph.Edge;
 import org.kie.workbench.common.stunner.core.graph.Node;
 import org.kie.workbench.common.stunner.core.graph.content.definition.Definition;
 import org.kie.workbench.common.stunner.core.graph.content.view.View;
 import org.kie.workbench.common.stunner.core.graph.processing.index.Index;
 
-//TODO Remove lienzo-core dependency (JsCanvas)
 @JsType
 public class JsStunnerSession {
 
     @JsIgnore
-    private ViewerSession session;
+    private AbstractSession session;
 
-    private JsDefinitionManager definitionManager;
-    public JsStunnerCommands commands;
-
-    public JsStunnerSession(JsDefinitionManager definitionManager,
-                            ViewerSession session,
-                            JsStunnerCommands commands) {
-        this.definitionManager = definitionManager;
+    public JsStunnerSession(AbstractSession session) {
         this.session = session;
-        this.commands = commands;
+    }
+
+    public Diagram getDiagram() {
+        return session.getCanvasHandler().getDiagram();
+    }
+
+    public Node getNodeByUUID(String uuid) {
+        return getGraphIndex().getNode(uuid);
+    }
+
+    public Node getNodeByName(String name) {
+        Iterable<Node> nodes = getGraphIndex().getGraph().nodes();
+        return StreamSupport.stream(nodes.spliterator(), false)
+                .filter(node -> name.equals(getNodeName(node)))
+                .findAny()
+                .orElse(null);
+    }
+
+    public String getNodeName(Node node) {
+        Object definition = ((Node<Definition, Edge>) node).getContent().getDefinition();
+        return getName(definition);
+    }
+
+    public String getName(Object bean) {
+        return JsWindow.editor.definitions.getName(bean);
+    }
+
+    public Edge getEdgeByUUID(String uuid) {
+        return getGraphIndex().getEdge(uuid);
     }
 
     public String getSelectedElementUUID() {
@@ -69,29 +96,11 @@ public class JsStunnerSession {
         session.getSelectionControl().clearSelection();
     }
 
-    public Node getNodeByUUID(String uuid) {
-        return getGraphIndex().getNode(uuid);
-    }
-
-    public Node getNodeByName(String name) {
-        Iterable<Node> nodes = getGraphIndex().getGraph().nodes();
-        return StreamSupport.stream(nodes.spliterator(), false)
-                .filter(node -> name.equals(getNodeName(node)))
-                .findAny()
-                .orElse(null);
-    }
-
-    public String getNodeName(Node node) {
-        Object definition = ((Node<Definition, Edge>) node).getContent().getDefinition();
-        return getName(definition);
-    }
-
-    public String getName(Object bean) {
-        return definitionManager.getName(bean);
-    }
-
-    public Edge getEdgeByUUID(String uuid) {
-        return getGraphIndex().getEdge(uuid);
+    @SuppressWarnings("all")
+    public CommandResult execute(CanvasCommand command) {
+        CanvasCommandManager<AbstractCanvasHandler> commandManager = session.getCommandManager();
+        CommandResult<CanvasViolation> result = commandManager.execute(getCanvasHandler(), command);
+        return result;
     }
 
     private Index getGraphIndex() {
@@ -99,6 +108,6 @@ public class JsStunnerSession {
     }
 
     private AbstractCanvasHandler getCanvasHandler() {
-        return session.getCanvasHandler();
+        return Js.uncheckedCast(session.getCanvasHandler());
     }
 }

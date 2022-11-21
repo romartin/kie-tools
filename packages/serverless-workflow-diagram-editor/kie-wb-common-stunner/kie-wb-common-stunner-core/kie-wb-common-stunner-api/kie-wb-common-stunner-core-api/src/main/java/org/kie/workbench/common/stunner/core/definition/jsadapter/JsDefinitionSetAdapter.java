@@ -36,13 +36,11 @@ import org.kie.workbench.common.stunner.core.i18n.StunnerTranslationService;
 public class JsDefinitionSetAdapter implements DefinitionSetAdapter<Object> {
 
     private StunnerTranslationService translationService;
-    private Annotation editorQualifier;
-    private String i18nSeparator;
-    private String definitionClassName;
+    private Annotation domainQualifier;
 
     @Override
     public String getId(Object pojo) {
-        return definitionClassName;
+        return BindableAdapterUtils.getDefinitionSetId(pojo.getClass());
     }
 
     @Override
@@ -57,7 +55,7 @@ public class JsDefinitionSetAdapter implements DefinitionSetAdapter<Object> {
 
     @Override
     public Set<String> getDefinitions(Object pojo) {
-        String field = translationService.getValue(getId(pojo) + i18nSeparator + "field_definitions");
+        String field = translationService.getValue(getId(pojo) + StunnerTranslationService.I18N_SEPARATOR + "field_definitions");
         JsPropertyMap<Object> map = Js.asPropertyMap(pojo);
         String definitions = Js.uncheckedCast(map.get(field));
         String[] split = definitions.split(",");
@@ -71,7 +69,7 @@ public class JsDefinitionSetAdapter implements DefinitionSetAdapter<Object> {
 
     @Override
     public Annotation getQualifier(Object pojo) {
-        return editorQualifier;
+        return domainQualifier;
     }
 
     @Override
@@ -89,19 +87,12 @@ public class JsDefinitionSetAdapter implements DefinitionSetAdapter<Object> {
         return true;
     }
 
-    public void setEditorQualifier(Annotation editorQualifier) {
-        this.editorQualifier = editorQualifier;
-    }
-
-    public void setI18nSeparator(String i18nSeparator) {
-        this.i18nSeparator = i18nSeparator;
+    public void setDomainQualifier(Annotation domainQualifier) {
+        this.domainQualifier = domainQualifier;
     }
 
     public void setTranslationService(StunnerTranslationService translationService) {
         this.translationService = translationService;
     }
 
-    public void setDefinitionClassName(String definitionClassName) {
-        this.definitionClassName = definitionClassName;
-    }
 }

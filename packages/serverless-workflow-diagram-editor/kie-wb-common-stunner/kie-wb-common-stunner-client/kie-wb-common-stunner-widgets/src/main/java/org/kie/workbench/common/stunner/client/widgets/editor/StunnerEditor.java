@@ -16,6 +16,7 @@
 
 package org.kie.workbench.common.stunner.client.widgets.editor;
 
+import java.lang.annotation.Annotation;
 import java.util.Arrays;
 import java.util.function.Consumer;
 
@@ -36,12 +37,14 @@ import org.kie.workbench.common.stunner.core.client.canvas.controls.AlertsContro
 import org.kie.workbench.common.stunner.core.client.i18n.ClientTranslationService;
 import org.kie.workbench.common.stunner.core.client.service.ClientRuntimeError;
 import org.kie.workbench.common.stunner.core.client.session.ClientSession;
+import org.kie.workbench.common.stunner.core.client.session.impl.AbstractSession;
 import org.kie.workbench.common.stunner.core.client.session.impl.EditorSession;
 import org.kie.workbench.common.stunner.core.client.session.impl.ViewerSession;
 import org.kie.workbench.common.stunner.core.definition.exception.DefinitionNotFoundException;
 import org.kie.workbench.common.stunner.core.diagram.Diagram;
 import org.kie.workbench.common.stunner.core.diagram.DiagramParsingException;
 import org.kie.workbench.common.stunner.core.i18n.CoreTranslationMessages;
+import org.kie.workbench.common.stunner.core.rule.RuleSet;
 import org.kie.workbench.common.widgets.client.errorpage.ErrorPage;
 
 @Dependent
@@ -58,7 +61,6 @@ public class StunnerEditor {
     private boolean isReadOnly;
     private Consumer<DiagramParsingException> parsingExceptionProcessor;
     private Consumer<Throwable> exceptionProcessor;
-    private Consumer<Integer> onResetContentHashProcessor;
     private AlertsControl<AbstractCanvas> alertsControl;
 
     // CDI proxy.
@@ -82,16 +84,10 @@ public class StunnerEditor {
         };
         this.exceptionProcessor = e -> {
         };
-        this.onResetContentHashProcessor = e -> {
-        };
     }
 
     public void setReadOnly(boolean readOnly) {
         isReadOnly = readOnly;
-    }
-
-    public void setOnResetContentHashProcessor(Consumer<Integer> onResetContentHashProcessor) {
-        this.onResetContentHashProcessor = onResetContentHashProcessor;
     }
 
     public void setParsingExceptionProcessor(Consumer<DiagramParsingException> parsingExceptionProcessor) {
@@ -100,6 +96,19 @@ public class StunnerEditor {
 
     public void setExceptionProcessor(Consumer<Throwable> exceptionProcessor) {
         this.exceptionProcessor = exceptionProcessor;
+    }
+
+    @Inject
+    private StunnerEditorInitializer editorInitializer;
+
+    public StunnerEditor initializeDomainQualifier(Annotation domainQualifier) {
+        editorInitializer.initializeDomainQualifier(domainQualifier);
+        return this;
+    }
+
+    public StunnerEditor initializeRules(RuleSet rules) {
+        editorInitializer.initializeRules(rules);
+        return this;
     }
 
     public void open(final Diagram diagram,
@@ -140,6 +149,7 @@ public class StunnerEditor {
             @Override
             public void onSuccess() {
                 alertsControl.clear();
+                editorInitializer.initializeSession((AbstractSession) getSession());
                 callback.onSuccess();
             }
 

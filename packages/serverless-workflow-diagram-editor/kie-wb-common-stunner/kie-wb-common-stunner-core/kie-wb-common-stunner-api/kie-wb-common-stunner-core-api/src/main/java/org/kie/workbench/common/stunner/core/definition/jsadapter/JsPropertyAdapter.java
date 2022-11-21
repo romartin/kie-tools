@@ -29,8 +29,6 @@ public class JsPropertyAdapter implements PropertyAdapter<JsDefinitionProperty, 
 
     private StunnerTranslationService translationService;
 
-    private String i18nSeparator;
-
     @Override
     public String getId(JsDefinitionProperty property) {
         String defId = getJsDefinitionId(property.getPojo());
@@ -42,7 +40,7 @@ public class JsPropertyAdapter implements PropertyAdapter<JsDefinitionProperty, 
         Object pojo = property.getPojo();
         String id = getJsDefinitionId(pojo);
         String field = property.getField();
-        return translationService.getValue(id + i18nSeparator + "property" + i18nSeparator + field);
+        return translationService.getValue(id + StunnerTranslationService.I18N_SEPARATOR + "property" + StunnerTranslationService.I18N_SEPARATOR + field);
     }
 
     @Override
@@ -63,10 +61,6 @@ public class JsPropertyAdapter implements PropertyAdapter<JsDefinitionProperty, 
     @Override
     public boolean accepts(Class<?> type) {
         return JsDefinitionProperty.class.equals(type);
-    }
-
-    public void setI18nSeparator(String i18nSeparator) {
-        this.i18nSeparator = i18nSeparator;
     }
 
     public void setTranslationService(StunnerTranslationService translationService) {

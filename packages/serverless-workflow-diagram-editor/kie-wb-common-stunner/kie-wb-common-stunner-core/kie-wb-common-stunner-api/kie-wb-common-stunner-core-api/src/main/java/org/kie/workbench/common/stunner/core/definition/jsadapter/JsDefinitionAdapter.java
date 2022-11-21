@@ -34,7 +34,6 @@ import org.kie.workbench.common.stunner.core.i18n.StunnerTranslationService;
 public class JsDefinitionAdapter implements DefinitionAdapter<Object> {
 
     private StunnerTranslationService translationService;
-    private String i18nSeparator;
 
     @Override
     public DefinitionId getId(Object pojo) {
@@ -49,7 +48,7 @@ public class JsDefinitionAdapter implements DefinitionAdapter<Object> {
     @Override
     public String getCategory(Object pojo) {
         String id = getJsDefinitionId(pojo);
-        return translationService.getValue(id + i18nSeparator + "category");
+        return translationService.getValue(id + StunnerTranslationService.I18N_SEPARATOR + "category");
     }
 
     @Override
@@ -67,7 +66,7 @@ public class JsDefinitionAdapter implements DefinitionAdapter<Object> {
     @Override
     public String[] getLabels(Object pojo) {
         String id = getJsDefinitionId(pojo);
-        String labels = translationService.getValue(id + i18nSeparator + "labels");
+        String labels = translationService.getValue(id + StunnerTranslationService.I18N_SEPARATOR + "labels");
         return labels.isEmpty() ? new String[0] : labels.split(",");
     }
 
@@ -89,7 +88,7 @@ public class JsDefinitionAdapter implements DefinitionAdapter<Object> {
     public String getMetaPropertyField(Object pojo, PropertyMetaTypes metaType) {
         if (metaType == PropertyMetaTypes.NAME) {
             String id = getJsDefinitionId(pojo);
-            return translationService.getValue(id + i18nSeparator + "property_name");
+            return translationService.getValue(id + StunnerTranslationService.I18N_SEPARATOR + "property_name");
         }
         // Only Name is supported
         throw new UnsupportedOperationException("Unsupported PropertyMetaType: " + metaType.name());
@@ -114,7 +113,4 @@ public class JsDefinitionAdapter implements DefinitionAdapter<Object> {
         this.translationService = translationService;
     }
 
-    public void setI18nSeparator(String i18nSeparator) {
-        this.i18nSeparator = i18nSeparator;
-    }
 }
