@@ -16,7 +16,11 @@
 
 package org.kie.workbench.common.stunner.core.definition.jsadapter;
 
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import javax.enterprise.context.ApplicationScoped;
 
@@ -33,7 +37,17 @@ import org.kie.workbench.common.stunner.core.i18n.StunnerTranslationService;
 @ApplicationScoped
 public class JsDefinitionAdapter implements DefinitionAdapter<Object> {
 
+    private final Map<String, String> categories;
+    private final Map<String, String> labels;
+    private final Map<String, String> nameFields;
+
     private StunnerTranslationService translationService;
+
+    public JsDefinitionAdapter() {
+        categories = new HashMap<String, String>();
+        labels = new HashMap<String, String>();
+        nameFields = new HashMap<String, String>();
+    }
 
     @Override
     public DefinitionId getId(Object pojo) {
@@ -48,7 +62,7 @@ public class JsDefinitionAdapter implements DefinitionAdapter<Object> {
     @Override
     public String getCategory(Object pojo) {
         String id = getJsDefinitionId(pojo);
-        return translationService.getValue(id + StunnerTranslationService.I18N_SEPARATOR + "category");
+        return categories.get(id);
     }
 
     @Override
@@ -66,8 +80,8 @@ public class JsDefinitionAdapter implements DefinitionAdapter<Object> {
     @Override
     public String[] getLabels(Object pojo) {
         String id = getJsDefinitionId(pojo);
-        String labels = translationService.getValue(id + StunnerTranslationService.I18N_SEPARATOR + "labels");
-        return labels.isEmpty() ? new String[0] : labels.split(",");
+        String raw = labels.get(id);
+        return raw.isEmpty() ? new String[0] : raw.split(",");
     }
 
     @Override
@@ -88,7 +102,8 @@ public class JsDefinitionAdapter implements DefinitionAdapter<Object> {
     public String getMetaPropertyField(Object pojo, PropertyMetaTypes metaType) {
         if (metaType == PropertyMetaTypes.NAME) {
             String id = getJsDefinitionId(pojo);
-            return translationService.getValue(id + StunnerTranslationService.I18N_SEPARATOR + "property_name");
+            String name = nameFields.get(id);
+            return null != name ? name : "name";
         }
         // Only Name is supported
         throw new UnsupportedOperationException("Unsupported PropertyMetaType: " + metaType.name());
@@ -109,8 +124,19 @@ public class JsDefinitionAdapter implements DefinitionAdapter<Object> {
         return true;
     }
 
+    public void setCategory(String definitionId, String category) {
+        categories.put(definitionId, category);
+    }
+
+    public void setLabels(String definitionId, String[] definitionLabels) {
+        labels.put(definitionId, Arrays.stream(definitionLabels).collect(Collectors.joining(",")));
+    }
+
+    public void setDefinitionNameField(String definitionId, String nameField) {
+        nameFields.put(definitionId, nameField);
+    }
+
     public void setTranslationService(StunnerTranslationService translationService) {
         this.translationService = translationService;
     }
-
 }

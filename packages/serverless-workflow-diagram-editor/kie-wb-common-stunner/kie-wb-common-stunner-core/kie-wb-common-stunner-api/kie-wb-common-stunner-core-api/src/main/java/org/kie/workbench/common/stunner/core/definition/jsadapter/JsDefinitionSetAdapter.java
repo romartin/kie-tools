@@ -36,6 +36,7 @@ import org.kie.workbench.common.stunner.core.i18n.StunnerTranslationService;
 public class JsDefinitionSetAdapter implements DefinitionSetAdapter<Object> {
 
     private StunnerTranslationService translationService;
+    private String definitionsField;
     private Annotation domainQualifier;
 
     @Override
@@ -55,9 +56,8 @@ public class JsDefinitionSetAdapter implements DefinitionSetAdapter<Object> {
 
     @Override
     public Set<String> getDefinitions(Object pojo) {
-        String field = translationService.getValue(getId(pojo) + StunnerTranslationService.I18N_SEPARATOR + "field_definitions");
         JsPropertyMap<Object> map = Js.asPropertyMap(pojo);
-        String definitions = Js.uncheckedCast(map.get(field));
+        String definitions = Js.uncheckedCast(map.get(definitionsField));
         String[] split = definitions.split(",");
         return Arrays.stream(split).collect(Collectors.toSet());
     }
@@ -91,8 +91,15 @@ public class JsDefinitionSetAdapter implements DefinitionSetAdapter<Object> {
         this.domainQualifier = domainQualifier;
     }
 
+    public void setDefinitionsField(String definitionsField) {
+        this.definitionsField = definitionsField;
+    }
+
     public void setTranslationService(StunnerTranslationService translationService) {
         this.translationService = translationService;
     }
 
+    public static String toClassNames(Class... types) {
+        return Arrays.stream(types).map(t -> t.getName()).collect(Collectors.joining(","));
+    }
 }

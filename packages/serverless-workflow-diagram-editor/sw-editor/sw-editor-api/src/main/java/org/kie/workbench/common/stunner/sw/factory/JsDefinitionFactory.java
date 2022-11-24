@@ -19,7 +19,7 @@ package org.kie.workbench.common.stunner.sw.factory;
 import javax.enterprise.context.ApplicationScoped;
 
 import org.kie.workbench.common.stunner.core.factory.definition.DefinitionFactory;
-import org.kie.workbench.common.stunner.sw.Definitions;
+import org.kie.workbench.common.stunner.sw.SWDefinitionSet;
 import org.kie.workbench.common.stunner.sw.definition.CallbackState;
 import org.kie.workbench.common.stunner.sw.definition.CompensationTransition;
 import org.kie.workbench.common.stunner.sw.definition.DataConditionTransition;
@@ -147,9 +147,9 @@ public class JsDefinitionFactory implements DefinitionFactory<Object> {
             return new EventTimeout();
         }
 
-        if (Definitions.class.getName().equals(identifier)) {
+        if (SWDefinitionSet.class.getName().equals(identifier)) {
 
-            return new org.kie.workbench.common.stunner.sw.Definitions();
+            return new SWDefinitionSet();
         }
 
         return null;

@@ -15,7 +15,6 @@
  */
 package org.kie.workbench.common.stunner.sw.client.editor;
 
-import java.lang.annotation.Annotation;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
@@ -60,10 +59,9 @@ import org.kie.workbench.common.stunner.core.graph.Edge;
 import org.kie.workbench.common.stunner.core.graph.Element;
 import org.kie.workbench.common.stunner.core.graph.Node;
 import org.kie.workbench.common.stunner.core.graph.content.view.View;
-import org.kie.workbench.common.stunner.sw.SWEditor;
+import org.kie.workbench.common.stunner.sw.SWDomainInitializer;
 import org.kie.workbench.common.stunner.sw.client.services.ClientDiagramService;
 import org.kie.workbench.common.stunner.sw.client.services.IncrementalMarshaller;
-import org.kie.workbench.common.stunner.sw.factory.RulesFactory;
 import org.kie.workbench.common.stunner.sw.marshall.Message;
 import org.kie.workbench.common.stunner.sw.marshall.ParseResult;
 import org.uberfire.backend.vfs.Path;
@@ -103,6 +101,14 @@ public class DiagramEditor {
         this.incrementalMarshaller = incrementalMarshaller;
         this.canvasFileExport = canvasFileExport;
         this.jsCanvas = null;
+    }
+
+    @Inject
+    private SWDomainInitializer domainInitializer;
+
+    public void onStartup(final PlaceRequest place) {
+        domainInitializer.initialize();
+        stunnerEditor.setReadOnly(true);
     }
 
     public IsWidget asWidget() {
@@ -184,13 +190,6 @@ public class DiagramEditor {
                                          public void onSuccess(final ParseResult parseResult) {
                                              stunnerEditor
                                                      .close()
-                                                     .initializeDomainQualifier(new SWEditor() {
-                                                                           @Override
-                                                                           public Class<? extends Annotation> annotationType() {
-                                                                               return SWEditor.class;
-                                                                           }
-                                                                       })
-                                                     .initializeRules(RulesFactory.buildRuleSet())
                                                      .open(parseResult.getDiagram(),
                                                            new SessionPresenter.SessionPresenterCallback() {
                                                                @Override
@@ -271,10 +270,6 @@ public class DiagramEditor {
         jsCanvas.center(uuid);
 
         return null;
-    }
-
-    public void onStartup(final PlaceRequest place) {
-        stunnerEditor.setReadOnly(true);
     }
 
     public void onOpen() {

@@ -33,6 +33,7 @@ import org.kie.workbench.common.stunner.core.api.DefinitionManager;
 import org.kie.workbench.common.stunner.core.api.FactoryManager;
 import org.kie.workbench.common.stunner.core.client.service.ClientRuntimeError;
 import org.kie.workbench.common.stunner.core.diagram.MetadataImpl;
+import org.kie.workbench.common.stunner.core.factory.diagram.DiagramFactory;
 import org.kie.workbench.common.stunner.core.graph.Edge;
 import org.kie.workbench.common.stunner.core.graph.Graph;
 import org.kie.workbench.common.stunner.core.graph.Node;
@@ -64,7 +65,6 @@ import org.kie.workbench.common.stunner.sw.definition.SwitchState;
 import org.kie.workbench.common.stunner.sw.definition.Transition;
 import org.kie.workbench.common.stunner.sw.definition.Workflow;
 import org.kie.workbench.common.stunner.sw.definition.Workflow_JsonMapperImpl;
-import org.kie.workbench.common.stunner.sw.factory.DiagramFactory;
 import org.uberfire.client.promise.Promises;
 
 import static org.kie.workbench.common.stunner.sw.marshall.StateMarshalling.ANY_NODE_MARSHALLER;
@@ -106,6 +106,7 @@ public class Marshaller {
 
     private final DefinitionManager definitionManager;
     private final FactoryManager factoryManager;
+    private final DiagramFactory diagramFactory;
     private final Parser parser;
     private final Promises promises;
 
@@ -118,10 +119,12 @@ public class Marshaller {
     @Inject
     public Marshaller(DefinitionManager definitionManager,
                       FactoryManager factoryManager,
+                      DiagramFactory diagramFactory,
                       Parser parser,
                       Promises promises) {
         this.definitionManager = definitionManager;
         this.factoryManager = factoryManager;
+        this.diagramFactory = diagramFactory;
         this.parser = parser;
         this.promises = promises;
         workflow = null;
@@ -218,7 +221,7 @@ public class Marshaller {
                         @Override
                         public IThenable<Object> onInvoke(Node node) {
                             success.onInvoke(
-                                    new ParseResult(new DiagramFactory().build("diagram", new MetadataImpl(), (Graph) graph),
+                                    new ParseResult(diagramFactory.build("diagram", new MetadataImpl(), (Graph) graph),
                                                     context.getMessages()));
                             return null;
                         }
