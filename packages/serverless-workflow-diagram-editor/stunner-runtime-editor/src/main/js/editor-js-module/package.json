@@ -1,0 +1,9 @@
+{
+  "name": "",
+  "version": "0.0.0",
+  "keywords": [],
+  "type": "module",
+  "dependencies": {
+    "@kogito-tooling/kie-editors-standalone": "^0.16.0"
+  }
+}
