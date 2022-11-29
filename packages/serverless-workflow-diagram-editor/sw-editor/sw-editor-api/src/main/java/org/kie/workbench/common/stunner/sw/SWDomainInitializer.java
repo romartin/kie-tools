@@ -1,3 +1,20 @@
+/*
+ * Copyright 2022 Red Hat, Inc. and/or its affiliates.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+
 package org.kie.workbench.common.stunner.sw;
 
 import java.lang.annotation.Annotation;
@@ -29,7 +46,6 @@ import org.kie.workbench.common.stunner.sw.definition.State;
 import org.kie.workbench.common.stunner.sw.definition.SwitchState;
 import org.kie.workbench.common.stunner.sw.definition.Transition;
 import org.kie.workbench.common.stunner.sw.definition.Workflow;
-import org.kie.workbench.common.stunner.sw.factory.RulesFactory;
 
 @ApplicationScoped
 public class SWDomainInitializer {
@@ -124,6 +140,63 @@ public class SWDomainInitializer {
                 .initializeLabels(DefaultConditionTransition.class, LABEL_TRANSITION, LABEL_TRANSITION_DEFAULT_CONDITION)
                 .initializeLabels(CompensationTransition.class, LABEL_TRANSITION, LABEL_TRANSITION_COMPENSATION)
                 // Rules.
-                .initializeRules(RulesFactory.buildRuleSet());
+                .setContainmentRule(OnEvent.class, LABEL_EVENT)
+                .setContainmentRule(Workflow.class, LABEL_ROOT_NODE)
+                .setContainmentRule(SWDefinitionSet.class, LABEL_WORKFLOW)
+                .setConnectionRule(DataConditionTransition.class,
+                                   new String[]{LABEL_STATE, LABEL_STATE},
+                                   new String[]{LABEL_STATE, LABEL_END})
+                .setConnectionRule(DefaultConditionTransition.class,
+                                   new String[]{LABEL_STATE, LABEL_STATE},
+                                   new String[]{LABEL_STATE, LABEL_END})
+                .setConnectionRule(ErrorTransition.class,
+                                   new String[]{LABEL_STATE, LABEL_STATE},
+                                   new String[]{LABEL_STATE, LABEL_END})
+                .setConnectionRule(EventConditionTransition.class,
+                                   new String[]{LABEL_STATE, LABEL_STATE},
+                                   new String[]{LABEL_STATE, LABEL_END})
+                .setConnectionRule(Transition.class,
+                                   new String[]{LABEL_STATE, LABEL_STATE},
+                                   new String[]{LABEL_STATE, LABEL_END})
+                .setConnectionRule(CompensationTransition.class, new String[]{LABEL_STATE, LABEL_STATE})
+                .setConnectionRule(StartTransition.class, new String[]{LABEL_START, LABEL_STATE})
+                .setDockingRule(State.class, LABEL_TIMEOUT)
+                .setOccurrences(LABEL_WORKFLOW, 0, 1)
+                .setOccurrences(LABEL_START, 0, 1)
+                .setOccurrences(LABEL_END, 0, 1)
+                .setEdgeOccurrences(CompensationTransition.class, LABEL_STATE, true, 0, -1)
+                .setEdgeOccurrences(CompensationTransition.class, LABEL_STATE, false, 0, 1)
+                .setEdgeOccurrences(CompensationTransition.class, LABEL_START, true, 0, 0)
+                .setEdgeOccurrences(CompensationTransition.class, LABEL_START, false, 0, 0)
+                .setEdgeOccurrences(CompensationTransition.class, LABEL_END, true, 0, 0)
+                .setEdgeOccurrences(CompensationTransition.class, LABEL_END, false, 0, 0)
+                .setEdgeOccurrences(DataConditionTransition.class, LABEL_STATE, true, 0, -1)
+                .setEdgeOccurrences(DataConditionTransition.class, LABEL_STATE, false, 0, 1)
+                .setEdgeOccurrences(DataConditionTransition.class, LABEL_START, true, 0, 0)
+                .setEdgeOccurrences(DataConditionTransition.class, LABEL_START, false, 0, 0)
+                .setEdgeOccurrences(DataConditionTransition.class, LABEL_END, false, 0, 0)
+                .setEdgeOccurrences(DefaultConditionTransition.class, LABEL_STATE, true, 0, -1)
+                .setEdgeOccurrences(DefaultConditionTransition.class, LABEL_STATE, false, 0, 1)
+                .setEdgeOccurrences(DefaultConditionTransition.class, LABEL_START, true, 0, 0)
+                .setEdgeOccurrences(DefaultConditionTransition.class, LABEL_START, false, 0, 0)
+                .setEdgeOccurrences(DefaultConditionTransition.class, LABEL_END, false, 0, 0)
+                .setEdgeOccurrences(ErrorTransition.class, LABEL_STATE, true, 0, -1)
+                .setEdgeOccurrences(ErrorTransition.class, LABEL_STATE, false, 0, -1)
+                .setEdgeOccurrences(ErrorTransition.class, LABEL_START, true, 0, 0)
+                .setEdgeOccurrences(ErrorTransition.class, LABEL_START, false, 0, 0)
+                .setEdgeOccurrences(ErrorTransition.class, LABEL_END, false, 0, 0)
+                .setEdgeOccurrences(EventConditionTransition.class, LABEL_STATE, true, 0, -1)
+                .setEdgeOccurrences(EventConditionTransition.class, LABEL_STATE, false, 0, 1)
+                .setEdgeOccurrences(EventConditionTransition.class, LABEL_START, true, 0, 0)
+                .setEdgeOccurrences(EventConditionTransition.class, LABEL_START, false, 0, 0)
+                .setEdgeOccurrences(EventConditionTransition.class, LABEL_END, false, 0, 0)
+                .setEdgeOccurrences(StartTransition.class, LABEL_START, true, 0, 0)
+                .setEdgeOccurrences(StartTransition.class, LABEL_START, false, 0, 1)
+                .setEdgeOccurrences(Transition.class, LABEL_STATE, true, 0, -1)
+                .setEdgeOccurrences(Transition.class, LABEL_STATE, false, 0, 1)
+                .setEdgeOccurrences(Transition.class, LABEL_START, true, 0, 0)
+                .setEdgeOccurrences(Transition.class, LABEL_START, false, 0, 0)
+                .setEdgeOccurrences(Transition.class, LABEL_END, false, 0, 0)
+                .initializeRules();
     }
 }
