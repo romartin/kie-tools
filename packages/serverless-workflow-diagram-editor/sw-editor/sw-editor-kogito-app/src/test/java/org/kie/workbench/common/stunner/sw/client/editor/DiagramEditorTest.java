@@ -217,7 +217,7 @@ public class DiagramEditorTest {
                                        incrementalMarshaller,
                                        canvasFileExport));
         tested.jsRegExp = jsRegExp;
-        tested.jsCanvas = jsCanvas;
+        when(tested.getJsCanvas()).thenReturn(jsCanvas);
     }
 
     @Test

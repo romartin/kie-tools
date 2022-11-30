@@ -32,11 +32,13 @@ import elemental2.core.JsRegExp;
 import elemental2.core.RegExpResult;
 import elemental2.dom.DomGlobal;
 import elemental2.promise.Promise;
+import jsinterop.base.Js;
 import org.kie.workbench.common.stunner.client.lienzo.canvas.wires.WiresCanvas;
 import org.kie.workbench.common.stunner.client.widgets.canvas.ScrollableLienzoPanel;
 import org.kie.workbench.common.stunner.client.widgets.editor.StunnerEditor;
 import org.kie.workbench.common.stunner.client.widgets.presenters.session.SessionPresenter;
 import org.kie.workbench.common.stunner.core.api.DefinitionManager;
+import org.kie.workbench.common.stunner.core.client.api.JsWindow;
 import org.kie.workbench.common.stunner.core.client.api.SessionManager;
 import org.kie.workbench.common.stunner.core.client.canvas.AbstractCanvasHandler;
 import org.kie.workbench.common.stunner.core.client.canvas.CanvasHandler;
@@ -87,8 +89,6 @@ public class DiagramEditor {
     private final IncrementalMarshaller incrementalMarshaller;
     private final CanvasFileExport canvasFileExport;
 
-    JsCanvas jsCanvas;
-
     @Inject
     public DiagramEditor(Promises promises,
                          StunnerEditor stunnerEditor,
@@ -100,7 +100,6 @@ public class DiagramEditor {
         this.diagramService = diagramService;
         this.incrementalMarshaller = incrementalMarshaller;
         this.canvasFileExport = canvasFileExport;
-        this.jsCanvas = null;
     }
 
     @Inject
@@ -260,6 +259,10 @@ public class DiagramEditor {
         });
     }
 
+    JsCanvas getJsCanvas() {
+        return Js.uncheckedCast(JsWindow.canvas);
+    }
+
     public Promise<Void> selectStateByName(final String name) {
         String uuid = diagramService.getMarshaller().getContext().getNameToUUIDBindings().get(name);
         AbstractSession session = (AbstractSession) stunnerEditor.getSession();
@@ -267,7 +270,7 @@ public class DiagramEditor {
         session.getSelectionControl().clearSelection().addSelection(uuid);
 
         // center the node in the diagram
-        jsCanvas.center(uuid);
+        getJsCanvas().center(uuid);
 
         return null;
     }
@@ -281,7 +284,7 @@ public class DiagramEditor {
 
     void close() {
         stunnerEditor.close();
-        jsCanvas.close();
+        getJsCanvas().close();
     }
 
     @SuppressWarnings("all")
@@ -326,7 +329,7 @@ public class DiagramEditor {
             }
         }
 
-        centerFirstSelectedNode(stunnerEditor, jsCanvas);
+        centerFirstSelectedNode(stunnerEditor, getJsCanvas());
     }
 
     @SuppressWarnings("all")
