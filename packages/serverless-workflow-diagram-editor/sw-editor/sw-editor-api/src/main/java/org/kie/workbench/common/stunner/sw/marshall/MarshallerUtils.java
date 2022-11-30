@@ -18,8 +18,8 @@ package org.kie.workbench.common.stunner.sw.marshall;
 
 import java.util.Stack;
 
+import elemental2.core.Global;
 import elemental2.core.JsObject;
-import jdk.nashorn.internal.objects.Global;
 import jsinterop.base.Js;
 import jsinterop.base.JsPropertyMap;
 import org.kie.workbench.common.stunner.core.api.DefinitionManager;
