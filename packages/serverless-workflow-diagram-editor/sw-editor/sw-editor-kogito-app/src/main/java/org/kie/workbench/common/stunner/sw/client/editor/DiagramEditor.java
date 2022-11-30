@@ -19,7 +19,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Optional;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
@@ -37,9 +36,7 @@ import org.kie.workbench.common.stunner.client.lienzo.canvas.wires.WiresCanvas;
 import org.kie.workbench.common.stunner.client.widgets.canvas.ScrollableLienzoPanel;
 import org.kie.workbench.common.stunner.client.widgets.editor.StunnerEditor;
 import org.kie.workbench.common.stunner.client.widgets.presenters.session.SessionPresenter;
-import org.kie.workbench.common.stunner.core.api.DefinitionManager;
 import org.kie.workbench.common.stunner.core.client.api.JsWindow;
-import org.kie.workbench.common.stunner.core.client.api.SessionManager;
 import org.kie.workbench.common.stunner.core.client.canvas.AbstractCanvasHandler;
 import org.kie.workbench.common.stunner.core.client.canvas.CanvasHandler;
 import org.kie.workbench.common.stunner.core.client.canvas.controls.SelectionControl;
@@ -49,11 +46,8 @@ import org.kie.workbench.common.stunner.core.client.command.ClearAllCommand;
 import org.kie.workbench.common.stunner.core.client.service.ClientRuntimeError;
 import org.kie.workbench.common.stunner.core.client.service.ServiceCallback;
 import org.kie.workbench.common.stunner.core.client.session.impl.AbstractSession;
-import org.kie.workbench.common.stunner.core.client.session.impl.ViewerSession;
 import org.kie.workbench.common.stunner.core.command.CommandResult;
 import org.kie.workbench.common.stunner.core.command.util.CommandUtils;
-import org.kie.workbench.common.stunner.core.definition.adapter.DefinitionId;
-import org.kie.workbench.common.stunner.core.definition.property.PropertyMetaTypes;
 import org.kie.workbench.common.stunner.core.diagram.Diagram;
 import org.kie.workbench.common.stunner.core.diagram.DiagramParsingException;
 import org.kie.workbench.common.stunner.core.diagram.Metadata;
@@ -103,7 +97,7 @@ public class DiagramEditor {
     }
 
     @Inject
-    private SWDomainInitializer domainInitializer;
+    SWDomainInitializer domainInitializer;
 
     public void onStartup(final PlaceRequest place) {
         domainInitializer.initialize();
@@ -115,49 +109,12 @@ public class DiagramEditor {
     }
 
     public Promise<String> getPreview() {
-        if (true) {
-            return logJsDefinitions();
-        }
-
         CanvasHandler canvasHandler = stunnerEditor.getCanvasHandler();
         if (canvasHandler != null) {
             return promises.resolve(canvasFileExport.exportToSvg((AbstractCanvasHandler) canvasHandler));
         } else {
             return promises.resolve("");
         }
-    }
-
-    @Inject
-    private SessionManager sessionManager;
-
-    @Inject
-    private DefinitionManager definitionManager;
-
-    public Promise<String> logJsDefinitions() {
-        ViewerSession session = sessionManager.getCurrentSession();
-        String selectedUUID = session.getSelectionControl().getSelectedItems().iterator().next();
-        if (null != selectedUUID) {
-            Node node = session.getCanvasHandler().getGraphIndex().getNode(selectedUUID);
-            View<?> content = (View<?>) node.getContent();
-            Object definition = content.getDefinition();
-            DefinitionId defId = definitionManager.adapters().forDefinition().getId(definition);
-            DomGlobal.console.log("DefinitionID = " + defId.value());
-            String namePropertyField = definitionManager.adapters().forDefinition().getMetaPropertyField(definition, PropertyMetaTypes.NAME);
-            Optional<?> name = definitionManager.adapters().forDefinition().getProperty(definition, namePropertyField);
-            Object nameValue = definitionManager.adapters().forProperty().getValue(name.get());
-            DomGlobal.console.log("Name = " + nameValue);
-
-            String[] propertyFields = definitionManager.adapters().forDefinition().getPropertyFields(definition);
-            for (int i = 0; i < propertyFields.length; i++) {
-                String field = propertyFields[i];
-                Optional<?> property = definitionManager.adapters().forDefinition().getProperty(definition, field);
-                property.ifPresent(p -> {
-                    Object value = definitionManager.adapters().forProperty().getValue(p);
-                    DomGlobal.console.log(field + "-->" + value);
-                });
-            }
-        }
-        return promises.resolve("");
     }
 
     public Promise validate() {

@@ -53,6 +53,7 @@ import org.kie.workbench.common.stunner.core.diagram.Metadata;
 import org.kie.workbench.common.stunner.core.diagram.MetadataImpl;
 import org.kie.workbench.common.stunner.core.graph.Graph;
 import org.kie.workbench.common.stunner.core.graph.Node;
+import org.kie.workbench.common.stunner.sw.SWDomainInitializer;
 import org.kie.workbench.common.stunner.sw.client.services.ClientDiagramService;
 import org.kie.workbench.common.stunner.sw.client.services.IncrementalMarshaller;
 import org.mockito.Mock;
@@ -143,6 +144,9 @@ public class DiagramEditorTest {
     @Mock
     private CanvasCommandManager commandManager;
 
+    @Mock
+    private SWDomainInitializer domainInitializer;
+
     private DiagramEditor tested;
     private Promises promises;
     private DiagramImpl diagram;
@@ -217,6 +221,7 @@ public class DiagramEditorTest {
                                        incrementalMarshaller,
                                        canvasFileExport));
         tested.jsRegExp = jsRegExp;
+        tested.domainInitializer = domainInitializer;
         when(tested.getJsCanvas()).thenReturn(jsCanvas);
     }
 
@@ -286,19 +291,17 @@ public class DiagramEditorTest {
         assertEquals(w, tested.asWidget());
     }
 
-    //TODO fix me!
-//    @Test
-//    public void testGetPreview() {
-//
-//        when(canvasFileExport.exportToSvg(eq(canvasHandler2))).thenReturn("<svg/>");
-//        Promise content = tested.getPreview();
-//        final String[] result = {""};
-//        content.then(p -> {
-//            result[0] = p.toString();
-//            return null;
-//        });
-//        assertEquals("<svg/>", result[0]);
-//    }
+    @Test
+    public void testGetPreview() {
+        when(canvasFileExport.exportToSvg(eq(canvasHandler2))).thenReturn("<svg/>");
+        Promise content = tested.getPreview();
+        final String[] result = {""};
+        content.then(p -> {
+            result[0] = p.toString();
+            return null;
+        });
+        assertEquals("<svg/>", result[0]);
+    }
 
     @Test
     public void testSetNewContent() {
