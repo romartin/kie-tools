@@ -285,6 +285,12 @@ public class DiagramEditorTest {
     }
 
     @Test
+    public void testDomainInitializer() {
+        tested.onStartup(new DefaultPlaceRequest());
+        verify(domainInitializer, times(1)).initialize();
+    }
+
+    @Test
     public void testAsWidget() {
         IsWidget w = mock(IsWidget.class);
         when(stunnerEditor2.getView()).thenReturn(w);
