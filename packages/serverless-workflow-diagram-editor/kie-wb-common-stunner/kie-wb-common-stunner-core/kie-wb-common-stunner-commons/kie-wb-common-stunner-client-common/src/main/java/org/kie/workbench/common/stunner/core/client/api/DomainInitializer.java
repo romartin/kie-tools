@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-
 package org.kie.workbench.common.stunner.core.client.api;
 
 import java.lang.annotation.Annotation;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 
@@ -46,19 +46,19 @@ import org.kie.workbench.common.stunner.core.rule.impl.Occurrences;
 public class DomainInitializer {
 
     @Inject
-    private DefinitionManager definitionManager;
+    DefinitionManager definitionManager;
     @Inject
-    private JsDefinitionAdapter jsDefinitionAdapter;
+    JsDefinitionAdapter jsDefinitionAdapter;
     @Inject
-    private JsPropertyAdapter jsPropertyAdapter;
+    JsPropertyAdapter jsPropertyAdapter;
     @Inject
     private JsRuleAdapter jsRuleAdapter;
     @Inject
-    private StunnerTranslationService translationService;
+    StunnerTranslationService translationService;
     @Inject
-    private JsDefinitionSetAdapter jsDefinitionSetAdapter;
+    JsDefinitionSetAdapter jsDefinitionSetAdapter;
 
-    private Collection<Rule> rules;
+    Collection<Rule> rules;
 
     @PostConstruct
     public void build() {
@@ -113,9 +113,7 @@ public class DomainInitializer {
 
     public DomainInitializer setContainmentRule(Class type, String... roles) {
         final HashSet<String> allowedRoles = new HashSet<>(roles.length);
-        for (String role : roles) {
-            allowedRoles.add(role);
-        }
+        allowedRoles.addAll(Arrays.asList(roles));
         rules.add(new CanContain("CAN_CONTAIN" + rules.size(), type.getName(), allowedRoles));
 
         return this;
@@ -123,7 +121,7 @@ public class DomainInitializer {
 
     public DomainInitializer setConnectionRule(Class type, String[]... roles) {
         final ArrayList<CanConnect.PermittedConnection> allowedRoles = new ArrayList<>(roles.length);
-        for (String role[] : roles) {
+        for (String[] role : roles) {
             allowedRoles.add(new CanConnect.PermittedConnection(role[0], role[1]));
         }
         rules.add(new CanConnect("CAN_CONNECT" + rules.size(), type.getName(), allowedRoles));
@@ -133,9 +131,7 @@ public class DomainInitializer {
 
     public DomainInitializer setDockingRule(Class type, String... roles) {
         final HashSet<String> allowedRoles = new HashSet<>(roles.length);
-        for (String role : roles) {
-            allowedRoles.add(role);
-        }
+        allowedRoles.addAll(Arrays.asList(roles));
         rules.add(new CanDock("CAN_DOCK" + rules.size(), type.getName(), allowedRoles));
 
         return this;

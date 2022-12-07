@@ -108,6 +108,7 @@ public class DiagramEditor {
         return stunnerEditor.getView();
     }
 
+    @SuppressWarnings("all")
     public Promise<String> getPreview() {
         CanvasHandler canvasHandler = stunnerEditor.getCanvasHandler();
         if (canvasHandler != null) {
@@ -117,6 +118,7 @@ public class DiagramEditor {
         }
     }
 
+    @SuppressWarnings("all")
     public Promise validate() {
         return Promise.resolve(new Notification[0]);
     }
@@ -185,6 +187,7 @@ public class DiagramEditor {
         });
     }
 
+    @SuppressWarnings("all")
     Diagram renderDiagram;
 
     public Promise<Void> updateContent(final String path, final String value) {
@@ -220,6 +223,7 @@ public class DiagramEditor {
         return Js.uncheckedCast(JsWindow.canvas);
     }
 
+    @SuppressWarnings("all")
     public Promise<Void> selectStateByName(final String name) {
         String uuid = diagramService.getMarshaller().getContext().getNameToUUIDBindings().get(name);
         AbstractSession session = (AbstractSession) stunnerEditor.getSession();
@@ -322,6 +326,7 @@ public class DiagramEditor {
         stunnerEditor.handleError(clientRuntimeError);
     }
 
+    @SuppressWarnings("all")
     private void onDiagramOpenSuccess() {
         Diagram diagram = stunnerEditor.getCanvasHandler().getDiagram();
         Metadata metadata = diagram.getMetadata();
