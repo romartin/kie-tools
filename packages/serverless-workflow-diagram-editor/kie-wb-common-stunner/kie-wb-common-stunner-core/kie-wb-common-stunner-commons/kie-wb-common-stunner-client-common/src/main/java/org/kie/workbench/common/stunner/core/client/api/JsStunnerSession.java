@@ -80,7 +80,6 @@ public class JsStunnerSession {
         return definition;
     }
 
-    // TODO: Multiple selection / center selection.
     public void selectByUUID(String uuid) {
         session.getSelectionControl().clearSelection().addSelection(uuid);
     }

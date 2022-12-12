@@ -60,7 +60,7 @@ public class Workflow {
 
     @JsonbTypeSerializer(EventJsonbTypeSerializer.class)
     @JsonbTypeDeserializer(EventJsonbTypeDeserializer.class)
-    public Object events; //TODO array or string
+    public Object events;
 
     @JsonbTypeSerializer(StateJsonSerializer.class)
     @JsonbTypeDeserializer(StateJsonDeserializer.class)
