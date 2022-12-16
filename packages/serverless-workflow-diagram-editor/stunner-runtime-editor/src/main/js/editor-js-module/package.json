@@ -4,6 +4,7 @@
   "keywords": [],
   "type": "module",
   "dependencies": {
-    "@kogito-tooling/kie-editors-standalone": "^0.16.0"
+    "@kogito-tooling/kie-editors-standalone": "^0.16.0",
+    "systemjs": "^6.13.0"
   }
 }

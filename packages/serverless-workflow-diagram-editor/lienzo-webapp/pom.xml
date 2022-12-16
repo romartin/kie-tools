@@ -251,6 +251,7 @@
 							<noServer>false</noServer>
 							<extraJvmArgs>-Xmx3G -Xms512m -Xss1M -XX:CompileThreshold=7000 -XX:+UseSerialGC -Djava.io.tmpdir=${project.build.directory}
 							</extraJvmArgs>
+							<style>PRETTY</style>
 							<disableCastChecking>true</disableCastChecking>
 							<generateJsInteropExports>true</generateJsInteropExports>
 							<soycDetailed>false</soycDetailed>

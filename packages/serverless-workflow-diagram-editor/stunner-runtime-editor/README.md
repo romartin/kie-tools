@@ -36,6 +36,9 @@ Start page: `index.html`
 # TODOs
 
 - Core
+  - Decouple from unnecessary resources (js,css,etc)
+    - See SwfDiagramEditorResources.ts
+    - Analyze stunner-widges dependencies to resources, other modules shouldn't depend on
   - Support for native js types domain declaration
     - If object contains '**clazz**' -> It is JsType
     - If object DOES NOT contain '**clazz**' -> It is JsType(native=true)

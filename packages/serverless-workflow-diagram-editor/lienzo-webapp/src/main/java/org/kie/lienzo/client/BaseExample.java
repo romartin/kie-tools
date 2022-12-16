@@ -17,6 +17,7 @@ import elemental2.dom.HTMLDivElement;
 import elemental2.dom.HTMLElement;
 import elemental2.dom.HTMLOptionElement;
 import elemental2.dom.HTMLSelectElement;
+import org.kie.lienzo.client.js.WindowJSCanvas;
 import org.kie.lienzo.client.util.Console;
 import org.kie.lienzo.client.util.Util;
 

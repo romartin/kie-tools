@@ -40,6 +40,7 @@ import com.ait.lienzo.client.widget.panel.LienzoPanel;
 import com.ait.lienzo.client.widget.panel.impl.ScrollablePanel;
 import com.ait.lienzo.tools.client.collection.NFastArrayList;
 import elemental2.dom.HTMLCanvasElement;
+import jsinterop.annotations.JsIgnore;
 import jsinterop.annotations.JsType;
 
 @JsType
@@ -49,8 +50,10 @@ public class JsCanvas implements JsCanvasNodeLister {
     public static JsCanvasAnimations animations;
     public static JsCanvasLogger logger;
     protected JSShapeStateApplier stateApplier;
-    LienzoPanel panel;
-    Layer layer;
+    @JsIgnore
+    public LienzoPanel panel;
+    @JsIgnore
+    public Layer layer;
 
     public JsCanvas(LienzoPanel panel, Layer layer, JSShapeStateApplier stateApplier) {
         this.panel = panel;

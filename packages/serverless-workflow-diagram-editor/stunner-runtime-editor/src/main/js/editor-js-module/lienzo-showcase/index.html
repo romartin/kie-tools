@@ -1,0 +1,35 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+  <head>
+    <title>Lienzo Showcase</title>
+    <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport" />
+    <link rel="stylesheet" href="css/app.css" />
+    <script type="module" src="main.js"></script>
+    <!--<script language="javascript" src="org.kie.lienzo.LienzoShowcase.nocache.js"></script>-->
+  </head>
+
+  <body>
+    <div class="container">
+      <div id="nav" class="nav"></div>
+
+      <div id="main" class="content">
+        <div id="top" style="display: none"></div>
+      </div>
+
+      <div id="console" class="console">
+        <div>Console</div>
+      </div>
+    </div>
+
+    <script type="application/javascript">
+      window.onload = function (e) {
+        updateScroll();
+      };
+
+      function updateScroll() {
+        var element = document.getElementById("console");
+        element.scrollTop = element.scrollHeight;
+      }
+    </script>
+  </body>
+</html>

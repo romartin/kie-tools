@@ -8,10 +8,14 @@ import com.ait.lienzo.client.core.shape.Line;
 import com.ait.lienzo.client.widget.panel.IsResizable;
 import com.ait.lienzo.client.widget.panel.LienzoPanel;
 import com.google.gwt.dom.client.Style.Display;
+import elemental2.dom.DomGlobal;
 import elemental2.dom.Element;
 import elemental2.dom.HTMLDivElement;
+import jsinterop.base.Js;
+import org.kie.lienzo.client.js.WindowJSCanvas;
 
 import static elemental2.dom.DomGlobal.document;
+import static elemental2.dom.DomGlobal.setTimeout;
 
 public class BaseLienzoExamples {
 
@@ -22,6 +26,15 @@ public class BaseLienzoExamples {
     private Example test;
 
     public void doLoad() {
+        DomGlobal.console.log("GWT MODULE onLoad()!!!");
+        if (false) {
+            setTimeout((d) -> {
+                LienzoNativeExample.createExample(Js.uncheckedCast(document.getElementById("main")));
+            }, 1500);
+        }
+    }
+
+    public void doLoadORIGINAL() {
         createTests(new BasicShapesExample("Shapes"),
                     new BasicWiresExample("Wires"),
                     new LineSpliceExample("Line Splice"),

@@ -14,22 +14,26 @@
  * limitations under the License.
  */
 
-package org.kie.lienzo.client;
+package org.kie.lienzo.client.js;
 
 import com.ait.lienzo.client.core.types.JsCanvas;
 import jsinterop.annotations.JsOverlay;
 import jsinterop.annotations.JsPackage;
 import jsinterop.annotations.JsProperty;
 import jsinterop.annotations.JsType;
+import org.kie.lienzo.client.JsCanvasExamples;
 
 @JsType(isNative = true, namespace = JsPackage.GLOBAL, name = "window")
 public class WindowJSCanvas {
 
     @JsProperty
-    private static Object jsCanvas;
+    public static Object jsCanvas;
 
     @JsProperty
-    private static Object jsCanvasExamples;
+    public static JsObjectAdapter jsObjectAdapter;
+
+    @JsProperty
+    public static Object jsCanvasExamples;
 
     @JsOverlay
     public static final void linkJSCanvas(JsCanvas canvas) {
