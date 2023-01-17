@@ -278,6 +278,10 @@ public class OrthogonalLineUtils {
 
         double y = p0y;
 
+        // double break_distance_ratio = 2;
+        double break_distance_ratio = (Math.abs(dx) / Math.abs(dy)) * 2;
+        break_distance_ratio = break_distance_ratio < 1.5d ? 1.5d : break_distance_ratio;
+
         if (behind) {
             // means p0 is behind.
             switch (tailDirection) {
@@ -288,7 +292,7 @@ public class OrthogonalLineUtils {
                             (dx > 0 && lastDirection == EAST) ||
                             (dx < 0 && lastDirection == WEST)) {
                         // A mid point is needed to ensure an attractive line is drawn.
-                        x = p0x + (dx / 2);
+                        x = p0x + (dx / break_distance_ratio);
                         addPoint(buffer, x, y, write);
 
                         if (lastDirection == NORTH || lastDirection == SOUTH) {
@@ -317,7 +321,7 @@ public class OrthogonalLineUtils {
                             (dy > 0 && lastDirection == SOUTH) ||
                             (dy < 0 && lastDirection == NORTH)) {
                         // A mid point is needed to ensure an attrictive line is drawn.
-                        y = p0y + (dy / 2);
+                        y = p0y + (dy / break_distance_ratio);
                         addPoint(buffer, x, y, write);
 
                         if (lastDirection == EAST || lastDirection == WEST) {
@@ -352,7 +356,7 @@ public class OrthogonalLineUtils {
                             (dx > 0 && lastDirection == WEST) ||
                             (dx < 0 && lastDirection == EAST)) {
                         // A mid point is needed to ensure an attrictive line is drawn.
-                        y = p0y + (dy / 2);
+                        y = p0y + (dy / break_distance_ratio);
                         addPoint(buffer, x, y, write);
 
                         if (lastDirection == EAST || lastDirection == WEST) {
@@ -378,7 +382,7 @@ public class OrthogonalLineUtils {
                             (dy > 0 && lastDirection == NORTH) ||
                             (dy < 0 && lastDirection == SOUTH)) {
                         // A mid point is needed to ensure an attrictive line is drawn.
-                        x = p0x + (dx / 2);
+                        x = p0x + (dx / break_distance_ratio);
                         addPoint(buffer, x, y, write);
 
                         if (lastDirection == NORTH || lastDirection == SOUTH) {
