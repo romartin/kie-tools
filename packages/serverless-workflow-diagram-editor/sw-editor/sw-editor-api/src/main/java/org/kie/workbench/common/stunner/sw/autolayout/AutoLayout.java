@@ -59,6 +59,8 @@ import org.uberfire.client.promise.Promises;
 
 public class AutoLayout {
 
+    public static final double X_DEVIATION = 102d;
+
     private AutoLayout() {
         // Private constructor to prevent instantiation
     }
@@ -91,6 +93,8 @@ public class AutoLayout {
                                     .build();
                     all.execute(context);
 
+                    moveEndNodesX(graph, X_DEVIATION);
+
                     // TODO: Apply proprerly the orthogonal stuff, during marshalling/graph instances creation,
                     //  instead of re-traversing all nodes/edges for the whole graph again.
                     applyOrthogonalLinesBehaviour(graph);
@@ -102,6 +106,20 @@ public class AutoLayout {
                     resolve.onInvoke(parentNode);
                     return null;
                 }));
+    }
+
+    private static void moveEndNodesX(Graph graph, final double x) {
+        Iterable<Node> nodes = graph.nodes();
+        nodes.forEach(node -> {
+            if (node.getContent() instanceof View) {
+                final View content = (View) node.getContent();
+                if (content.getDefinition() instanceof End) {
+                    final Bounds bounds = content.getBounds();
+                    final Bounds newBounds = Bounds.create(bounds.getX() + x, bounds.getY(), bounds.getWidth(), bounds.getHeight());
+                    content.setBounds(newBounds);
+                }
+            }
+        });
     }
 
     @SuppressWarnings("all")
