@@ -19,11 +19,20 @@ package org.kie.workbench.common.stunner.sw.client.editor;
 import elemental2.core.Global;
 import jsinterop.annotations.JsOverlay;
 import jsinterop.annotations.JsPackage;
+import jsinterop.annotations.JsProperty;
 import jsinterop.annotations.JsType;
 
 // TODO: This is temporal until tooling integration?
 @JsType(isNative = true, namespace = JsPackage.GLOBAL, name = "window")
 public class EditorWindow {
+
+    // TODO: Drop this
+    @JsProperty
+    public static JsDomainInitializer jsDomainInitializer;
+
+    // TODO: Drop this
+    @JsProperty
+    public static JsStunnerCommands jsStunnerCommands;
 
     @JsOverlay
     public static void updateContent(String raw) {

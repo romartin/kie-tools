@@ -20,6 +20,7 @@ import java.util.Collection;
 import java.util.Collections;
 
 import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Inject;
 
 import org.kie.workbench.common.stunner.core.definition.adapter.DefinitionSetRuleAdapter;
 import org.kie.workbench.common.stunner.core.rule.Rule;
@@ -28,11 +29,12 @@ import org.kie.workbench.common.stunner.core.rule.RuleSet;
 @ApplicationScoped
 public class JsRuleAdapter implements DefinitionSetRuleAdapter<Object> {
 
-    private RuleSet ruleSet;
+    @Inject
+    JsDomains domains;
 
     @Override
     public RuleSet getRuleSet(Object pojo) {
-        return null != ruleSet ? ruleSet : new RuleSet() {
+        return null != getDefaultRuleSet() ? getDefaultRuleSet() : new RuleSet() {
             @Override
             public String getName() {
                 return "Empty rule set.";
@@ -45,8 +47,8 @@ public class JsRuleAdapter implements DefinitionSetRuleAdapter<Object> {
         };
     }
 
-    public void setRuleSet(RuleSet ruleSet) {
-        this.ruleSet = ruleSet;
+    private RuleSet getDefaultRuleSet() {
+        return domains.getDomainInfo().getRuleSet();
     }
 
     @Override

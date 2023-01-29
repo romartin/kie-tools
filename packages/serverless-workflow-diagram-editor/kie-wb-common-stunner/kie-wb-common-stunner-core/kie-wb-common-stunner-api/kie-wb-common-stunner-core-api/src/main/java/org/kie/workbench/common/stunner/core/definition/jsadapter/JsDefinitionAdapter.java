@@ -16,13 +16,10 @@
 
 package org.kie.workbench.common.stunner.core.definition.jsadapter;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Inject;
 
 import elemental2.core.Function;
 import elemental2.core.JsObject;
@@ -37,16 +34,13 @@ import org.kie.workbench.common.stunner.core.i18n.StunnerTranslationService;
 @ApplicationScoped
 public class JsDefinitionAdapter implements DefinitionAdapter<Object> {
 
-    private final Map<String, String> categories;
-    private final Map<String, String> labels;
-    private final Map<String, String> nameFields;
+    @Inject
+    StunnerTranslationService translationService;
+    @Inject
+    JsDomains domains;
 
-    private StunnerTranslationService translationService;
-
-    public JsDefinitionAdapter() {
-        categories = new HashMap<String, String>();
-        labels = new HashMap<String, String>();
-        nameFields = new HashMap<String, String>();
+    public static String getJsDefinitionId(Object pojo) {
+        return JsAdapterUtils.getObjectId(pojo);
     }
 
     @Override
@@ -55,33 +49,33 @@ public class JsDefinitionAdapter implements DefinitionAdapter<Object> {
         return DefinitionId.build(defId);
     }
 
-    public static String getJsDefinitionId(Object pojo) {
-        return pojo.getClass().getName();
-    }
-
     @Override
     public String getCategory(Object pojo) {
         String id = getJsDefinitionId(pojo);
-        return categories.get(id);
+        return domains.getDomainInfo().getCategory(id);
     }
 
     @Override
     public String getTitle(Object pojo) {
         String id = getJsDefinitionId(pojo);
-        return translationService.getDefinitionTitle(id);
+        // TODO
+        String definitionTitle = translationService.getDefinitionTitle(id);
+        return null != definitionTitle ? definitionTitle : id;
     }
 
     @Override
     public String getDescription(Object pojo) {
         String id = getJsDefinitionId(pojo);
-        return translationService.getDefinitionDescription(id);
+        // TODO
+        String definitionDescription = translationService.getDefinitionDescription(id);
+        return null != definitionDescription ? definitionDescription : id;
+
     }
 
     @Override
     public String[] getLabels(Object pojo) {
         String id = getJsDefinitionId(pojo);
-        String raw = labels.get(id);
-        return raw.isEmpty() ? new String[0] : raw.split(",");
+        return domains.getDomainInfo().getLabels(id);
     }
 
     @Override
@@ -102,7 +96,7 @@ public class JsDefinitionAdapter implements DefinitionAdapter<Object> {
     public String getMetaPropertyField(Object pojo, PropertyMetaTypes metaType) {
         if (metaType == PropertyMetaTypes.NAME) {
             String id = getJsDefinitionId(pojo);
-            String name = nameFields.get(id);
+            String name = domains.getDomainInfo().getNameField(id);
             return null != name ? name : "name";
         }
         // Only Name is supported
@@ -122,21 +116,5 @@ public class JsDefinitionAdapter implements DefinitionAdapter<Object> {
     @Override
     public boolean accepts(Class<?> type) {
         return true;
-    }
-
-    public void setCategory(String definitionId, String category) {
-        categories.put(definitionId, category);
-    }
-
-    public void setLabels(String definitionId, String[] definitionLabels) {
-        labels.put(definitionId, Arrays.stream(definitionLabels).collect(Collectors.joining(",")));
-    }
-
-    public void setDefinitionNameField(String definitionId, String nameField) {
-        nameFields.put(definitionId, nameField);
-    }
-
-    public void setTranslationService(StunnerTranslationService translationService) {
-        this.translationService = translationService;
     }
 }

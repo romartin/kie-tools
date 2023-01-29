@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Red Hat, Inc. and/or its affiliates.
+ * Copyright 2022 Red Hat, Inc. and/or its affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,17 +14,15 @@
  * limitations under the License.
  */
 
-package org.kie.workbench.common.stunner.core.definition.adapter.binding;
+package org.kie.workbench.common.stunner.sw.client.shapes;
 
-class BindableTestBean1 extends BindableTestBean {
+import com.ait.lienzo.client.core.shape.MultiPath;
+import org.kie.workbench.common.stunner.core.client.shape.impl.NodeShapeImpl;
 
-    String idField;
-    String categoryField;
-    String titleField;
-    String descriptionField;
-    String[] labelsField;
+public class JsNativeShape extends NodeShapeImpl {
 
-    String nameField;
-    String stringField;
-    BindableTestProperty1 propertyField;
+    // TODO: Coupling here stunner view with lienzo, and it should not be!
+    public JsNativeShape(MultiPath path) {
+        super(new JsNativeShapeView(path).asAbstractShape());
+    }
 }

@@ -43,6 +43,7 @@ import org.kie.workbench.common.stunner.core.client.canvas.AbstractCanvasHandler
 import org.kie.workbench.common.stunner.core.client.canvas.CanvasHandler;
 import org.kie.workbench.common.stunner.core.client.canvas.controls.SelectionControl;
 import org.kie.workbench.common.stunner.core.client.canvas.util.CanvasFileExport;
+import org.kie.workbench.common.stunner.core.client.command.CanvasCommandFactory;
 import org.kie.workbench.common.stunner.core.client.command.CanvasCommandManager;
 import org.kie.workbench.common.stunner.core.client.command.ClearAllCommand;
 import org.kie.workbench.common.stunner.core.client.service.ClientRuntimeError;
@@ -53,11 +54,14 @@ import org.kie.workbench.common.stunner.core.command.util.CommandUtils;
 import org.kie.workbench.common.stunner.core.diagram.Diagram;
 import org.kie.workbench.common.stunner.core.diagram.DiagramParsingException;
 import org.kie.workbench.common.stunner.core.diagram.Metadata;
+import org.kie.workbench.common.stunner.core.factory.graph.EdgeFactory;
+import org.kie.workbench.common.stunner.core.factory.graph.NodeFactory;
 import org.kie.workbench.common.stunner.core.graph.Edge;
 import org.kie.workbench.common.stunner.core.graph.Element;
 import org.kie.workbench.common.stunner.core.graph.Node;
 import org.kie.workbench.common.stunner.core.graph.content.view.View;
 import org.kie.workbench.common.stunner.sw.SWDomainInitializer;
+import org.kie.workbench.common.stunner.sw.client.ShapeFactory;
 import org.kie.workbench.common.stunner.sw.client.services.ClientDiagramService;
 import org.kie.workbench.common.stunner.sw.client.services.IncrementalMarshaller;
 import org.kie.workbench.common.stunner.sw.marshall.Message;
@@ -102,11 +106,19 @@ public class DiagramEditor {
     }
 
     @Inject
-    SWDomainInitializer domainInitializer;
+    SWDomainInitializer swDomainInitializer;
+    @Inject
+    ShapeFactory shapeFactory;
 
     public void onStartup(final PlaceRequest place) {
-        domainInitializer.initialize();
+        swDomainInitializer.initialize();
+
+        EditorWindow.jsDomainInitializer = JsDomainInitializer.build(swDomainInitializer.getDomainInitializer(),
+                                                                     shapeFactory);
+        EditorWindow.jsDomainInitializer.injectScript();
+
         stunnerEditor.setReadOnly(true);
+
     }
 
     public IsWidget asWidget() {
@@ -196,6 +208,26 @@ public class DiagramEditor {
 
     @SuppressWarnings("all")
     Diagram renderDiagram;
+
+    @Inject
+    private CanvasCommandFactory commandFactory;
+    @Inject
+    private NodeFactory nodeFactory;
+    @Inject
+    private EdgeFactory edgeFactory;
+
+    @SuppressWarnings("all")
+    private void onDiagramOpenSuccess() {
+        Diagram diagram = stunnerEditor.getCanvasHandler().getDiagram();
+        Metadata metadata = diagram.getMetadata();
+        String title = metadata.getTitle();
+        Path path = PathFactory.newPath(title, "/" + title + ".sw");
+        metadata.setPath(path);
+        incrementalMarshaller.run(diagramService.getMarshaller());
+
+        JsStunnerCommands commands = new JsStunnerCommands(commandFactory, nodeFactory, edgeFactory);
+        EditorWindow.jsStunnerCommands = commands;
+    }
 
     public Promise<Void> updateContent(final String path, final String value) {
         return promises.create((success, failure) -> {
@@ -331,16 +363,6 @@ public class DiagramEditor {
         final ClientRuntimeError clientRuntimeError =
                 new ClientRuntimeError(error.getMessage(), diagramParsingException);
         stunnerEditor.handleError(clientRuntimeError);
-    }
-
-    @SuppressWarnings("all")
-    private void onDiagramOpenSuccess() {
-        Diagram diagram = stunnerEditor.getCanvasHandler().getDiagram();
-        Metadata metadata = diagram.getMetadata();
-        String title = metadata.getTitle();
-        Path path = PathFactory.newPath(title, "/" + title + ".sw");
-        metadata.setPath(path);
-        incrementalMarshaller.run(diagramService.getMarshaller());
     }
 
     @SuppressWarnings("all")

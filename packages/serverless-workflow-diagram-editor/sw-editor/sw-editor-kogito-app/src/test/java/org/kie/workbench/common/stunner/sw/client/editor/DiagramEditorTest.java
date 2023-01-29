@@ -227,7 +227,7 @@ public class DiagramEditorTest {
                                        canvasFileExport,
                                        togglePreviewEvent));
         tested.jsRegExp = jsRegExp;
-        tested.domainInitializer = domainInitializer;
+        tested.swDomainInitializer = domainInitializer;
         when(tested.getJsCanvas()).thenReturn(jsCanvas);
     }
 

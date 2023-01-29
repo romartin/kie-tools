@@ -19,11 +19,15 @@ package org.kie.workbench.common.stunner.sw.client;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
+import com.ait.lienzo.client.core.shape.MultiPath;
+import elemental2.dom.DomGlobal;
+import jsinterop.base.Js;
 import org.appformer.kogito.bridge.client.resource.ResourceContentService;
 import org.kie.workbench.common.stunner.core.client.shape.Shape;
 import org.kie.workbench.common.stunner.core.definition.shape.Glyph;
 import org.kie.workbench.common.stunner.sw.client.resources.GlyphFactory;
 import org.kie.workbench.common.stunner.sw.client.shapes.EndShape;
+import org.kie.workbench.common.stunner.sw.client.shapes.JsNativeShape;
 import org.kie.workbench.common.stunner.sw.client.shapes.StartShape;
 import org.kie.workbench.common.stunner.sw.client.shapes.StateShape;
 import org.kie.workbench.common.stunner.sw.client.shapes.TransitionShape;
@@ -70,6 +74,12 @@ public class ShapeFactory
             return new StateShape((State) instance, resourceContentService);
         } else if (TransitionShape.isTransition(instance)) {
             return TransitionShape.create(instance).setAppearance(instance);
+        } else if (null != instance) {
+            Object view = JsShapeFactory.createShapeFor(instance);
+            if (null != view) {
+                MultiPath path = Js.uncheckedCast(view);
+                return new JsNativeShape(path);
+            }
         }
         return null;
     }
@@ -121,6 +131,8 @@ public class ShapeFactory
             return GlyphFactory.TRANSITION_COMPENSATION;
         }
 
-        throw new IllegalArgumentException("Definition " + definitionId + " do not have a Glyph.");
+        // TODO
+        DomGlobal.console.warn("Definition " + definitionId + " does not have a Glyph.");
+        return GlyphFactory.STATE_OPERATION;
     }
 }

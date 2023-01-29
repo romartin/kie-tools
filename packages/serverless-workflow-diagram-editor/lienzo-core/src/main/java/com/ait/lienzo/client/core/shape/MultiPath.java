@@ -42,12 +42,14 @@ public class MultiPath extends AbstractMultiPathPartShape<MultiPath> {
     public MultiPath(String[] paths) {
         super(ShapeType.MULTI_PATH);
 
-        for (String path : paths) {
-            PathPartList list = getOrIncrementList();
+        if (null != paths) {
+            for (String path : paths) {
+                PathPartList list = getOrIncrementList();
 
-            SVGPath.parse(list, path);
+                SVGPath.parse(list, path);
 
-            list.close();
+                list.close();
+            }
         }
     }
 

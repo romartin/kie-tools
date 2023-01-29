@@ -28,11 +28,13 @@ import javax.inject.Inject;
 
 import org.kie.workbench.common.stunner.core.api.DefinitionManager;
 import org.kie.workbench.common.stunner.core.api.JsDefinitionManager;
+import org.kie.workbench.common.stunner.core.definition.jsadapter.JsAdapterUtils;
 import org.kie.workbench.common.stunner.core.definition.jsadapter.JsDefinitionAdapter;
 import org.kie.workbench.common.stunner.core.definition.jsadapter.JsDefinitionSetAdapter;
+import org.kie.workbench.common.stunner.core.definition.jsadapter.JsDomains;
 import org.kie.workbench.common.stunner.core.definition.jsadapter.JsPropertyAdapter;
 import org.kie.workbench.common.stunner.core.definition.jsadapter.JsRuleAdapter;
-import org.kie.workbench.common.stunner.core.i18n.StunnerTranslationService;
+import org.kie.workbench.common.stunner.core.registry.DynamicRegistry;
 import org.kie.workbench.common.stunner.core.rule.Rule;
 import org.kie.workbench.common.stunner.core.rule.RuleSetImpl;
 import org.kie.workbench.common.stunner.core.rule.context.EdgeCardinalityContext;
@@ -48,23 +50,21 @@ public class DomainInitializer {
     @Inject
     DefinitionManager definitionManager;
     @Inject
+    JsDomains domains;
+    @Inject
+    JsDefinitionSetAdapter jsDefinitionSetAdapter;
+    @Inject
     JsDefinitionAdapter jsDefinitionAdapter;
     @Inject
     JsPropertyAdapter jsPropertyAdapter;
     @Inject
-    private JsRuleAdapter jsRuleAdapter;
-    @Inject
-    StunnerTranslationService translationService;
-    @Inject
-    JsDefinitionSetAdapter jsDefinitionSetAdapter;
+    JsRuleAdapter jsRuleAdapter;
 
     Collection<Rule> rules;
 
     @PostConstruct
     public void build() {
-        JsDefinitionManager jsDefinitionManager = JsDefinitionManager.build(translationService,
-                                                                            definitionManager.definitionSets(),
-                                                                            jsDefinitionSetAdapter,
+        JsDefinitionManager jsDefinitionManager = JsDefinitionManager.build(jsDefinitionSetAdapter,
                                                                             jsDefinitionAdapter,
                                                                             jsPropertyAdapter,
                                                                             jsRuleAdapter);
@@ -73,45 +73,50 @@ public class DomainInitializer {
         this.rules = new HashSet<>();
     }
 
+    @SuppressWarnings("all")
     public DomainInitializer initializeDefinitionSet(Object definitionSet) {
-        JsWindow.editor.definitions.initializeDefinitionSet(definitionSet);
+        domains.getDomainInfo().definitionSet = definitionSet;
+        ((DynamicRegistry) definitionManager.definitionSets()).register(definitionSet);
         return this;
     }
 
     public DomainInitializer initializeDefinitionsField(String definitionsField) {
-        JsWindow.editor.definitions.initializeDefinitionsField(definitionsField);
+        domains.getDomainInfo().definitionsField = definitionsField;
         return this;
     }
 
     public DomainInitializer initializeDomainQualifier(Annotation domainQualifier) {
-        JsWindow.editor.definitions.initializeDomainQualifier(domainQualifier);
+        domains.getDomainInfo().domainQualifier = domainQualifier;
+        return this;
+    }
+
+    public DomainInitializer initializeDefinition(Object type) {
+        String typeId = JsAdapterUtils.getClassId(type);
+        domains.getDomainInfo().addDefinition(typeId);
         return this;
     }
 
     @SuppressWarnings("all")
-    public DomainInitializer initializeCategory(Class type, String category) {
-        JsWindow.editor.definitions.initializeCategory(type.getName(), category);
+    public DomainInitializer initializeCategory(Object type, String category) {
+        String typeId = JsAdapterUtils.getClassId(type);
+        domains.getDomainInfo().setCategory(typeId, category);
         return this;
     }
 
     @SuppressWarnings("all")
-    public DomainInitializer initializeLabels(Class type, String... definitionLabels) {
-        JsWindow.editor.definitions.initializeLabels(type.getName(), definitionLabels);
+    public DomainInitializer initializeLabels(Object type, String... definitionLabels) {
+        String typeId = JsAdapterUtils.getClassId(type);
+        domains.getDomainInfo().setLabels(typeId, definitionLabels);
         return this;
     }
 
     @SuppressWarnings("all")
     public DomainInitializer initializeDefinitionNameField(Class type, String nameField) {
-        JsWindow.editor.definitions.initializeDefinitionNameField(type.getName(), nameField);
+        domains.getDomainInfo().setDefinitionNameField(JsAdapterUtils.getClassId(type), nameField);
         return this;
     }
 
-    public DomainInitializer initializeRules() {
-        JsWindow.editor.definitions.initializeRules(new RuleSetImpl("DefinitionsRuleAdapterImpl", rules));
-        return this;
-    }
-
-    public DomainInitializer setContainmentRule(Class type, String... roles) {
+    public DomainInitializer addContainmentRule(Class type, String... roles) {
         final HashSet<String> allowedRoles = new HashSet<>(roles.length);
         allowedRoles.addAll(Arrays.asList(roles));
         rules.add(new CanContain("CAN_CONTAIN" + rules.size(), type.getName(), allowedRoles));
@@ -119,7 +124,7 @@ public class DomainInitializer {
         return this;
     }
 
-    public DomainInitializer setConnectionRule(Class type, String[]... roles) {
+    public DomainInitializer addConnectionRule(Class type, String[]... roles) {
         final ArrayList<CanConnect.PermittedConnection> allowedRoles = new ArrayList<>(roles.length);
         for (String[] role : roles) {
             allowedRoles.add(new CanConnect.PermittedConnection(role[0], role[1]));
@@ -129,7 +134,7 @@ public class DomainInitializer {
         return this;
     }
 
-    public DomainInitializer setDockingRule(Class type, String... roles) {
+    public DomainInitializer addDockingRule(Class type, String... roles) {
         final HashSet<String> allowedRoles = new HashSet<>(roles.length);
         allowedRoles.addAll(Arrays.asList(roles));
         rules.add(new CanDock("CAN_DOCK" + rules.size(), type.getName(), allowedRoles));
@@ -137,13 +142,13 @@ public class DomainInitializer {
         return this;
     }
 
-    public DomainInitializer setOccurrences(String role, int minOccurrences, int maxOccurrences) {
+    public DomainInitializer addOccurrences(String role, int minOccurrences, int maxOccurrences) {
         rules.add(new Occurrences("OCCURRENCES" + rules.size(), role, minOccurrences, maxOccurrences));
 
         return this;
     }
 
-    public DomainInitializer setEdgeOccurrences(Class type,
+    public DomainInitializer addEdgeOccurrences(Class type,
                                                 String role,
                                                 boolean isIncoming,
                                                 int minOccurrences,
@@ -159,4 +164,11 @@ public class DomainInitializer {
 
         return this;
     }
+
+    public DomainInitializer initializeRules() {
+        RuleSetImpl ruleSet = new RuleSetImpl("DefinitionsRuleAdapterImpl", rules);
+        domains.getDomainInfo().setRuleSet(ruleSet);
+        return this;
+    }
+
 }
