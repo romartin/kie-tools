@@ -130,18 +130,46 @@ public class AutoLayout {
                 List<Edge> outEdges = (List<Edge>) node.getOutEdges().stream()
                         .filter(e -> ((Edge) e).getContent() instanceof ViewConnector)
                         .collect(Collectors.toList());
+                List<Edge> inEdges = (List<Edge>) node.getInEdges().stream()
+                        .filter(e -> ((Edge) e).getContent() instanceof ViewConnector)
+                        .collect(Collectors.toList());
+                final int inConnectionsSize = inEdges.size();
                 final int outConnectionsSize = outEdges.size();
+
+                // Incoming connections
+                if (inConnectionsSize >= 1) {
+                    for (int i = 0; i < inConnectionsSize; i++) {
+                        Edge edge = inEdges.get(i);
+                        ViewConnector content = (ViewConnector) edge.getContent();
+                        MagnetConnection targetConnection = (MagnetConnection) content.getTargetConnection().get();
+
+                        // Handle connection / magnet default settings.
+                        if (inConnectionsSize == 1) {
+                            targetConnection.setAuto(false);
+                            targetConnection.setIndex(targetConnection.MAGNET_TOP);
+                        } else {
+                            targetConnection.setAuto(false);
+                            targetConnection.setIndex(targetConnection.MAGNET_CENTER);
+                        }
+                    }
+                }
+
+                // Outgoing connections
                 if (outConnectionsSize >= 1) {
                     for (int i = 0; i < outConnectionsSize; i++) {
                         Edge edge = outEdges.get(i);
                         ViewConnector content = (ViewConnector) edge.getContent();
                         MagnetConnection sourceConnection = (MagnetConnection) content.getSourceConnection().get();
                         MagnetConnection targetConnection = (MagnetConnection) content.getTargetConnection().get();
-                        // Handle connection / nagnet default settings.
-                        sourceConnection.setAuto(false);
-                        sourceConnection.setIndex(0);
-                        targetConnection.setAuto(false);
-                        targetConnection.setIndex(0);
+
+                        // Handle connection / magnet default settings.
+                        if (outConnectionsSize == 1) {
+                            sourceConnection.setAuto(false);
+                            sourceConnection.setIndex(targetConnection.MAGNET_BOTTOM);
+                        } else {
+                            sourceConnection.setAuto(false);
+                            sourceConnection.setIndex(targetConnection.MAGNET_CENTER);
+                        }
 
                         org.kie.workbench.common.stunner.core.graph.content.view.Point2D sourceLocation = sourceConnection.getLocation();
                         org.kie.workbench.common.stunner.core.graph.content.view.Point2D targetLocation = targetConnection.getLocation();
