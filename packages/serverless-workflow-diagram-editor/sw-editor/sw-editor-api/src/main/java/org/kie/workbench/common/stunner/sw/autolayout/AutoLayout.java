@@ -144,11 +144,10 @@ public class AutoLayout {
                         MagnetConnection targetConnection = (MagnetConnection) content.getTargetConnection().get();
 
                         // Handle connection / magnet default settings.
-                        if (inConnectionsSize == 1) {
-                            targetConnection.setAuto(false);
+                        targetConnection.setAuto(false);
+                        if (i == 0) {
                             targetConnection.setIndex(targetConnection.MAGNET_TOP);
                         } else {
-                            targetConnection.setAuto(false);
                             targetConnection.setIndex(targetConnection.MAGNET_CENTER);
                         }
                     }
@@ -211,16 +210,17 @@ public class AutoLayout {
                                         boolean isTopBottom = sourceBounds.getY() < controlPoints[j].getLocation().getY();
                                         double ty = sourceBounds.getY() + (isTopBottom ? sourceBounds.getHeight() + padding : -padding);
                                         controlPoints[j].getLocation().setY(ty);
-                                        sourceConnection.setIndex(isTopBottom ? 3 : 1);
+                                        sourceConnection.setIndex(targetConnection.MAGNET_BOTTOM);
                                         sourceConnection.setAuto(false);
                                     }
                                     if (j == controlPoints.length - 1) {
                                         boolean isTopBottom = targetBounds.getY() < controlPoints[j].getLocation().getY();
                                         double ty = targetBounds.getY() + (isTopBottom ? targetBounds.getHeight() + padding : -padding);
                                         controlPoints[j].getLocation().setY(ty);
-                                        targetConnection.setIndex(isTopBottom ? 3 : 1);
+                                        targetConnection.setIndex(targetConnection.MAGNET_CENTER);
                                         sourceConnection.setAuto(false);
                                     }
+
                                     ControlPoint cp = controlPoints[j];
                                     if (cp.getLocation().getX() > maxx) {
                                         maxx = cp.getLocation().getX();
@@ -228,6 +228,7 @@ public class AutoLayout {
                                             controlPoints[k].getLocation().setX(maxx);
                                         }
                                     }
+
                                     cp.getLocation().setX(maxx);
                                 }
                                 content.setControlPoints(new ControlPoint[]{
