@@ -31,15 +31,21 @@ import org.jboss.errai.ioc.client.api.ManagedInstance;
 import org.kie.workbench.common.stunner.client.lienzo.canvas.LienzoCanvas;
 import org.kie.workbench.common.stunner.client.lienzo.canvas.LienzoPanel;
 import org.kie.workbench.common.stunner.client.lienzo.util.StunnerStateApplier;
+import org.kie.workbench.common.stunner.client.widgets.api.JsStunnerEditor;
+import org.kie.workbench.common.stunner.client.widgets.api.JsStunnerWindow;
 import org.kie.workbench.common.stunner.client.widgets.presenters.session.SessionDiagramPresenter;
 import org.kie.workbench.common.stunner.client.widgets.presenters.session.SessionPresenter;
 import org.kie.workbench.common.stunner.client.widgets.presenters.session.impl.SessionEditorPresenter;
 import org.kie.workbench.common.stunner.client.widgets.presenters.session.impl.SessionViewerPresenter;
+import org.kie.workbench.common.stunner.core.api.DomainInitializer;
+import org.kie.workbench.common.stunner.core.api.JsDefinitionManager;
+import org.kie.workbench.common.stunner.core.api.JsDomainInitializer;
+import org.kie.workbench.common.stunner.core.client.api.JsStunnerCommands;
 import org.kie.workbench.common.stunner.core.client.api.JsStunnerSession;
-import org.kie.workbench.common.stunner.core.client.api.JsWindow;
 import org.kie.workbench.common.stunner.core.client.canvas.AbstractCanvas;
 import org.kie.workbench.common.stunner.core.client.canvas.CanvasHandler;
 import org.kie.workbench.common.stunner.core.client.canvas.controls.AlertsControl;
+import org.kie.workbench.common.stunner.core.client.command.CanvasCommandFactory;
 import org.kie.workbench.common.stunner.core.client.i18n.ClientTranslationService;
 import org.kie.workbench.common.stunner.core.client.service.ClientRuntimeError;
 import org.kie.workbench.common.stunner.core.client.session.ClientSession;
@@ -48,8 +54,14 @@ import org.kie.workbench.common.stunner.core.client.session.impl.EditorSession;
 import org.kie.workbench.common.stunner.core.client.session.impl.ViewerSession;
 import org.kie.workbench.common.stunner.core.client.shape.Shape;
 import org.kie.workbench.common.stunner.core.definition.exception.DefinitionNotFoundException;
+import org.kie.workbench.common.stunner.core.definition.jsadapter.JsDefinitionAdapter;
+import org.kie.workbench.common.stunner.core.definition.jsadapter.JsDefinitionSetAdapter;
+import org.kie.workbench.common.stunner.core.definition.jsadapter.JsPropertyAdapter;
+import org.kie.workbench.common.stunner.core.definition.jsadapter.JsRuleAdapter;
 import org.kie.workbench.common.stunner.core.diagram.Diagram;
 import org.kie.workbench.common.stunner.core.diagram.DiagramParsingException;
+import org.kie.workbench.common.stunner.core.factory.graph.EdgeFactory;
+import org.kie.workbench.common.stunner.core.factory.graph.NodeFactory;
 import org.kie.workbench.common.stunner.core.i18n.CoreTranslationMessages;
 import org.kie.workbench.common.widgets.client.errorpage.ErrorPage;
 
@@ -69,11 +81,6 @@ public class StunnerEditor {
     private Consumer<Throwable> exceptionProcessor;
     private AlertsControl<AbstractCanvas> alertsControl;
 
-    // CDI proxy.
-    public StunnerEditor() {
-        this(null, null, null, null, null);
-    }
-
     @Inject
     public StunnerEditor(ManagedInstance<SessionEditorPresenter<EditorSession>> editorSessionPresenterInstances,
                          ManagedInstance<SessionViewerPresenter<ViewerSession>> viewerSessionPresenterInstances,
@@ -92,16 +99,38 @@ public class StunnerEditor {
         };
     }
 
-    public void setReadOnly(boolean readOnly) {
+    @Inject
+    JsDefinitionSetAdapter jsDefinitionSetAdapter;
+    @Inject
+    JsDefinitionAdapter jsDefinitionAdapter;
+    @Inject
+    JsPropertyAdapter jsPropertyAdapter;
+    @Inject
+    JsRuleAdapter jsRuleAdapter;
+
+    public StunnerEditor initialize(DomainInitializer domainInitializer) {
+        JsStunnerWindow.editor = new JsStunnerEditor();
+        JsStunnerWindow.editor.definitions = JsDefinitionManager.build(jsDefinitionSetAdapter,
+                                                                       jsDefinitionAdapter,
+                                                                       jsPropertyAdapter,
+                                                                       jsRuleAdapter);
+        JsStunnerWindow.editor.domainInitializer = JsDomainInitializer.build(domainInitializer);
+        return this;
+    }
+
+    public StunnerEditor setReadOnly(boolean readOnly) {
         isReadOnly = readOnly;
+        return this;
     }
 
-    public void setParsingExceptionProcessor(Consumer<DiagramParsingException> parsingExceptionProcessor) {
+    public StunnerEditor setParsingExceptionProcessor(Consumer<DiagramParsingException> parsingExceptionProcessor) {
         this.parsingExceptionProcessor = parsingExceptionProcessor;
+        return this;
     }
 
-    public void setExceptionProcessor(Consumer<Throwable> exceptionProcessor) {
+    public StunnerEditor setExceptionProcessor(Consumer<Throwable> exceptionProcessor) {
         this.exceptionProcessor = exceptionProcessor;
+        return this;
     }
 
     @SuppressWarnings("all")
@@ -155,25 +184,35 @@ public class StunnerEditor {
         });
     }
 
+    @Inject
+    private CanvasCommandFactory commandFactory;
+    @Inject
+    private NodeFactory nodeFactory;
+    @Inject
+    private EdgeFactory edgeFactory;
+
     @SuppressWarnings("all")
     private void initializeJsSession(AbstractSession session) {
-        JsStunnerSession jssession = new JsStunnerSession(session);
-        JsWindow.editor.session = jssession;
+        JsStunnerSession jssession = new JsStunnerSession(session, JsStunnerWindow.editor.definitions);
+        JsStunnerWindow.editor.session = jssession;
+        JsStunnerCommands commands = new JsStunnerCommands(commandFactory, nodeFactory, edgeFactory, jssession);
+        JsStunnerWindow.editor.commands = commands;
         initializeJsCanvas(session);
     }
 
     @SuppressWarnings("all")
     private void initializeJsCanvas(AbstractSession session) {
-        LienzoCanvas canvas = (LienzoCanvas) session.getCanvasHandler().getCanvas();
-        LienzoPanel panel = (LienzoPanel) canvas.getView().getPanel();
-        LienzoBoundsPanel lienzoPanel = panel.getView();
+        final LienzoCanvas canvas = (LienzoCanvas) session.getCanvasHandler().getCanvas();
+        final LienzoPanel panel = (LienzoPanel) canvas.getView().getPanel();
+        final LienzoBoundsPanel lienzoPanel = panel.getView();
         JsCanvas jsCanvas = new JsCanvas(lienzoPanel, lienzoPanel.getLayer(), new StunnerStateApplier() {
             @Override
             public Shape getShape(String uuid) {
                 return canvas.getShape(uuid);
             }
         });
-        JsWindow.canvas = jsCanvas;
+        JsStunnerWindow.editor.canvas = jsCanvas;
+        JsStunnerWindow.canvas = jsCanvas;
     }
 
     public int getCurrentContentHash() {

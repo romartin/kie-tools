@@ -24,26 +24,34 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.event.Event;
 import javax.inject.Inject;
 
+import com.ait.lienzo.client.core.shape.Circle;
+import com.ait.lienzo.client.core.shape.Layer;
+import com.ait.lienzo.client.core.shape.MultiPath;
+import com.ait.lienzo.client.core.shape.Rectangle;
+import com.ait.lienzo.client.core.shape.wires.LayoutContainer;
+import com.ait.lienzo.client.core.shape.wires.WiresShape;
 import com.ait.lienzo.client.core.types.JsCanvas;
+import com.ait.lienzo.client.core.types.Point2D;
 import com.ait.lienzo.client.widget.panel.impl.ScrollablePanel;
 import com.ait.lienzo.client.widget.panel.util.PanelTransformUtils;
+import com.ait.lienzo.shared.core.types.ColorName;
+import com.ait.lienzo.shared.core.types.EventPropagationMode;
 import com.google.gwt.user.client.ui.IsWidget;
 import elemental2.core.JsRegExp;
 import elemental2.core.RegExpResult;
 import elemental2.dom.DomGlobal;
 import elemental2.promise.Promise;
-import jsinterop.base.Js;
 import org.kie.workbench.common.stunner.client.lienzo.canvas.wires.WiresCanvas;
+import org.kie.workbench.common.stunner.client.lienzo.canvas.wires.WiresLayer;
 import org.kie.workbench.common.stunner.client.lienzo.components.mediators.preview.TogglePreviewEvent;
+import org.kie.workbench.common.stunner.client.widgets.api.JsStunnerWindow;
 import org.kie.workbench.common.stunner.client.widgets.canvas.ScrollableLienzoPanel;
 import org.kie.workbench.common.stunner.client.widgets.editor.StunnerEditor;
 import org.kie.workbench.common.stunner.client.widgets.presenters.session.SessionPresenter;
-import org.kie.workbench.common.stunner.core.client.api.JsWindow;
 import org.kie.workbench.common.stunner.core.client.canvas.AbstractCanvasHandler;
 import org.kie.workbench.common.stunner.core.client.canvas.CanvasHandler;
 import org.kie.workbench.common.stunner.core.client.canvas.controls.SelectionControl;
 import org.kie.workbench.common.stunner.core.client.canvas.util.CanvasFileExport;
-import org.kie.workbench.common.stunner.core.client.command.CanvasCommandFactory;
 import org.kie.workbench.common.stunner.core.client.command.CanvasCommandManager;
 import org.kie.workbench.common.stunner.core.client.command.ClearAllCommand;
 import org.kie.workbench.common.stunner.core.client.service.ClientRuntimeError;
@@ -54,14 +62,11 @@ import org.kie.workbench.common.stunner.core.command.util.CommandUtils;
 import org.kie.workbench.common.stunner.core.diagram.Diagram;
 import org.kie.workbench.common.stunner.core.diagram.DiagramParsingException;
 import org.kie.workbench.common.stunner.core.diagram.Metadata;
-import org.kie.workbench.common.stunner.core.factory.graph.EdgeFactory;
-import org.kie.workbench.common.stunner.core.factory.graph.NodeFactory;
 import org.kie.workbench.common.stunner.core.graph.Edge;
 import org.kie.workbench.common.stunner.core.graph.Element;
 import org.kie.workbench.common.stunner.core.graph.Node;
 import org.kie.workbench.common.stunner.core.graph.content.view.View;
 import org.kie.workbench.common.stunner.sw.SWDomainInitializer;
-import org.kie.workbench.common.stunner.sw.client.ShapeFactory;
 import org.kie.workbench.common.stunner.sw.client.services.ClientDiagramService;
 import org.kie.workbench.common.stunner.sw.client.services.IncrementalMarshaller;
 import org.kie.workbench.common.stunner.sw.marshall.Message;
@@ -107,18 +112,15 @@ public class DiagramEditor {
 
     @Inject
     SWDomainInitializer swDomainInitializer;
-    @Inject
-    ShapeFactory shapeFactory;
 
     public void onStartup(final PlaceRequest place) {
         swDomainInitializer.initialize();
 
-        EditorWindow.jsDomainInitializer = JsDomainInitializer.build(swDomainInitializer.getDomainInitializer(),
-                                                                     shapeFactory);
-        EditorWindow.jsDomainInitializer.injectScript();
+        stunnerEditor
+                .setReadOnly(true)
+                .initialize(swDomainInitializer.getDomainInitializer());
 
-        stunnerEditor.setReadOnly(true);
-
+        JsStunnerWindow.editor.domainInitializer.injectScript(JsDomainInitializerBundle.INSTANCE.initialize().getText());
     }
 
     public IsWidget asWidget() {
@@ -172,6 +174,7 @@ public class DiagramEditor {
                                                                @Override
                                                                public void onSuccess() {
                                                                    onDiagramOpenSuccess();
+                                                                   // TODO Helping Kieill - testShapeIcons(stunnerEditor);
                                                                    scaleToFitWorkflow(stunnerEditor);
                                                                    if (parseResult.getMessages().length > 0) {
                                                                        for (Message m : parseResult.getMessages()) {
@@ -209,13 +212,6 @@ public class DiagramEditor {
     @SuppressWarnings("all")
     Diagram renderDiagram;
 
-    @Inject
-    private CanvasCommandFactory commandFactory;
-    @Inject
-    private NodeFactory nodeFactory;
-    @Inject
-    private EdgeFactory edgeFactory;
-
     @SuppressWarnings("all")
     private void onDiagramOpenSuccess() {
         Diagram diagram = stunnerEditor.getCanvasHandler().getDiagram();
@@ -224,9 +220,6 @@ public class DiagramEditor {
         Path path = PathFactory.newPath(title, "/" + title + ".sw");
         metadata.setPath(path);
         incrementalMarshaller.run(diagramService.getMarshaller());
-
-        JsStunnerCommands commands = new JsStunnerCommands(commandFactory, nodeFactory, edgeFactory);
-        EditorWindow.jsStunnerCommands = commands;
     }
 
     public Promise<Void> updateContent(final String path, final String value) {
@@ -259,7 +252,7 @@ public class DiagramEditor {
     }
 
     JsCanvas getJsCanvas() {
-        return Js.uncheckedCast(JsWindow.canvas);
+        return JsStunnerWindow.canvas;
     }
 
     @SuppressWarnings("all")
@@ -376,6 +369,85 @@ public class DiagramEditor {
                 jsCanvas.centerNode(uuid);
             }
         }
+    }
+
+    static void testShapeIcons(StunnerEditor stunnerEditor) {
+        WiresCanvas wiresCanvas = (WiresCanvas) stunnerEditor.getCanvasHandler().getCanvas();
+        WiresLayer wiresLayer = wiresCanvas.getView().getLayer();
+        Layer layer = wiresLayer.getLienzoLayer();
+
+        double x = 400;
+        double y = 200;
+        MultiPath path = new MultiPath().rect(0, 0, 100, 100)
+                .setFillColor(ColorName.BLACK);
+        path.addNodeMouseClickHandler(event -> DomGlobal.console.log("PATH - MOUSE CLICK"));
+
+        WiresShape shape = new WiresShape(path);
+        shape.setLocation(new Point2D(x, y));
+
+        shape.getGroup().setEventPropagationMode(EventPropagationMode.LAST_ANCESTOR);
+        //shape.getPath().setEventPropagationMode(EventPropagationMode.NO_ANCESTORS);
+
+        shape.getPath().addNodeMouseEnterHandler((event -> DomGlobal.console.log("SHAPE - MOUSE ENTER")));
+        shape.getPath().addNodeMouseExitHandler(event -> DomGlobal.console.log("SHAPE - MOUSE EXIT"));
+        shape.getPath().addNodeMouseOverHandler(event -> DomGlobal.console.log("SHAPE - MOUSE OVER"));
+        shape.getPath().addNodeMouseOutHandler(event -> DomGlobal.console.log("SHAPE - MOUSE OUT"));
+        shape.getGroup().addNodeMouseClickHandler(event -> {
+            DomGlobal.console.log("SHAPE - MOUSE CLICK");
+            if (null != event.getSource()) {
+                String type = event.getSource().getNodeType().toString();
+                DomGlobal.console.log(type);
+            }
+        });
+
+        Circle icon = new Circle(25)
+                .setFillColor(ColorName.RED)
+                .setFillAlpha(1)
+                .setListening(true);
+        shape.addChild(icon, LayoutContainer.Layout.CENTER);
+
+        wiresCanvas.getWiresManager().register(shape);
+
+        layer.draw();
+    }
+
+    static void testShapeIconsPrimitives(StunnerEditor stunnerEditor) {
+        WiresCanvas wiresCanvas = (WiresCanvas) stunnerEditor.getCanvasHandler().getCanvas();
+        WiresLayer wiresLayer = wiresCanvas.getView().getLayer();
+        Layer layer = wiresLayer.getLienzoLayer();
+
+        double x = 400;
+        double y = 200;
+        Rectangle shape = new Rectangle(100, 100)
+                .setX(x)
+                .setY(y)
+                .setFillColor(ColorName.BLACK)
+                .setFillAlpha(1)
+                .setListening(true);
+        Circle icon = new Circle(25)
+                .setX(x + 50)
+                .setY(y + 50)
+                .setFillColor(ColorName.RED)
+                .setFillAlpha(1)
+                .setListening(true);
+
+        //shape.setEventPropagationMode(EventPropagationMode.FIRST_ANCESTOR);
+        icon.setEventPropagationMode(EventPropagationMode.LAST_ANCESTOR);
+
+        shape.addNodeMouseEnterHandler(event -> DomGlobal.console.log("SHAPE - MOUSE ENTER"));
+        shape.addNodeMouseExitHandler(event -> DomGlobal.console.log("SHAPE - MOUSE EXIT"));
+        shape.addNodeMouseOverHandler(event -> DomGlobal.console.log("SHAPE - MOUSE OVER"));
+        shape.addNodeMouseOutHandler(event -> DomGlobal.console.log("SHAPE - MOUSE OUT"));
+        shape.addNodeMouseClickHandler(event -> DomGlobal.console.log("SHAPE - MOUSE CLICK"));
+
+        icon.addNodeMouseEnterHandler(event -> DomGlobal.console.log("ICON - MOUSE ENTER"));
+        icon.addNodeMouseExitHandler(event -> DomGlobal.console.log("ICON - MOUSE EXIT"));
+        icon.addNodeMouseOverHandler(event -> DomGlobal.console.log("ICON - MOUSE OVER"));
+        icon.addNodeMouseOutHandler(event -> DomGlobal.console.log("ICON - MOUSE OUT"));
+        icon.addNodeMouseClickHandler(event -> DomGlobal.console.log("ICON - MOUSE CLICK"));
+
+        layer.add(shape);
+        layer.add(icon);
     }
 
     static void scaleToFitWorkflow(StunnerEditor stunnerEditor) {

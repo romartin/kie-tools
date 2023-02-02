@@ -6,6 +6,7 @@ import java.util.stream.StreamSupport;
 import jsinterop.annotations.JsIgnore;
 import jsinterop.annotations.JsType;
 import jsinterop.base.Js;
+import org.kie.workbench.common.stunner.core.api.JsDefinitionManager;
 import org.kie.workbench.common.stunner.core.client.canvas.AbstractCanvasHandler;
 import org.kie.workbench.common.stunner.core.client.command.CanvasCommand;
 import org.kie.workbench.common.stunner.core.client.command.CanvasCommandManager;
@@ -24,9 +25,12 @@ public class JsStunnerSession {
 
     @JsIgnore
     private AbstractSession session;
+    @JsIgnore
+    private JsDefinitionManager definitionManager;
 
-    public JsStunnerSession(AbstractSession session) {
+    public JsStunnerSession(AbstractSession session, JsDefinitionManager definitionManager) {
         this.session = session;
+        this.definitionManager = definitionManager;
     }
 
     public Diagram getDiagram() {
@@ -51,7 +55,7 @@ public class JsStunnerSession {
     }
 
     public String getName(Object bean) {
-        return JsWindow.editor.definitions.getName(bean);
+        return definitionManager.getName(bean);
     }
 
     public Edge getEdgeByUUID(String uuid) {

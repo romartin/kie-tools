@@ -31,7 +31,7 @@ import jsinterop.base.JsPropertyMap;
 import org.kie.workbench.common.stunner.core.rule.RuleSet;
 
 @JsType
-public class JsDomainInfo {
+public class JsDomain {
 
     // Def. Set. info.
     public Object definitionSet;
@@ -52,7 +52,7 @@ public class JsDomainInfo {
 
     // TODO: Include all i18n dynamic parameters.
 
-    public JsDomainInfo() {
+    public JsDomain() {
         runtimeDefinitions = new HashSet<String>();
         categories = new HashMap<String, String>();
         labels = new HashMap<String, String>();

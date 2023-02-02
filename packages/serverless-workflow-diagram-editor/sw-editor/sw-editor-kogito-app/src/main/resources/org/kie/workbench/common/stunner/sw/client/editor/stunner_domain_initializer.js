@@ -29,12 +29,13 @@ class Roger {
 }
 
 window.Roger = Roger;
-window.jsDomainInitializer.initializeDefinition(Roger);
-window.jsDomainInitializer.initializeCategory(Roger, "SWStates");
-window.jsDomainInitializer.initializeLabels(Roger, "rootNode", "state");
+window.editor.domainInitializer.addDefinition(Roger);
+window.editor.domainInitializer.setCategory(Roger, "SWStates");
+window.editor.domainInitializer.setLabels(Roger, "rootNode", "state");
 
-window.createShapeFor = function (bean) {
-  console.log("Creating shape view for " + bean);
+window.editor.shapeViewFactory = function (bean) {
+  console.log("Creating shape view for: ");
+  console.log(bean);
   // var mpath = new window.com.ait.lienzo.client.core.shape.MultiPath().circle(25);
   var mpath = new window.com.ait.lienzo.client.core.shape.MultiPath().rect(0, 0, 100, 100);
 

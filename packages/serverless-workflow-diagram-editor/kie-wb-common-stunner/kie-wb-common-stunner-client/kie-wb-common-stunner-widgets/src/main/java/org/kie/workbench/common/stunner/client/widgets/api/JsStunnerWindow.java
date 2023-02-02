@@ -14,13 +14,23 @@
  * limitations under the License.
  */
 
-package org.kie.workbench.common.stunner.sw.client;
+package org.kie.workbench.common.stunner.client.widgets.api;
 
+import com.ait.lienzo.client.core.types.JsCanvas;
 import jsinterop.annotations.JsPackage;
+import jsinterop.annotations.JsProperty;
 import jsinterop.annotations.JsType;
 
 @JsType(isNative = true, namespace = JsPackage.GLOBAL, name = "window")
-public class JsShapeFactory {
+public class JsStunnerWindow {
 
-    public static native Object createShapeFor(Object instance);
+    @JsProperty
+    public static JsStunnerEditor editor;
+
+    /**
+     * @deprecated Use JsStunnerEditor#canvas instead.
+     */
+    @Deprecated
+    @JsProperty
+    public static JsCanvas canvas;
 }

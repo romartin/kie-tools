@@ -48,7 +48,7 @@ public class JsRuleAdapter implements DefinitionSetRuleAdapter<Object> {
     }
 
     private RuleSet getDefaultRuleSet() {
-        return domains.getDomainInfo().getRuleSet();
+        return domains.getDomain().getRuleSet();
     }
 
     @Override

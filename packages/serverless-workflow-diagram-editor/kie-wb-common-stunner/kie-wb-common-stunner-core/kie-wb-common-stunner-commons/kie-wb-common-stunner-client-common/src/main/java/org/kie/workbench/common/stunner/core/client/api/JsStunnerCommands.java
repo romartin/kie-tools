@@ -14,13 +14,11 @@
  * limitations under the License.
  */
 
-package org.kie.workbench.common.stunner.sw.client.editor;
+package org.kie.workbench.common.stunner.core.client.api;
 
 import elemental2.dom.DomGlobal;
 import jsinterop.annotations.JsIgnore;
 import jsinterop.annotations.JsType;
-import org.kie.workbench.common.stunner.core.client.api.JsStunnerSession;
-import org.kie.workbench.common.stunner.core.client.api.JsWindow;
 import org.kie.workbench.common.stunner.core.client.command.CanvasCommand;
 import org.kie.workbench.common.stunner.core.client.command.CanvasCommandFactory;
 import org.kie.workbench.common.stunner.core.command.CommandResult;
@@ -44,11 +42,14 @@ public class JsStunnerCommands {
     private NodeFactory nodeFactory;
     @JsIgnore
     private EdgeFactory edgeFactory;
+    @JsIgnore
+    private JsStunnerSession session;
 
-    public JsStunnerCommands(CanvasCommandFactory commandFactory, NodeFactory nodeFactory, EdgeFactory edgeFactory) {
+    public JsStunnerCommands(CanvasCommandFactory commandFactory, NodeFactory nodeFactory, EdgeFactory edgeFactory, JsStunnerSession session) {
         this.commandFactory = commandFactory;
         this.nodeFactory = nodeFactory;
         this.edgeFactory = edgeFactory;
+        this.session = session;
     }
 
     public Node buildNode(Object def, double width, double height) {
@@ -69,11 +70,11 @@ public class JsStunnerCommands {
     }
 
     public void addNode(Node node) {
-        String rootUUID = getSession().getDiagram().getMetadata().getCanvasRootUUID();
-        String shapeSetId = getSession().getDiagram().getMetadata().getShapeSetId();
+        String rootUUID = session.getDiagram().getMetadata().getCanvasRootUUID();
+        String shapeSetId = session.getDiagram().getMetadata().getShapeSetId();
         CanvasCommand command;
         if (null != rootUUID) {
-            Node parent = getSession().getNodeByUUID(rootUUID);
+            Node parent = session.getNodeByUUID(rootUUID);
             command = commandFactory.addChildNode(parent, node, shapeSetId);
         } else {
             command = commandFactory.addNode(node, shapeSetId);
@@ -104,14 +105,10 @@ public class JsStunnerCommands {
     // TODO: undo / redo ?
 
     private void execute(CanvasCommand command) {
-        CommandResult result = getSession().execute(command);
+        CommandResult result = session.execute(command);
         if (CommandResult.Type.ERROR.equals(result.getType())) {
             logError(result.getViolations().iterator().next().toString());
         }
-    }
-
-    private JsStunnerSession getSession() {
-        return JsWindow.editor.session;
     }
 
     private static void logError(String message) {

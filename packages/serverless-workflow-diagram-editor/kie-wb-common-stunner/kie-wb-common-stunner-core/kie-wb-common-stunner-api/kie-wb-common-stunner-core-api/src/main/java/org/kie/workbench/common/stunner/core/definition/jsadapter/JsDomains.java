@@ -22,20 +22,20 @@ import javax.enterprise.context.ApplicationScoped;
 @ApplicationScoped
 public class JsDomains {
 
-    private JsDomainInfo domainInfo;
+    private JsDomain domain;
 
     public JsDomains() {
-        domainInfo = new JsDomainInfo();
+        domain = new JsDomain();
     }
 
-    public JsDomainInfo getDomainInfo() {
-        return domainInfo;
+    public JsDomain getDomain() {
+        return domain;
     }
 
-    public JsDomainInfo getDomainInfo(Object pojo) {
-        if (domainInfo.definitionSet == pojo) {
-            return domainInfo;
+    public JsDomain getDomain(Object pojo) {
+        if (domain.definitionSet == pojo) {
+            return domain;
         }
-        throw new UnsupportedOperationException("Just a single JsDomainInfo instance is supported.");
+        throw new UnsupportedOperationException("Just a single JsDomain instance is supported.");
     }
 }

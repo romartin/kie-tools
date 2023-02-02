@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Red Hat, Inc. and/or its affiliates.
+ * Copyright 2023 Red Hat, Inc. and/or its affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,26 +14,20 @@
  * limitations under the License.
  */
 
-package org.kie.workbench.common.stunner.core.client.api;
+package org.kie.workbench.common.stunner.core.api;
 
 import java.lang.annotation.Annotation;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.stream.Collectors;
 
-import javax.annotation.PostConstruct;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
-import org.kie.workbench.common.stunner.core.api.DefinitionManager;
-import org.kie.workbench.common.stunner.core.api.JsDefinitionManager;
 import org.kie.workbench.common.stunner.core.definition.jsadapter.JsAdapterUtils;
-import org.kie.workbench.common.stunner.core.definition.jsadapter.JsDefinitionAdapter;
-import org.kie.workbench.common.stunner.core.definition.jsadapter.JsDefinitionSetAdapter;
 import org.kie.workbench.common.stunner.core.definition.jsadapter.JsDomains;
-import org.kie.workbench.common.stunner.core.definition.jsadapter.JsPropertyAdapter;
-import org.kie.workbench.common.stunner.core.definition.jsadapter.JsRuleAdapter;
 import org.kie.workbench.common.stunner.core.registry.DynamicRegistry;
 import org.kie.workbench.common.stunner.core.rule.Rule;
 import org.kie.workbench.common.stunner.core.rule.RuleSetImpl;
@@ -51,68 +45,53 @@ public class DomainInitializer {
     DefinitionManager definitionManager;
     @Inject
     JsDomains domains;
-    @Inject
-    JsDefinitionSetAdapter jsDefinitionSetAdapter;
-    @Inject
-    JsDefinitionAdapter jsDefinitionAdapter;
-    @Inject
-    JsPropertyAdapter jsPropertyAdapter;
-    @Inject
-    JsRuleAdapter jsRuleAdapter;
 
-    Collection<Rule> rules;
+    private final Collection<Rule> rules;
 
-    @PostConstruct
-    public void build() {
-        JsDefinitionManager jsDefinitionManager = JsDefinitionManager.build(jsDefinitionSetAdapter,
-                                                                            jsDefinitionAdapter,
-                                                                            jsPropertyAdapter,
-                                                                            jsRuleAdapter);
-        JsWindow.editor = new JsStunnerEditor();
-        JsWindow.editor.definitions = jsDefinitionManager;
+    public DomainInitializer() {
         this.rules = new HashSet<>();
     }
 
     @SuppressWarnings("all")
-    public DomainInitializer initializeDefinitionSet(Object definitionSet) {
-        domains.getDomainInfo().definitionSet = definitionSet;
+    public DomainInitializer setDefinitionSet(Object definitionSet) {
+        domains.getDomain().definitionSet = definitionSet;
         ((DynamicRegistry) definitionManager.definitionSets()).register(definitionSet);
         return this;
     }
 
-    public DomainInitializer initializeDefinitionsField(String definitionsField) {
-        domains.getDomainInfo().definitionsField = definitionsField;
+    public DomainInitializer setDefinitionsField(String definitionsField) {
+        domains.getDomain().definitionsField = definitionsField;
         return this;
     }
 
-    public DomainInitializer initializeDomainQualifier(Annotation domainQualifier) {
-        domains.getDomainInfo().domainQualifier = domainQualifier;
+    public DomainInitializer setDomainQualifier(Annotation domainQualifier) {
+        domains.getDomain().domainQualifier = domainQualifier;
         return this;
     }
 
-    public DomainInitializer initializeDefinition(Object type) {
+    public DomainInitializer addDefinition(Object type) {
         String typeId = JsAdapterUtils.getClassId(type);
-        domains.getDomainInfo().addDefinition(typeId);
+        domains.getDomain().addDefinition(typeId);
         return this;
     }
 
     @SuppressWarnings("all")
-    public DomainInitializer initializeCategory(Object type, String category) {
+    public DomainInitializer setCategory(Object type, String category) {
         String typeId = JsAdapterUtils.getClassId(type);
-        domains.getDomainInfo().setCategory(typeId, category);
+        domains.getDomain().setCategory(typeId, category);
         return this;
     }
 
     @SuppressWarnings("all")
-    public DomainInitializer initializeLabels(Object type, String... definitionLabels) {
+    public DomainInitializer setLabels(Object type, String... definitionLabels) {
         String typeId = JsAdapterUtils.getClassId(type);
-        domains.getDomainInfo().setLabels(typeId, definitionLabels);
+        domains.getDomain().setLabels(typeId, definitionLabels);
         return this;
     }
 
     @SuppressWarnings("all")
-    public DomainInitializer initializeDefinitionNameField(Class type, String nameField) {
-        domains.getDomainInfo().setDefinitionNameField(JsAdapterUtils.getClassId(type), nameField);
+    public DomainInitializer setDefinitionNameField(Class type, String nameField) {
+        domains.getDomain().setDefinitionNameField(JsAdapterUtils.getClassId(type), nameField);
         return this;
     }
 
@@ -166,9 +145,9 @@ public class DomainInitializer {
     }
 
     public DomainInitializer initializeRules() {
-        RuleSetImpl ruleSet = new RuleSetImpl("DefinitionsRuleAdapterImpl", rules);
-        domains.getDomainInfo().setRuleSet(ruleSet);
+        RuleSetImpl ruleSet = new RuleSetImpl("DefinitionsRuleAdapterImpl", rules.stream().collect(Collectors.<Rule>toSet()));
+        domains.getDomain().setRuleSet(ruleSet);
+        rules.clear();
         return this;
     }
-
 }

@@ -59,7 +59,7 @@ public class JsDefinitionSetAdapter implements DefinitionSetAdapter<Object> {
 
     @Override
     public Set<String> getDefinitions(Object pojo) {
-        return domains.getDomainInfo(pojo).getDefinitions();
+        return domains.getDomain(pojo).getDefinitions();
     }
 
     @Override
@@ -69,7 +69,7 @@ public class JsDefinitionSetAdapter implements DefinitionSetAdapter<Object> {
 
     @Override
     public Annotation getQualifier(Object pojo) {
-        return domains.getDomainInfo(pojo).domainQualifier;
+        return domains.getDomain(pojo).domainQualifier;
     }
 
     @Override

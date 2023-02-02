@@ -18,6 +18,7 @@ package org.kie.workbench.common.stunner.sw.client.shapes;
 
 import com.ait.lienzo.client.core.shape.MultiPath;
 
+// TODO: Move to core.
 public class JsNativeShapeView extends ServerlessWorkflowBasicShape<JsNativeShapeView> {
 
     public JsNativeShapeView(MultiPath path) {

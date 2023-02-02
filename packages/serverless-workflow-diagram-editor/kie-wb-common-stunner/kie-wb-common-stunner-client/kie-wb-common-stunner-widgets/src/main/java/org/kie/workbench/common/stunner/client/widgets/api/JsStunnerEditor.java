@@ -14,12 +14,22 @@
  * limitations under the License.
  */
 
-package org.kie.workbench.common.stunner.core.api;
+package org.kie.workbench.common.stunner.client.widgets.api;
 
+import com.ait.lienzo.client.core.types.JsCanvas;
 import jsinterop.annotations.JsType;
+import org.kie.workbench.common.stunner.core.api.JsDefinitionManager;
+import org.kie.workbench.common.stunner.core.api.JsDomainInitializer;
+import org.kie.workbench.common.stunner.core.client.api.JsStunnerCommands;
+import org.kie.workbench.common.stunner.core.client.api.JsStunnerSession;
 
 @JsType
-public class JsStunnerDomain {
+public class JsStunnerEditor {
 
     public JsDefinitionManager definitions;
+    public JsDomainInitializer domainInitializer;
+    public JsStunnerSession session;
+    public JsStunnerCommands commands;
+    public JsCanvas canvas;
+    public JsShapeViewFactory shapeViewFactory;
 }

@@ -28,11 +28,11 @@ import org.junit.runner.RunWith;
 import org.kie.workbench.common.stunner.client.lienzo.canvas.LienzoCanvas;
 import org.kie.workbench.common.stunner.client.lienzo.canvas.LienzoPanel;
 import org.kie.workbench.common.stunner.client.lienzo.canvas.wires.WiresCanvasView;
+import org.kie.workbench.common.stunner.client.widgets.api.JsStunnerEditor;
+import org.kie.workbench.common.stunner.client.widgets.api.JsStunnerWindow;
 import org.kie.workbench.common.stunner.client.widgets.presenters.session.SessionPresenter;
 import org.kie.workbench.common.stunner.client.widgets.presenters.session.impl.SessionEditorPresenter;
 import org.kie.workbench.common.stunner.client.widgets.presenters.session.impl.SessionViewerPresenter;
-import org.kie.workbench.common.stunner.core.client.api.JsStunnerEditor;
-import org.kie.workbench.common.stunner.core.client.api.JsWindow;
 import org.kie.workbench.common.stunner.core.client.canvas.AbstractCanvas;
 import org.kie.workbench.common.stunner.core.client.canvas.AbstractCanvasHandler;
 import org.kie.workbench.common.stunner.core.client.canvas.controls.AlertsControl;
@@ -137,7 +137,7 @@ public class StunnerEditorTest {
                                    translationService,
                                    view,
                                    errorPage);
-        JsWindow.editor = new JsStunnerEditor();
+        JsStunnerWindow.editor = new JsStunnerEditor();
     }
 
     @Test

@@ -14,16 +14,12 @@
  * limitations under the License.
  */
 
-package org.kie.workbench.common.stunner.sw.client.shapes;
+package org.kie.workbench.common.stunner.client.widgets.api;
 
-import com.ait.lienzo.client.core.shape.MultiPath;
-import org.kie.workbench.common.stunner.core.client.shape.impl.NodeShapeImpl;
+import jsinterop.annotations.JsFunction;
 
-// TODO: Move to core.
-public class JsNativeShape extends NodeShapeImpl {
+@JsFunction
+public interface JsShapeViewFactory {
 
-    // TODO: Coupling here stunner view with lienzo, and it should not be!
-    public JsNativeShape(MultiPath path) {
-        super(new JsNativeShapeView(path).asAbstractShape());
-    }
+    Object buildView(Object bean);
 }

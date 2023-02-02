@@ -23,6 +23,7 @@ import com.ait.lienzo.client.core.shape.MultiPath;
 import elemental2.dom.DomGlobal;
 import jsinterop.base.Js;
 import org.appformer.kogito.bridge.client.resource.ResourceContentService;
+import org.kie.workbench.common.stunner.client.widgets.api.JsStunnerWindow;
 import org.kie.workbench.common.stunner.core.client.shape.Shape;
 import org.kie.workbench.common.stunner.core.definition.shape.Glyph;
 import org.kie.workbench.common.stunner.sw.client.resources.GlyphFactory;
@@ -75,7 +76,7 @@ public class ShapeFactory
         } else if (TransitionShape.isTransition(instance)) {
             return TransitionShape.create(instance).setAppearance(instance);
         } else if (null != instance) {
-            Object view = JsShapeFactory.createShapeFor(instance);
+            Object view = JsStunnerWindow.editor.shapeViewFactory.buildView(instance);
             if (null != view) {
                 MultiPath path = Js.uncheckedCast(view);
                 return new JsNativeShape(path);

@@ -52,7 +52,7 @@ public class JsDefinitionAdapter implements DefinitionAdapter<Object> {
     @Override
     public String getCategory(Object pojo) {
         String id = getJsDefinitionId(pojo);
-        return domains.getDomainInfo().getCategory(id);
+        return domains.getDomain().getCategory(id);
     }
 
     @Override
@@ -75,7 +75,7 @@ public class JsDefinitionAdapter implements DefinitionAdapter<Object> {
     @Override
     public String[] getLabels(Object pojo) {
         String id = getJsDefinitionId(pojo);
-        return domains.getDomainInfo().getLabels(id);
+        return domains.getDomain().getLabels(id);
     }
 
     @Override
@@ -96,7 +96,7 @@ public class JsDefinitionAdapter implements DefinitionAdapter<Object> {
     public String getMetaPropertyField(Object pojo, PropertyMetaTypes metaType) {
         if (metaType == PropertyMetaTypes.NAME) {
             String id = getJsDefinitionId(pojo);
-            String name = domains.getDomainInfo().getNameField(id);
+            String name = domains.getDomain().getNameField(id);
             return null != name ? name : "name";
         }
         // Only Name is supported
