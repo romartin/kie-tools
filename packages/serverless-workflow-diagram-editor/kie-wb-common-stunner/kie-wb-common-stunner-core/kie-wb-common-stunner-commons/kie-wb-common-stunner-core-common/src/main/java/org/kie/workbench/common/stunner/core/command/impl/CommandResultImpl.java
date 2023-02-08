@@ -18,18 +18,17 @@ package org.kie.workbench.common.stunner.core.command.impl;
 
 import java.util.Collection;
 
-import org.jboss.errai.common.client.api.annotations.MapsTo;
-import org.jboss.errai.common.client.api.annotations.Portable;
+import jsinterop.annotations.JsType;
 import org.kie.workbench.common.stunner.core.command.CommandResult;
 
-@Portable
-public final class CommandResultImpl<V> implements CommandResult<V> {
+@JsType
+public class CommandResultImpl<V> implements CommandResult<V> {
 
     private final Type type;
     private final Collection<V> violations;
 
-    public CommandResultImpl(final @MapsTo("type") Type type,
-                             final @MapsTo("violations") Collection<V> violations) {
+    public CommandResultImpl(Type type,
+                             Collection<V> violations) {
         this.violations = violations;
         this.type = type;
     }

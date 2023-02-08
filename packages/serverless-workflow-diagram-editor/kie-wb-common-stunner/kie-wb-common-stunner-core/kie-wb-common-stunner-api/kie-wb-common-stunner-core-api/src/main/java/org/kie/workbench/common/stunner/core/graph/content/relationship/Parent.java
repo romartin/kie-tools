@@ -16,13 +16,13 @@
 
 package org.kie.workbench.common.stunner.core.graph.content.relationship;
 
-import org.jboss.errai.common.client.api.annotations.Portable;
+import jsinterop.annotations.JsType;
 
 /**
  * Indicates that the target node is the parent of the source node.
  * This content has no view representation on the canvas.
  */
-@Portable
+@JsType
 public class Parent implements Relationship {
 
     private static final transient String RELATIONSHIP = "parent";

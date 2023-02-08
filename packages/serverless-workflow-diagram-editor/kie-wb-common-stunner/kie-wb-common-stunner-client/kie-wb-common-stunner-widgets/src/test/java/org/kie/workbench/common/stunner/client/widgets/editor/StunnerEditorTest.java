@@ -121,7 +121,8 @@ public class StunnerEditorTest {
         when(sessionEditorPresenter.getHandler()).thenReturn(canvasHandler);
         when(sessionViewerPresenter.getHandler()).thenReturn(canvasHandler);
         Metadata metadata = new MetadataImpl.MetadataImplBuilder("testSet").build();
-        diagram = new DiagramImpl("testDiagram", mock(Graph.class), metadata);
+        diagram = new DiagramImpl("testDiagram", metadata);
+        diagram.setGraph(mock(Graph.class));
         when(editorSession.getCanvasHandler()).thenReturn(canvasHandler);
         when(canvasHandler.getCanvas()).thenReturn(canvas);
         when(canvas.getView()).thenReturn(canvasView);

@@ -19,11 +19,8 @@ package org.kie.workbench.common.stunner.core.graph.content;
 import java.util.Objects;
 
 import jsinterop.annotations.JsType;
-import org.jboss.errai.common.client.api.annotations.MapsTo;
-import org.jboss.errai.common.client.api.annotations.Portable;
 import org.kie.workbench.common.stunner.core.util.HashUtil;
 
-@Portable
 @JsType
 public class Bounds {
 
@@ -31,22 +28,22 @@ public class Bounds {
         return create(0d, 0d, 0d, 0d);
     }
 
-    public static Bounds createMinBounds(final double x1,
-                                         final double y1) {
+    public static Bounds createMinBounds(double x1,
+                                         double y1) {
         return createFromBounds(Bound.create(x1, y1),
                                 null);
     }
 
-    public static Bounds create(final double x1,
-                                final double y1,
-                                final double x2,
-                                final double y2) {
+    public static Bounds create(double x1,
+                                double y1,
+                                double x2,
+                                double y2) {
         return createFromBounds(Bound.create(x1, y1),
                                 Bound.create(x2, y2));
     }
 
-    public static Bounds createFromBounds(final Bound xy0,
-                                          final Bound xy1) {
+    public static Bounds createFromBounds(Bound xy0,
+                                          Bound xy1) {
         return new Bounds(xy0,
                           xy1);
     }
@@ -54,8 +51,8 @@ public class Bounds {
     private Bound lr;
     private Bound ul;
 
-    public Bounds(final @MapsTo("ul") Bound ul,
-                  final @MapsTo("lr") Bound lr) {
+    public Bounds(Bound ul,
+                  Bound lr) {
         this.ul = ul;
         this.lr = lr;
     }
@@ -76,11 +73,11 @@ public class Bounds {
         return null != ul;
     }
 
-    public void setLowerRight(final Bound lr) {
+    public void setLowerRight(Bound lr) {
         this.lr = lr;
     }
 
-    public void setUpperLeft(final Bound ul) {
+    public void setUpperLeft(Bound ul) {
         this.ul = ul;
     }
 

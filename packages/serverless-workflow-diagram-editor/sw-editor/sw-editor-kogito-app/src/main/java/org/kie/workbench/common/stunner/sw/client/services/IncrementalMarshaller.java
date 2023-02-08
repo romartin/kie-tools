@@ -36,6 +36,7 @@ import org.kie.workbench.common.stunner.sw.marshall.Context;
 import org.kie.workbench.common.stunner.sw.marshall.Marshaller;
 import org.kie.workbench.common.stunner.sw.marshall.MarshallerUtils;
 
+// TODO: DROP!
 @ApplicationScoped
 public class IncrementalMarshaller {
 

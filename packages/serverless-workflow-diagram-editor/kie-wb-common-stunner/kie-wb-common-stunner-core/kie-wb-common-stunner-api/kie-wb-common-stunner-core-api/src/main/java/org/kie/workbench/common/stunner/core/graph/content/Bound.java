@@ -17,24 +17,21 @@
 package org.kie.workbench.common.stunner.core.graph.content;
 
 import jsinterop.annotations.JsType;
-import org.jboss.errai.common.client.api.annotations.MapsTo;
-import org.jboss.errai.common.client.api.annotations.Portable;
 import org.kie.workbench.common.stunner.core.util.HashUtil;
 
-@Portable
 @JsType
 public class Bound {
 
-    public static Bound create(final double x,
-                               final double y) {
+    public static Bound create(double x,
+                               double y) {
         return new Bound(x, y);
     }
 
     private Double x;
     private Double y;
 
-    public Bound(final @MapsTo("x") Double x,
-                 final @MapsTo("y") Double y) {
+    public Bound(Double x,
+                 Double y) {
         this.x = x;
         this.y = y;
     }

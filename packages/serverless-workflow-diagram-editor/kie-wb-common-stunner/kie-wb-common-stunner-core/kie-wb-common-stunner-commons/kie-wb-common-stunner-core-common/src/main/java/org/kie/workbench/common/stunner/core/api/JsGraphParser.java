@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Red Hat, Inc. and/or its affiliates.
+ * Copyright 2023 Red Hat, Inc. and/or its affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,24 +14,12 @@
  * limitations under the License.
  */
 
-package org.kie.workbench.common.stunner.core.graph.content.relationship;
+package org.kie.workbench.common.stunner.core.api;
 
-import jsinterop.annotations.JsType;
+import jsinterop.annotations.JsFunction;
 
-/**
- * Indicates that the target node is docked into the parent one.
- * This content has no view representation on the canvas.
- */
-@JsType
-public class Dock implements Relationship {
+@JsFunction
+public interface JsGraphParser {
 
-    private static final transient String RELATIONSHIP = "dock";
-
-    public Dock() {
-    }
-
-    @Override
-    public String getName() {
-        return RELATIONSHIP;
-    }
+    void parse(JsGraphExecutionContext context, String src);
 }

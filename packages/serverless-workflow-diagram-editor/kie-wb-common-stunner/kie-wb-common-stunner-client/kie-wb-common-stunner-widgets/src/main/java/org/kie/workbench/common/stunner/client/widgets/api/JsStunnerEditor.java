@@ -20,6 +20,7 @@ import com.ait.lienzo.client.core.types.JsCanvas;
 import jsinterop.annotations.JsType;
 import org.kie.workbench.common.stunner.core.api.JsDefinitionManager;
 import org.kie.workbench.common.stunner.core.api.JsDomainInitializer;
+import org.kie.workbench.common.stunner.core.api.JsGraphParser;
 import org.kie.workbench.common.stunner.core.client.api.JsStunnerCommands;
 import org.kie.workbench.common.stunner.core.client.api.JsStunnerSession;
 
@@ -31,5 +32,6 @@ public class JsStunnerEditor {
     public JsStunnerSession session;
     public JsStunnerCommands commands;
     public JsCanvas canvas;
+    public JsGraphParser parser;
     public JsShapeViewFactory shapeViewFactory;
 }

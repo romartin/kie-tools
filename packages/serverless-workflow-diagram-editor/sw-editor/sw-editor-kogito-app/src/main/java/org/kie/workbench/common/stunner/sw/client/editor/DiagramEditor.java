@@ -48,6 +48,11 @@ import org.kie.workbench.common.stunner.client.widgets.api.JsStunnerWindow;
 import org.kie.workbench.common.stunner.client.widgets.canvas.ScrollableLienzoPanel;
 import org.kie.workbench.common.stunner.client.widgets.editor.StunnerEditor;
 import org.kie.workbench.common.stunner.client.widgets.presenters.session.SessionPresenter;
+import org.kie.workbench.common.stunner.core.api.DefinitionManager;
+import org.kie.workbench.common.stunner.core.api.FactoryManager;
+import org.kie.workbench.common.stunner.core.api.JsGraphCommands;
+import org.kie.workbench.common.stunner.core.api.JsGraphExecutionContext;
+import org.kie.workbench.common.stunner.core.client.api.ShapeManager;
 import org.kie.workbench.common.stunner.core.client.canvas.AbstractCanvasHandler;
 import org.kie.workbench.common.stunner.core.client.canvas.CanvasHandler;
 import org.kie.workbench.common.stunner.core.client.canvas.controls.SelectionControl;
@@ -59,16 +64,26 @@ import org.kie.workbench.common.stunner.core.client.service.ServiceCallback;
 import org.kie.workbench.common.stunner.core.client.session.impl.AbstractSession;
 import org.kie.workbench.common.stunner.core.command.CommandResult;
 import org.kie.workbench.common.stunner.core.command.util.CommandUtils;
+import org.kie.workbench.common.stunner.core.definition.adapter.binding.BindableAdapterUtils;
 import org.kie.workbench.common.stunner.core.diagram.Diagram;
 import org.kie.workbench.common.stunner.core.diagram.DiagramParsingException;
 import org.kie.workbench.common.stunner.core.diagram.Metadata;
+import org.kie.workbench.common.stunner.core.factory.graph.EdgeFactory;
+import org.kie.workbench.common.stunner.core.factory.graph.NodeFactory;
 import org.kie.workbench.common.stunner.core.graph.Edge;
 import org.kie.workbench.common.stunner.core.graph.Element;
 import org.kie.workbench.common.stunner.core.graph.Node;
+import org.kie.workbench.common.stunner.core.graph.command.impl.GraphCommandFactory;
 import org.kie.workbench.common.stunner.core.graph.content.view.View;
+import org.kie.workbench.common.stunner.sw.SWDefinitionSet;
 import org.kie.workbench.common.stunner.sw.SWDomainInitializer;
 import org.kie.workbench.common.stunner.sw.client.services.ClientDiagramService;
 import org.kie.workbench.common.stunner.sw.client.services.IncrementalMarshaller;
+import org.kie.workbench.common.stunner.sw.client.services.JsDiagramService;
+import org.kie.workbench.common.stunner.sw.definition.End;
+import org.kie.workbench.common.stunner.sw.definition.InjectState;
+import org.kie.workbench.common.stunner.sw.definition.Transition;
+import org.kie.workbench.common.stunner.sw.definition.Workflow;
 import org.kie.workbench.common.stunner.sw.marshall.Message;
 import org.kie.workbench.common.stunner.sw.marshall.ParseResult;
 import org.uberfire.backend.vfs.Path;
@@ -129,6 +144,12 @@ public class DiagramEditor {
 
     @SuppressWarnings("all")
     public Promise<String> getPreview() {
+
+        if (true) {
+            testJsMarshalling().then(unused -> null);
+            return promises.resolve("");
+        }
+
         CanvasHandler canvasHandler = stunnerEditor.getCanvasHandler();
         if (canvasHandler != null) {
             return promises.resolve(canvasFileExport.exportToSvg((AbstractCanvasHandler) canvasHandler));
@@ -159,6 +180,57 @@ public class DiagramEditor {
         return promises.resolve(stunnerEditor.hasErrors());
     }
 
+    @Inject
+    JsDiagramService service;
+    @Inject
+    DefinitionManager definitionManager;
+    @Inject
+    FactoryManager factoryManager;
+    @Inject
+    ShapeManager shapeManager;
+    @Inject
+    NodeFactory nodeFactory;
+    @Inject
+    GraphCommandFactory commandFactory;
+    @Inject
+    EdgeFactory edgeFactory;
+
+    @SuppressWarnings("all")
+    public Promise<Void> testJsMarshalling() {
+        JsGraphExecutionContext executionContext =
+                JsGraphExecutionContext.create("sw_graph")
+                        .bind(definitionManager,
+                              factoryManager,
+                              new JsGraphCommands(commandFactory,
+                                                  nodeFactory,
+                                                  edgeFactory));
+
+        JsStunnerWindow.editor
+                .parser
+                .parse(executionContext,
+                       "someRawContent");
+
+        // TODO: It will became JS code (g.editor.marshaller)!
+        if (false) {
+            executionContext
+                    .addRootNode("sw_root_node", new Workflow())
+                    .addNode("state1", new InjectState().setName("injectState1"))
+                    .changeLocation("state1", 350, 220)
+                    .addNode("end", new End())
+                    .changeLocation("end", 420, 470)
+                    .addEdge("state1_to_end", new Transition(), "state1")
+                    .connect("state1_to_end", "end");
+        }
+
+        String definitionSetId = BindableAdapterUtils.getDefinitionSetId(SWDefinitionSet.class);
+        String ssid = shapeManager.getDefaultShapeSet(definitionSetId).getId();
+        Diagram diagram = service.createDiagram(definitionSetId, "SW Test Diagram", executionContext.graph);
+        diagram.getMetadata().setCanvasRootUUID(executionContext.root.getUUID());
+        diagram.getMetadata().setShapeSetId(ssid);
+
+        return setDiagramContent(diagram);
+    }
+
     public Promise<Void> setNewContent(final String path, final String value) {
         return promises.create((success, failure) -> {
             stunnerEditor.clearAlerts();
@@ -167,36 +239,16 @@ public class DiagramEditor {
                                      new ServiceCallback<ParseResult>() {
                                          @Override
                                          public void onSuccess(final ParseResult parseResult) {
-                                             stunnerEditor
-                                                     .close()
-                                                     .open(parseResult.getDiagram(),
-                                                           new SessionPresenter.SessionPresenterCallback() {
-                                                               @Override
-                                                               public void onSuccess() {
-                                                                   onDiagramOpenSuccess();
-                                                                   // TODO Helping Kieill - testShapeIcons(stunnerEditor);
-                                                                   scaleToFitWorkflow(stunnerEditor);
-                                                                   if (parseResult.getMessages().length > 0) {
-                                                                       for (Message m : parseResult.getMessages()) {
-                                                                           stunnerEditor.addError(m.toString());
-                                                                       }
-                                                                   }
-                                                                   success.onInvoke((Void) null);
-                                                               }
-
-                                                               @Override
-                                                               public void onError(ClientRuntimeError error) {
-                                                                   stunnerEditor.handleError(error);
-                                                                   DomGlobal.console.error(error);
-                                                                   success.onInvoke((Void) null);
-                                                               }
-
-                                                               @Override
-                                                               public void afterCanvasInitialized() {
-                                                                   ((WiresCanvas) stunnerEditor.getCanvasHandler().getCanvas())
-                                                                           .setBackgroundColor(BACKGROUND_COLOR);
-                                                               }
-                                                           });
+                                             setDiagramContent(parseResult.getDiagram())
+                                                     .then(unused -> {
+                                                         if (parseResult.getMessages().length > 0) {
+                                                             for (Message m : parseResult.getMessages()) {
+                                                                 stunnerEditor.addError(m.toString());
+                                                             }
+                                                         }
+                                                         success.onInvoke((Void) null);
+                                                         return promises.resolve(null);
+                                                     });
                                          }
 
                                          @Override
@@ -206,6 +258,35 @@ public class DiagramEditor {
                                              failure.onInvoke(error);
                                          }
                                      });
+        });
+    }
+
+    public Promise<Void> setDiagramContent(Diagram diagram) {
+        return promises.create((success, failure) -> {
+            stunnerEditor
+                    .close()
+                    .open(diagram,
+                          new SessionPresenter.SessionPresenterCallback() {
+                              @Override
+                              public void onSuccess() {
+                                  onDiagramOpenSuccess();
+                                  scaleToFitWorkflow(stunnerEditor);
+                                  success.onInvoke((Void) null);
+                              }
+
+                              @Override
+                              public void onError(ClientRuntimeError error) {
+                                  stunnerEditor.handleError(error);
+                                  DomGlobal.console.error(error);
+                                  success.onInvoke((Void) null);
+                              }
+
+                              @Override
+                              public void afterCanvasInitialized() {
+                                  ((WiresCanvas) stunnerEditor.getCanvasHandler().getCanvas())
+                                          .setBackgroundColor(BACKGROUND_COLOR);
+                              }
+                          });
         });
     }
 

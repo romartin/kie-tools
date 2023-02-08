@@ -209,8 +209,8 @@ public class DiagramEditorTest {
                                .setTitle("testDiagram")
                                .build());
         diagram = spy(new DiagramImpl("testDiagram",
-                                      graph,
                                       metadata));
+        diagram.setGraph(graph);
         when(session.getCanvasHandler()).thenReturn(canvasHandler2);
         when(canvasHandler2.getDiagram()).thenReturn(diagram);
         doReturn(stunnerEditor2).when(stunnerEditor2).close();
