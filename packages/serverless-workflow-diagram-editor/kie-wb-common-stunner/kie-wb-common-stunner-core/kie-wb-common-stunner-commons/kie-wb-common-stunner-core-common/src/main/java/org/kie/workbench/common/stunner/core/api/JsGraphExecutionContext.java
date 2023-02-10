@@ -63,13 +63,13 @@ public class JsGraphExecutionContext {
         if (null != root) {
             throw new IllegalStateException("Just a single graph's root node is being supported.");
         }
-        root = commands.buildNode(uuid, definition, 100, 100);
+        root = commands.buildNode(uuid, definition, 1, 1);
         execute(commands.addNode(root));
         return this;
     }
 
     public JsGraphExecutionContext addNode(String uuid, Object definition) {
-        Node node = commands.buildNode(uuid, definition, 100, 100);
+        Node node = commands.buildNode(uuid, definition, 1, 1);
         GraphCommand command;
         if (null != root) {
             command = commands.addChildNode(root, node);
@@ -80,7 +80,7 @@ public class JsGraphExecutionContext {
         return this;
     }
 
-    public JsGraphExecutionContext changeLocation(String uuid, double x, double y) {
+    public JsGraphExecutionContext setLocation(String uuid, double x, double y) {
         Node node = index.getNode(uuid);
         execute(commands.changeLocation(node, x, y));
         return this;

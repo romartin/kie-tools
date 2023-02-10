@@ -14,16 +14,20 @@
  * limitations under the License.
  */
 
-package org.kie.workbench.common.stunner.sw.client.shapes;
+package org.kie.stunner.editor;
 
-import com.ait.lienzo.client.core.shape.MultiPath;
-import org.kie.workbench.common.stunner.core.client.shape.impl.NodeShapeImpl;
+import jsinterop.annotations.JsType;
+import org.kie.stunner.editor.workflow.Activity;
 
-// TODO: Move to core.
-public class JsNativeShape extends NodeShapeImpl {
+import static org.kie.workbench.common.stunner.core.definition.jsadapter.JsDefinitionSetAdapter.toClassNames;
 
-    // TODO: Coupling here stunner view with lienzo, and it should not be!
-    public JsNativeShape(MultiPath path) {
-        super(new JsNativeShapeView(path).asAbstractShape());
+@JsType
+public class StunnerJsDefinitionSet {
+
+    public String definitions;
+
+    public StunnerJsDefinitionSet() {
+        // TODO Just for local testing.... value must be empty string.
+        definitions = toClassNames(Activity.class);
     }
 }

@@ -215,9 +215,9 @@ public class DiagramEditor {
             executionContext
                     .addRootNode("sw_root_node", new Workflow())
                     .addNode("state1", new InjectState().setName("injectState1"))
-                    .changeLocation("state1", 350, 220)
+                    .setLocation("state1", 350, 220)
                     .addNode("end", new End())
-                    .changeLocation("end", 420, 470)
+                    .setLocation("end", 420, 470)
                     .addEdge("state1_to_end", new Transition(), "state1")
                     .connect("state1_to_end", "end");
         }

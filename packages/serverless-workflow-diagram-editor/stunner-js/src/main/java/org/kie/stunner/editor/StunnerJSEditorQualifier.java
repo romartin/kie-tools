@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Red Hat, Inc. and/or its affiliates.
+ * Copyright 2017 Red Hat, Inc. and/or its affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,16 +14,21 @@
  * limitations under the License.
  */
 
-package org.kie.workbench.common.stunner.sw.client.shapes;
+package org.kie.stunner.editor;
 
-import com.ait.lienzo.client.core.shape.MultiPath;
-import org.kie.workbench.common.stunner.core.client.shape.impl.NodeShapeImpl;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
-// TODO: Move to core.
-public class JsNativeShape extends NodeShapeImpl {
+import javax.inject.Qualifier;
 
-    // TODO: Coupling here stunner view with lienzo, and it should not be!
-    public JsNativeShape(MultiPath path) {
-        super(new JsNativeShapeView(path).asAbstractShape());
-    }
+/**
+ * Qualify injection point satisfaction for the Basic Set.
+ */
+@Qualifier
+@Retention(RetentionPolicy.RUNTIME)
+@Target({ElementType.TYPE, ElementType.METHOD, ElementType.FIELD, ElementType.PARAMETER})
+public @interface StunnerJSEditorQualifier {
+
 }

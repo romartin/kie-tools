@@ -14,16 +14,16 @@
  * limitations under the License.
  */
 
-package org.kie.workbench.common.stunner.sw.client.shapes;
+package org.kie.stunner.editor;
 
-import com.ait.lienzo.client.core.shape.MultiPath;
-import org.kie.workbench.common.stunner.core.client.shape.impl.NodeShapeImpl;
+import com.google.gwt.core.client.GWT;
+import com.google.gwt.resources.client.ClientBundle;
+import com.google.gwt.resources.client.TextResource;
 
-// TODO: Move to core.
-public class JsNativeShape extends NodeShapeImpl {
+public interface StunnerJsDomainInitializerBundle extends ClientBundle {
 
-    // TODO: Coupling here stunner view with lienzo, and it should not be!
-    public JsNativeShape(MultiPath path) {
-        super(new JsNativeShapeView(path).asAbstractShape());
-    }
+    StunnerJsDomainInitializerBundle INSTANCE = GWT.create(StunnerJsDomainInitializerBundle.class);
+
+    @Source("stunner_domain_initializer.js")
+    TextResource initialize();
 }

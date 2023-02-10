@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Red Hat, Inc. and/or its affiliates.
+ * Copyright 2022 Red Hat, Inc. and/or its affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,16 +14,18 @@
  * limitations under the License.
  */
 
-package org.kie.workbench.common.stunner.sw.client.shapes;
+package org.kie.stunner.editor;
 
-import com.ait.lienzo.client.core.shape.MultiPath;
-import org.kie.workbench.common.stunner.core.client.shape.impl.NodeShapeImpl;
+import javax.annotation.PostConstruct;
 
-// TODO: Move to core.
-public class JsNativeShape extends NodeShapeImpl {
+import org.jboss.errai.ioc.client.api.EntryPoint;
+import org.jboss.errai.ui.shared.api.annotations.Bundle;
 
-    // TODO: Coupling here stunner view with lienzo, and it should not be!
-    public JsNativeShape(MultiPath path) {
-        super(new JsNativeShapeView(path).asAbstractShape());
+@EntryPoint
+@Bundle("resources/i18n/StunnerJSConstants.properties")
+public class StunnerJSEntryPoint {
+
+    @PostConstruct
+    public void init() {
     }
 }

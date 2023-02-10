@@ -14,16 +14,24 @@
  * limitations under the License.
  */
 
-package org.kie.workbench.common.stunner.sw.client.shapes;
+package org.kie.stunner.editor.shape;
 
 import com.ait.lienzo.client.core.shape.MultiPath;
+import org.kie.workbench.common.stunner.core.client.shape.MutationContext;
 import org.kie.workbench.common.stunner.core.client.shape.impl.NodeShapeImpl;
+import org.kie.workbench.common.stunner.core.graph.Element;
 
-// TODO: Move to core.
+// TODO: Expose applyProperties to JS.
 public class JsNativeShape extends NodeShapeImpl {
 
     // TODO: Coupling here stunner view with lienzo, and it should not be!
     public JsNativeShape(MultiPath path) {
         super(new JsNativeShapeView(path).asAbstractShape());
+    }
+
+    @Override
+    public void applyTitle(String title, Element element, MutationContext mutationContext) {
+        super.applyTitle(title, element, mutationContext);
+        ((JsNativeShapeView) getShapeView()).initializeTitle(title);
     }
 }
