@@ -32,7 +32,7 @@ import org.kie.workbench.common.stunner.core.graph.content.view.Point2D;
 import org.kie.workbench.common.stunner.core.graph.content.view.View;
 import org.kie.workbench.common.stunner.core.util.UUID;
 
-// TODO: Refactor this API properly. Also move to cre.
+// TODO: Refactor this in order to implement JsGraphExecutionContext 's  API.
 @JsType
 public class JsStunnerCommands {
 

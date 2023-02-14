@@ -23,54 +23,59 @@ TODO: Check actual js scope.
 })*/
 
 const e = window.editor;
-const w_ns = window.org.kie.stunner.editor.workflow;
+const ns = window;
 console.log("Execution of custom js domain initializer script.");
 
 class Start {
   name = "start";
 }
-window.Start = Start;
+ns.Start = Start;
 
 class Activity {
   name = "activity";
 }
-window.Activity = Activity;
+ns.Activity = Activity;
+
+class Transition {
+  name = "transition";
+}
+ns.Transition = Transition;
 
 if (true) {
   const init = e.domainInitializer;
-  // init.addDefinition(w_ns.Workflow);
-  // init.setLabels(w_ns.Workflow, "rootNode");
-  init.addDefinition(window.Start);
-  init.setCategory(window.Start, "Activities");
-  init.setLabels(window.Start, "rootNode", "activity");
-  init.addDefinition(window.Activity);
-  init.setCategory(window.Activity, "Activities");
-  init.setLabels(window.Activity, "rootNode", "activity");
+  init.addDefinition(ns.Start);
+  init.setCategory(ns.Start, "Activities");
+  init.setLabels(ns.Start, "rootNode", "activity");
+  init.addDefinition(ns.Activity);
+  init.setCategory(ns.Activity, "Activities");
+  init.setLabels(ns.Activity, "rootNode", "activity");
+  init.addDefinition(ns.Transition);
+  init.setCategory(ns.Transition, "transitions");
+  init.setLabels(ns.Transition, "transition");
 }
 
 e.parser = function (context, raw) {
-  console.log("Marshalling: " + raw);
-  if (true) {
-    console.log("Parsing graph from JS...");
-    context
-      // .addRootNode("sw_root_node", new w_ns.Workflow())
-      .addNode("start", new window.Start())
-      .setLocation("start", 350, 75)
-      .addNode("activity1", new w_ns.Activity())
-      .setLocation("activity1", 350, 120)
-      .addNode("activity2", new window.Activity())
-      .setLocation("activity2", 350, 300);
-  }
+  console.log("Parsing: " + raw);
+  context
+    .addNode("start", new ns.Start())
+    .setLocation("start", 350, 75)
+    .addNode("activity1", new window.org.kie.stunner.editor.workflow.Activity())
+    .setLocation("activity1", 350, 120)
+    .addNode("activity2", new ns.Activity())
+    .setLocation("activity2", 350, 300)
+    .addEdge("activity1_to_activity2", new ns.Transition(), "activity1")
+    .connect("activity1_to_activity2", "activity2");
 };
 
 e.shapeViewFactory = function (bean) {
-  const lienzo_ns = window.com.ait.lienzo.client.core.shape;
-  console.log("Creating shape view for: ");
+  console.log("Creating view for: ");
   console.log(bean);
-  if (bean instanceof window.Activity) {
-    var mpath = new lienzo_ns.MultiPath().rect(0, 0, 250, 100);
-  } else if (bean instanceof window.Start) {
-    var mpath = new lienzo_ns.MultiPath().circle(25);
+  if (bean instanceof ns.Activity) {
+    return new window.com.ait.lienzo.client.core.shape.MultiPath().rect(0, 0, 250, 100);
+  } else if (bean instanceof ns.Start) {
+    return new window.com.ait.lienzo.client.core.shape.MultiPath().circle(25);
+  } else if (bean instanceof ns.Transition) {
+    return new window.org.kie.stunner.editor.shape.JsNativeConnector("#757575");
   }
-  return mpath;
+  return null;
 };

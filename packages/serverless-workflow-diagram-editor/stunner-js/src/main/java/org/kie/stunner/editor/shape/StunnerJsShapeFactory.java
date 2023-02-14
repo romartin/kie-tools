@@ -42,10 +42,14 @@ public class StunnerJsShapeFactory implements ShapeFactory<Object, Shape> {
 
     private Shape newJsShape(Object instance) {
         Object view = JsStunnerWindow.editor.shapeViewFactory.buildView(instance);
-        if (null != view) {
+        if (view instanceof MultiPath) {
             MultiPath path = Js.uncheckedCast(view);
             return new JsNativeShape(path);
+        } else if (view instanceof JsNativeConnector) {
+            JsNativeConnector connector = Js.uncheckedCast(view);
+            return JsNativeConnectorShape.create(connector);
         }
+
         return null;
     }
 
