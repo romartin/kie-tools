@@ -16,6 +16,7 @@
 
 package org.kie.stunner.editor;
 
+import javax.annotation.PostConstruct;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
@@ -60,6 +61,13 @@ public class StunnerJsDiagramService {
     @Inject
     Promises promises;
 
+    private JSONGraphMarshaller jsonGraphMarshaller;
+
+    @PostConstruct
+    public void init() {
+        jsonGraphMarshaller = JSONGraphMarshaller.create(definitionManager, factoryManager);
+    }
+
     @SuppressWarnings("all")
     public Promise<Diagram> parse(String definitionSetId, String content) {
         JsGraphExecutionContext executionContext =
@@ -70,10 +78,15 @@ public class StunnerJsDiagramService {
                                                   nodeFactory,
                                                   edgeFactory));
 
-        if (true) {
+        if (false) {
             JsStunnerWindow.editor
                     .parser
                     .parse(executionContext, content);
+        }
+
+        if (true) {
+            // TODO jsonGraphMarshaller.parse(executionContext, content);
+            jsonGraphMarshaller.parseExample(executionContext);
         }
 
         if (false) {
@@ -97,7 +110,7 @@ public class StunnerJsDiagramService {
 
     public String format(Diagram diagram) {
         if (true) {
-            return "";
+            return jsonGraphMarshaller.stringify(diagram.getGraph());
         }
         Graph graph = diagram.getGraph();
         Iterable<Node> nodes = graph.nodes();
