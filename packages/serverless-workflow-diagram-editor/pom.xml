@@ -111,6 +111,9 @@
     <module>sw-editor</module>
     <module>third_party</module>
 
+    <!-- Stunner JS-EDITOR -->
+    <module>stunner-js</module>
+
   </modules>
 
   <pluginRepositories>
