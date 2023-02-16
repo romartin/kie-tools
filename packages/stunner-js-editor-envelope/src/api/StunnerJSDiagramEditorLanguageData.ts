@@ -14,17 +14,23 @@
  * limitations under the License.
  */
 
-const { varsWithName, composeEnv } = require("@kie-tools-scripts/build-env");
+import { GwtLanguageData } from "@kie-tools/kie-bc-editors/dist/common";
+import { editors } from "./GwtEditorMapping";
 
-module.exports = composeEnv([require("@kie-tools/root-env/env")], {
-  vars: varsWithName({}),
-  get env() {
-    return {
-      standaloneEditors: {
-        dev: {
-          port: 9006,
-        },
+export function getStunnerJSDiagramEditorLanguageData(resourcesPathPrefix: string): GwtLanguageData {
+  return {
+    type: "gwt",
+    editorId: editors.sjs.id,
+    gwtModuleName: editors.sjs.name,
+    resources: [
+      {
+        type: "css",
+        paths: [`${resourcesPathPrefix}/${editors.sjs.name}/css/patternfly.min.css`],
       },
-    };
-  },
-});
+      {
+        type: "js",
+        paths: [`${resourcesPathPrefix}/${editors.sjs.name}/${editors.sjs.name}.nocache.js`],
+      },
+    ],
+  };
+}

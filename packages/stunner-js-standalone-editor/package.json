@@ -1,7 +1,7 @@
 {
-  "name": "@kie-tools/serverless-workflow-standalone-editor",
+  "name": "@kie-tools/stunner-js-standalone-editor",
   "version": "0.0.0",
-  "description": "Standalone editor for serverless workflow",
+  "description": "Standalone editor for Stunner JS Bundle",
   "license": "Apache-2.0",
   "keywords": [],
   "homepage": "https://github.com/kiegroup/kie-tools",
@@ -13,7 +13,7 @@
     "url": "https://github.com/kiegroup/kie-tools/issues"
   },
   "files": [
-    "dist/swf"
+    "dist/sjs"
   ],
   "scripts": {
     "build:dev": "rimraf dist && webpack --env dev --config webpack.editor-resources.config.js && webpack --env dev --config webpack.build-resources.config.js && pnpm build:preprocessor && webpack --env dev --config webpack.package-resources.config.js",
@@ -37,14 +37,13 @@
     "@kie-tools/eslint": "workspace:*",
     "@kie-tools/kie-bc-editors": "workspace:*",
     "@kie-tools/root-env": "workspace:*",
-    "@kie-tools/serverless-workflow-combined-editor": "workspace:*",
     "@kie-tools/serverless-workflow-diagram-editor": "workspace:*",
-    "@kie-tools/serverless-workflow-diagram-editor-assets": "workspace:*",
     "@kie-tools/serverless-workflow-diagram-editor-envelope": "workspace:*",
     "@kie-tools/serverless-workflow-language-service": "workspace:*",
     "@kie-tools/serverless-workflow-mermaid-viewer": "workspace:*",
     "@kie-tools/serverless-workflow-service-catalog": "workspace:*",
     "@kie-tools/serverless-workflow-text-editor": "workspace:*",
+    "@kie-tools/stunner-js-editor-assets": "workspace:*",
     "@kie-tools/tsconfig": "workspace:*",
     "@types/jest": "^26.0.23",
     "@types/jest-when": "^2.7.4",

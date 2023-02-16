@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Red Hat, Inc. and/or its affiliates.
+ * Copyright 2020 Red Hat, Inc. and/or its affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,17 +14,4 @@
  * limitations under the License.
  */
 
-const { varsWithName, composeEnv } = require("@kie-tools-scripts/build-env");
-
-module.exports = composeEnv([require("@kie-tools/root-env/env")], {
-  vars: varsWithName({}),
-  get env() {
-    return {
-      standaloneEditors: {
-        dev: {
-          port: 9006,
-        },
-      },
-    };
-  },
-});
+import "@testing-library/jest-dom";

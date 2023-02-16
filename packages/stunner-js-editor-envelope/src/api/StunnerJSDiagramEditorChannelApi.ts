@@ -14,17 +14,9 @@
  * limitations under the License.
  */
 
-const { varsWithName, composeEnv } = require("@kie-tools-scripts/build-env");
+import { KogitoEditorChannelApi } from "@kie-tools-core/editor/dist/api";
 
-module.exports = composeEnv([require("@kie-tools/root-env/env")], {
-  vars: varsWithName({}),
-  get env() {
-    return {
-      standaloneEditors: {
-        dev: {
-          port: 9006,
-        },
-      },
-    };
-  },
-});
+export interface StunnerJSDiagramEditorChannelApi extends KogitoEditorChannelApi {
+  // TODO: RENAME
+  kogitoSwfDiagramEditor__onNodeSelected(args: { nodeName: string; documentUri?: string }): void;
+}

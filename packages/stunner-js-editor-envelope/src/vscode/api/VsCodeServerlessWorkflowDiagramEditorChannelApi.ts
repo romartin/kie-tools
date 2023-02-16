@@ -14,17 +14,9 @@
  * limitations under the License.
  */
 
-const { varsWithName, composeEnv } = require("@kie-tools-scripts/build-env");
+import { JavaCodeCompletionChannelApi } from "@kie-tools-core/vscode-java-code-completion/dist/api";
+import { StunnerJSDiagramEditorChannelApi } from "../../api";
 
-module.exports = composeEnv([require("@kie-tools/root-env/env")], {
-  vars: varsWithName({}),
-  get env() {
-    return {
-      standaloneEditors: {
-        dev: {
-          port: 9006,
-        },
-      },
-    };
-  },
-});
+export interface VsCodeServerlessWorkflowDiagramEditorChannelApi
+  extends StunnerJSDiagramEditorChannelApi,
+    JavaCodeCompletionChannelApi {}

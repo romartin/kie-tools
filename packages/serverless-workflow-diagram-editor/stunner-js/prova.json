@@ -1,0 +1,74 @@
+{
+  "nodes": [
+    {
+      "uuid": "start",
+      "definition": {
+        "id": "Start",
+        "properties": [
+          {
+            "id": "name",
+            "value": "start"
+          }
+        ]
+      },
+      "bounds": {
+        "ul_x": 350,
+        "ul_y": 75,
+        "lr_x": 351,
+        "lr_y": 76
+      }
+    },
+    {
+      "uuid": "activity1",
+      "definition": {
+        "id": "org.kie.stunner.editor.workflow.Activity",
+        "properties": [
+          {
+            "id": "name",
+            "value": "Activity"
+          }
+        ]
+      },
+      "bounds": {
+        "ul_x": 350,
+        "ul_y": 120,
+        "lr_x": 351,
+        "lr_y": 121
+      }
+    },
+    {
+      "uuid": "activity2",
+      "definition": {
+        "id": "Activity",
+        "properties": [
+          {
+            "id": "name",
+            "value": "activity"
+          }
+        ]
+      },
+      "bounds": {
+        "ul_x": 350,
+        "ul_y": 300,
+        "lr_x": 351,
+        "lr_y": 301
+      }
+    }
+  ],
+  "edges": [
+    {
+      "uuid": "activity1_to_activity2",
+      "sourceUUID": "activity1",
+      "targetUUID": "activity2",
+      "definition": {
+        "id": "Transition",
+        "properties": [
+          {
+            "id": "name",
+            "value": "transition"
+          }
+        ]
+      }
+    }
+  ]
+}

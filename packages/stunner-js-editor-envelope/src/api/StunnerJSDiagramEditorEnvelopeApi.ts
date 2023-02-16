@@ -14,17 +14,10 @@
  * limitations under the License.
  */
 
-const { varsWithName, composeEnv } = require("@kie-tools-scripts/build-env");
+import { KogitoEditorEnvelopeApi } from "@kie-tools-core/editor/dist/api";
+import { CanvasEnvelopeApi } from "@kie-tools/kie-bc-editors/dist/canvas/CanvasEnvelopeApi";
 
-module.exports = composeEnv([require("@kie-tools/root-env/env")], {
-  vars: varsWithName({}),
-  get env() {
-    return {
-      standaloneEditors: {
-        dev: {
-          port: 9006,
-        },
-      },
-    };
-  },
-});
+export interface StunnerJSDiagramEditorEnvelopeApi extends KogitoEditorEnvelopeApi, CanvasEnvelopeApi {
+  // TODO: RENAME
+  kogitoSwfDiagramEditor__highlightNode(args: { nodeName: string }): void;
+}

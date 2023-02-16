@@ -14,17 +14,6 @@
  * limitations under the License.
  */
 
-const { varsWithName, composeEnv } = require("@kie-tools-scripts/build-env");
-
-module.exports = composeEnv([require("@kie-tools/root-env/env")], {
-  vars: varsWithName({}),
-  get env() {
-    return {
-      standaloneEditors: {
-        dev: {
-          port: 9006,
-        },
-      },
-    };
-  },
-});
+export * from "./StunnerJSDiagramEditor";
+export * from "./StunnerJSDiagramEditorFactory";
+export * from "./StunnerJSDiagramEditorEnvelopeApiImpl";

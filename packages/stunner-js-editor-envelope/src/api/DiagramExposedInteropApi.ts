@@ -1,4 +1,4 @@
-/*
+/**
  * Copyright 2023 Red Hat, Inc. and/or its affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,17 +14,15 @@
  * limitations under the License.
  */
 
-const { varsWithName, composeEnv } = require("@kie-tools-scripts/build-env");
-
-module.exports = composeEnv([require("@kie-tools/root-env/env")], {
-  vars: varsWithName({}),
-  get env() {
-    return {
-      standaloneEditors: {
-        dev: {
-          port: 9006,
-        },
-      },
-    };
-  },
-});
+/**
+ * EXPOSED INTEROP API
+ *
+ * This API is exposed from the Envelope to be consumed on Java code for diagram window interactions.
+ */
+export interface DiagramExposedInteropApi {
+  /**
+   * Event fired when a node is selected
+   * @param nodeName the name of the node
+   */
+  onNodeSelected: (nodeName: string) => void;
+}
