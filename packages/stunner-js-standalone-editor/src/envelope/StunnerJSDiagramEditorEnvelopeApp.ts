@@ -16,28 +16,24 @@
 
 import { initCustom } from "@kie-tools-core/editor/dist/envelope";
 import {
-  ServerlessWorkflowDiagramEditorChannelApi,
-  ServerlessWorkflowDiagramEditorEnvelopeApi,
-} from "@kie-tools/serverless-workflow-diagram-editor-envelope/dist/api";
+  StunnerJSDiagramEditorChannelApi,
+  StunnerJSDiagramEditorEnvelopeApi,
+} from "@kie-tools/stunner-js-editor-envelope/dist/api";
 import {
-  ServerlessWorkflowDiagramEditor,
-  ServerlessWorkflowDiagramEditorEnvelopeApiImpl,
-  ServerlessWorkflowDiagramEditorFactory,
-} from "@kie-tools/serverless-workflow-diagram-editor-envelope/dist/envelope";
+  StunnerJSDiagramEditor,
+  StunnerJSDiagramEditorEnvelopeApiImpl,
+  StunnerJSDiagramEditorFactory,
+} from "@kie-tools/stunner-js-editor-envelope/dist/envelope";
 
 const initEnvelope = () => {
-  initCustom<
-    ServerlessWorkflowDiagramEditor,
-    ServerlessWorkflowDiagramEditorEnvelopeApi,
-    ServerlessWorkflowDiagramEditorChannelApi
-  >({
+  initCustom<StunnerJSDiagramEditor, StunnerJSDiagramEditorEnvelopeApi, StunnerJSDiagramEditorChannelApi>({
     container: document.getElementById("diagram-envelope-app")!,
     bus: { postMessage: (message, targetOrigin, _) => window.parent.postMessage(message, "*", _) },
     apiImplFactory: {
       create: (args) =>
-        new ServerlessWorkflowDiagramEditorEnvelopeApiImpl(
+        new StunnerJSDiagramEditorEnvelopeApiImpl(
           args,
-          new ServerlessWorkflowDiagramEditorFactory({ shouldLoadResourcesDynamically: false })
+          new StunnerJSDiagramEditorFactory({ shouldLoadResourcesDynamically: false })
         ),
     },
   });

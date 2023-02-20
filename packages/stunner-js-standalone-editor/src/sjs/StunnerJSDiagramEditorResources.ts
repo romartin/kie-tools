@@ -15,33 +15,33 @@
  */
 
 import * as fs from "fs";
-import { BaseEditorResources } from "../../common/EditorResources";
-import { getServerlessWorkflowLanguageData } from "@kie-tools/serverless-workflow-diagram-editor-envelope/dist/api";
-import * as swfEditorAssets from "@kie-tools/serverless-workflow-diagram-editor-assets";
+import { BaseEditorResources } from "../common/EditorResources";
+import { getStunnerJSDiagramEditorLanguageData } from "@kie-tools/stunner-js-editor-envelope/dist/api";
+import * as sjsEditorAssets from "@kie-tools/stunner-js-editor-assets";
 
-export class ServerlessWorkflowDiagramEditorResources extends BaseEditorResources {
+export class StunnerJSDiagramEditorResources extends BaseEditorResources {
   public get(args: { resourcesPathPrefix: string }) {
-    const swfLanguageData = getServerlessWorkflowLanguageData(args.resourcesPathPrefix);
-    const swfEditorResources: any = {
-      envelopeJsResource: this.createResource({ path: `dist/envelope/swf-diagram-editor-envelope.js` }),
-      baseJsResources: swfLanguageData.resources
+    const sjsLanguageData = getStunnerJSDiagramEditorLanguageData(args.resourcesPathPrefix);
+    const sjsEditorResources: any = {
+      envelopeJsResource: this.createResource({ path: `dist/envelope/stunner-js-editor-envelope.js` }),
+      baseJsResources: sjsLanguageData.resources
         .filter((r) => r.type === "js")
         .flatMap((r) => r.paths)
         .map((p) => this.createResource({ path: p }, ["\\", "`", "$"]))!,
-      referencedJsResources: this.getReferencedJSPaths(args.resourcesPathPrefix, swfLanguageData.gwtModuleName).map(
+      referencedJsResources: this.getReferencedJSPaths(args.resourcesPathPrefix, sjsLanguageData.gwtModuleName).map(
         (rp) => this.createResource(rp, ["\\", "`", "$"])
       ),
-      baseCssResources: swfLanguageData.resources
+      baseCssResources: sjsLanguageData.resources
         .filter((r) => r.type === "css")
         .flatMap((r) => r.paths)
         .map((p) => this.createResource({ path: p }))!,
-      referencedCssResources: this.getReferencedCSSPaths(args.resourcesPathPrefix, swfLanguageData.gwtModuleName).map(
+      referencedCssResources: this.getReferencedCSSPaths(args.resourcesPathPrefix, sjsLanguageData.gwtModuleName).map(
         (rp) => this.createResource(rp)
       ),
-      fontResources: this.getFontResources(args.resourcesPathPrefix, swfLanguageData.gwtModuleName),
+      fontResources: this.getFontResources(args.resourcesPathPrefix, sjsLanguageData.gwtModuleName),
     };
 
-    return swfEditorResources;
+    return sjsEditorResources;
   }
 
   public getReferencedJSPaths(resourcesPathPrefix: string, gwtModuleName: string) {
@@ -118,14 +118,14 @@ export class ServerlessWorkflowDiagramEditorResources extends BaseEditorResource
   }
 
   public getEditorResourcesPath() {
-    return swfEditorAssets.swEditorPath();
+    return sjsEditorAssets.sjsEditorPath();
   }
 
   public getTemplatePath() {
-    return "dist/resources/swf/swfDiagramEditorEnvelopeIndex.template";
+    return "dist/resources/sjs/stunnerJSDiagramEditorEnvelopeIndex.template";
   }
 
   public getHtmlOutputPath() {
-    return "dist/resources/swf/swfDiagramEditorEnvelopeIndex.html";
+    return "dist/resources/sjs/stunnerJSDiagramEditorEnvelopeIndex.html";
   }
 }

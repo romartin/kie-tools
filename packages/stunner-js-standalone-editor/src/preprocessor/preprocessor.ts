@@ -17,18 +17,10 @@
 import * as _ from "underscore";
 import * as fs from "fs";
 import { BaseEditorResources } from "../common/EditorResources";
-import { ServerlessWorkflowDiagramEditorResources } from "../swf/resources/SwfDiagramEditorResources";
-import { ServerlessWorkflowMermaidViewerResources } from "../swf/resources/SwfMermaidViewerResources";
-import { ServerlessWorkflowTextEditorResources } from "../swf/resources/SwfTextEditorResources";
-import { ServerlessWorkflowCombinedEditorResources } from "../swf/resources/SwfCombinedEditorResources";
+import { StunnerJSDiagramEditorResources } from "../sjs/StunnerJSDiagramEditorResources";
 
 function main() {
-  const editorsResources: BaseEditorResources[] = [
-    new ServerlessWorkflowCombinedEditorResources(),
-    new ServerlessWorkflowDiagramEditorResources(),
-    new ServerlessWorkflowMermaidViewerResources(),
-    new ServerlessWorkflowTextEditorResources(),
-  ];
+  const editorsResources: BaseEditorResources[] = [new StunnerJSDiagramEditorResources()];
 
   editorsResources.forEach((editorResources) => {
     const template = _.template(fs.readFileSync(editorResources.getTemplatePath()).toString());

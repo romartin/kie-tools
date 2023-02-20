@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <style>
+      #editor-container {
+        height: calc(100vh - 50px);
+      }
+
+      .toolbar {
+        height: 30px;
+      }
+
+      .hidden {
+        display: none;
+      }
+    </style>
+
+    <title></title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <script src="index.js"></script>
+  </head>
+
+  <body>
+    <div class="toolbar">
+      <span id="unsavedChanges" class="hidden">File contains unsaved changes.</span>
+      <button id="undo">Undo</button>
+      <button id="redo">Redo</button>
+      <button id="download">Download</button>
+      <button id="downloadSvg">Download SVG</button>
+      <button id="select">Select</button>
+      <button id="clear">Clear Selection</button>
+      <button id="selected">Selected Name</button>
+      <button id="bgColor">BG Color</button>
+      <button id="fontColor">Font Color</button>
+      <button id="zoomIn">Zoom In</button>
+      <button id="zoomOut">Zoom Out</button>
+      <button id="translate">Translate</button>
+      <button id="badge">Show Badge</button>
+    </div>
+
+    <div id="editor-container" />
+
+    <script>
+      let workflow = "{}\n";
+
+      const editor = StunnerEditor.open({
+        container: document.getElementById("editor-container"),
+        initialContent: Promise.resolve(workflow),
+        readOnly: false,
+        languageType: "json",
+      });
+
+      function getSession() {
+        return window.frames[0].frames[1].editor.session;
+      }
+
+      function getCanvas() {
+        return window.frames[0].frames[1].canvas;
+      }
+
+      function createBadge(value) {
+        const contentWindow = window.frames[0].frames[1];
+        var badge = new contentWindow.com.ait.lienzo.client.core.shape.Group();
+        badge.listening = false;
+        badge.alpha = 0;
+        var text = new contentWindow.com.ait.lienzo.client.core.shape.Text(value, "arial", "italic", 12);
+        text.strokeColor = "white";
+        text.fillColor = "white";
+        var bb = text.getBoundingBox();
+        var decorator = new contentWindow.com.ait.lienzo.client.core.shape.Rectangle(
+          bb.getWidth() + 10,
+          bb.getHeight() + 10
+        );
+        decorator.x = bb.getX() - 5;
+        decorator.y = bb.getY() - 5;
+        decorator.fillAlpha = 1;
+        decorator.fillColor = "red";
+        decorator.strokeAlpha = 1;
+        decorator.strokeColor = "black";
+        decorator.strokeWitrh = 2;
+        decorator.cornerRadius = 5;
+        badge.add(decorator);
+        badge.add(text);
+        return badge;
+      }
+
+      function showBadge(shape, text) {
+        var bb = shape.getBoundingBox();
+        var badge = createBadge(text);
+        badge.x = shape.getComputedLocation().x + bb.getWidth() / 2;
+        badge.y = shape.getComputedLocation().y + (bb.getHeight() + 10);
+        getCanvas().add(badge);
+        getCanvas().animations().alpha(badge, 1, 500);
+      }
+
+      document.getElementById("undo").addEventListener("click", () => {
+        editor.undo();
+      });
+
+      document.getElementById("redo").addEventListener("click", () => {
+        editor.redo();
+      });
+
+      document.getElementById("download").addEventListener("click", () => {
+        editor.getContent().then((content) => {
+          const elem = window.document.createElement("a");
+          elem.href = "data:text/plain;charset=utf-8," + encodeURIComponent(content);
+          elem.download = "myWorkflow.sw.json";
+          document.body.appendChild(elem);
+          elem.click();
+          document.body.removeChild(elem);
+          editor.markAsSaved();
+        });
+      });
+
+      document.getElementById("downloadSvg").addEventListener("click", () => {
+        editor.getPreview().then((svgContent) => {
+          const elem = window.document.createElement("a");
+          elem.href = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(svgContent);
+          elem.download = "model.svg";
+          document.body.appendChild(elem);
+          elem.click();
+          document.body.removeChild(elem);
+        });
+      });
+
+      editor.subscribeToContentChanges((isDirty) => {
+        if (isDirty) {
+          document.getElementById("unsavedChanges").classList.remove("hidden");
+        } else {
+          document.getElementById("unsavedChanges").classList.add("hidden");
+        }
+      });
+
+      document.getElementById("select").addEventListener("click", () => {
+        var name = prompt("Enter node name:", "GreetPerson");
+        if (null == name) {
+          alert("Please inform a valid node name!");
+        } else {
+          getSession().selectByName(name);
+        }
+      });
+
+      document.getElementById("clear").addEventListener("click", () => {
+        getSession().clearSelection();
+      });
+
+      document.getElementById("selected").addEventListener("click", () => {
+        try {
+          var node = getSession().getSelectedNode();
+          var name = getSession().getNodeName(node);
+
+          window.alert("Selected State: " + name);
+        } catch (error) {
+          window.alert("Select a State!");
+        }
+      });
+
+      document.getElementById("bgColor").addEventListener("click", () => {
+        var name = prompt("Enter node name:", "ChooseOnLanguage");
+        var id = getSession().getNodeByName(name).getUUID();
+        var wiresShape = getCanvas().getWiresShape(id);
+        var color = prompt("Bacground Color:", "#ffff66");
+        wiresShape.getChild(0).fillColor = color;
+        getCanvas().draw();
+      });
+
+      document.getElementById("fontColor").addEventListener("click", () => {
+        var name = prompt("Enter node name:", "ChooseOnLanguage");
+        var id = getSession().getNodeByName(name).getUUID();
+        var wiresShape = getCanvas().getWiresShape(id);
+        var color = prompt("Bacground Color:", "red");
+        wiresShape.getChild(1).fillColor = color;
+        getCanvas().draw();
+      });
+
+      document.getElementById("zoomIn").addEventListener("click", () => {
+        var x = getCanvas().getScaleX();
+        var y = getCanvas().getScaleY();
+
+        getCanvas().scaleWithXY(x + x * 0.1, y + y * 0.1);
+      });
+
+      document.getElementById("zoomOut").addEventListener("click", () => {
+        var x = getCanvas().getScaleX();
+        var y = getCanvas().getScaleY();
+
+        getCanvas().scaleWithXY(x - x * 0.1, y - y * 0.1);
+      });
+
+      document.getElementById("translate").addEventListener("click", () => {
+        getCanvas().translate(-300, -300);
+      });
+
+      document.getElementById("badge").addEventListener("click", () => {
+        var name = prompt("Enter node name:", "HandleNewGreet");
+        var id = getSession().getNodeByName(name).getUUID();
+        var wiresShape = getCanvas().getWiresShape(id);
+        var text = prompt("Enter Badge text:", "Hello Badge!");
+        showBadge(wiresShape, text);
+      });
+    </script>
+  </body>
+</html>

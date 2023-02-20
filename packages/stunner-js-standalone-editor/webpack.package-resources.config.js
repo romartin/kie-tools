@@ -30,7 +30,7 @@ module.exports = (env) =>
       libraryTarget: "umd",
     },
     entry: {
-      swf: "./src/swf/index.ts",
+      sjs: "./src/sjs/index.ts",
     },
     module: {
       rules: [...patternflyBase.webpackModuleRules],

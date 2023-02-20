@@ -36,7 +36,7 @@ module.exports = (env) => [
       publicPath: "",
     },
     entry: {
-      "envelope/swf-combined-editor-envelope": "./src/envelope/SwfCombinedEditorEnvelopeApp.ts",
+      "envelope/stunner-js-editor-envelope": "./src/envelope/StunnerJSDiagramEditorEnvelopeApp.ts",
     },
     module: {
       rules: [...patternflyBase.webpackModuleRules],

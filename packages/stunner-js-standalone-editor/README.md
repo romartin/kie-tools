@@ -6,6 +6,17 @@ This library provides standalone Serverless Workflow Editor (one all-in-one Java
 
 A comprehensive API is also provided for setup and interaction with the Editor.
 
+### Running in dev
+
+1. pnpm install
+   If any issue about module not fonud, use instead:
+   pnpm install --save-dev browser-resolve
+   pnpm install --save-dev detective
+   pnpm install --save-dev buffer
+   pnpm install --save-dev process
+
+2. pnpm run build:dev
+
 ### Installation
 
 - To add it to your `package.json` file:
@@ -21,12 +32,12 @@ A comprehensive API is also provided for setup and interaction with the Editor.
 Here is an example on how to open the Serverless Workflow Standalone Editor using the provided API:
 
 ```
-const editor = SwfEditor.open({
+const editor = StunnerEditor.open({
       container: document.getElementById("swf-editor-container"),
       initialContent: Promise.resolve(""),
       readOnly: false,
       languageType: "json",
-      swfPreviewOptions: { editorMode: "diagram", defaultWidth: "100%" }
+      defaultWidth: "100%" }
     });
 ```
 
