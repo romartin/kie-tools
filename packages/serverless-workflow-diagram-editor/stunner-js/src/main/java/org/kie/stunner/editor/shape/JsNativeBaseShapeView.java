@@ -1,18 +1,13 @@
 package org.kie.stunner.editor.shape;
 
-import com.ait.lienzo.client.core.event.NodeMouseEnterHandler;
-import com.ait.lienzo.client.core.event.NodeMouseExitHandler;
 import com.ait.lienzo.client.core.shape.Circle;
 import com.ait.lienzo.client.core.shape.Group;
 import com.ait.lienzo.client.core.shape.MultiPath;
 import com.ait.lienzo.client.core.shape.Node;
 import com.ait.lienzo.client.core.shape.wires.WiresLayoutContainer;
-import com.ait.lienzo.shared.core.types.EventPropagationMode;
-import com.ait.lienzo.tools.client.event.HandlerRegistration;
 import org.kie.workbench.common.stunner.client.lienzo.shape.impl.ShapeStateDefaultHandler;
 import org.kie.workbench.common.stunner.client.lienzo.shape.view.ViewEventHandlerManager;
 import org.kie.workbench.common.stunner.client.lienzo.shape.view.wires.ext.WiresShapeViewExt;
-import org.kie.workbench.common.stunner.core.client.shape.ShapeState;
 import org.kie.workbench.common.stunner.core.client.shape.impl.AbstractShape;
 import org.kie.workbench.common.stunner.core.client.shape.impl.ShapeStateHandler;
 import org.kie.workbench.common.stunner.core.client.shape.view.event.ShapeViewSupportedEvents;
@@ -25,10 +20,6 @@ public abstract class JsNativeBaseShapeView<T extends JsNativeBaseShapeView> ext
 
     private ShapeStateDefaultHandler shapeStateHandler = new ShapeStateDefaultHandler().setBorderShape((() -> this))
             .setBackgroundShape(() -> this);
-
-    private final HandlerRegistration mouseEnterHandler;
-
-    private final HandlerRegistration mouseExitHandler;
 
     public JsNativeBaseShapeView(MultiPath path, String title) {
         this(path);
@@ -46,28 +37,17 @@ public abstract class JsNativeBaseShapeView<T extends JsNativeBaseShapeView> ext
         super(path
                       .setAlpha(1.00)
                       .setDraggable(false)
-                      .setListening(true) ,
+                      .setListening(true),
               new WiresLayoutContainer());
 
+        if (null == path.getFillColor()) {
+            path.setFillColor("white");
+        }
+        if (null == path.getStrokeColor()) {
+            path.setStrokeColor("black");
+        }
+
         setEventHandlerManager(new ViewEventHandlerManager(getShape(), getShape(), ShapeViewSupportedEvents.ALL_DESKTOP_EVENT_TYPES));
-
-        getShape().setEventPropagationMode(EventPropagationMode.NO_ANCESTORS);
-
-        NodeMouseEnterHandler enterEvent = event -> {
-            if (shapeStateHandler.getShapeState() == ShapeState.SELECTED) {
-                return;
-            }
-            shapeStateHandler.applyState(ShapeState.HIGHLIGHT);
-        };
-        mouseEnterHandler = getShape().addNodeMouseEnterHandler(enterEvent);
-
-        NodeMouseExitHandler exitEvent = event -> {
-            if (shapeStateHandler.getShapeState() == ShapeState.SELECTED) {
-                return;
-            }
-            shapeStateHandler.applyState(ShapeState.NONE);
-        };
-        mouseExitHandler = getShape().addNodeMouseExitHandler(exitEvent);
     }
 
     public ShapeStateHandler getShapeStateHandler() {
@@ -116,13 +96,5 @@ public abstract class JsNativeBaseShapeView<T extends JsNativeBaseShapeView> ext
                 .setDraggable(false)
                 .setListening(false)
                 .setAlpha(1.00);
-    }
-
-    @Override
-    public void destroy() {
-        super.destroy();
-        shapeStateHandler = null;
-        mouseEnterHandler.removeHandler();
-        mouseExitHandler.removeHandler();
     }
 }

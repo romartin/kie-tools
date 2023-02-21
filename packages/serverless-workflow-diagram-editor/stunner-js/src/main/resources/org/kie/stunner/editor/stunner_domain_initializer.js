@@ -41,23 +41,20 @@ class Transition {
 }
 ns.Transition = Transition;
 
-if (true) {
-  const init = e.domainInitializer;
-  init.addDefinition(ns.Start);
-  init.setCategory(ns.Start, "Activities");
-  init.setLabels(ns.Start, "rootNode", "activity");
-  init.addDefinition(ns.Activity);
-  init.setCategory(ns.Activity, "Activities");
-  init.setLabels(ns.Activity, "rootNode", "activity");
-  init.addDefinition(ns.Transition);
-  init.setCategory(ns.Transition, "transitions");
-  init.setLabels(ns.Transition, "transition");
-  init.addConnectionRule(ns.Transition, "activity", "activity");
-  init.initializeRules();
-}
+const init = e.domainInitializer;
+init.addDefinition(ns.Start);
+init.setCategory(ns.Start, "Activities");
+init.setLabels(ns.Start, "rootNode", "activity");
+init.addDefinition(ns.Activity);
+init.setCategory(ns.Activity, "Activities");
+init.setLabels(ns.Activity, "rootNode", "activity");
+init.addDefinition(ns.Transition);
+init.setCategory(ns.Transition, "transitions");
+init.setLabels(ns.Transition, "transition");
+init.addConnectionRule(ns.Transition, ["activity", "activity"]);
+init.initializeRules();
 
 e.parser = function (context, raw) {
-  console.log("Parsing: " + raw);
   context
     .addNode("start", new ns.Start())
     .setLocation("start", 350, 75)
@@ -72,16 +69,15 @@ e.parser = function (context, raw) {
 };
 
 e.shapeViewFactory = function (bean) {
-  console.log("Creating view for: ");
-  console.log(bean);
+  let shapeview;
   if (bean instanceof ns.Activity) {
-    return new window.com.ait.lienzo.client.core.shape.MultiPath().rect(0, 0, 250, 100);
+    shapeview = new window.com.ait.lienzo.client.core.shape.MultiPath().rect(0, 0, 250, 100);
+    shapeview.fillColor = "lightgrey";
   } else if (bean instanceof ns.Start) {
-    let shapeview = new window.com.ait.lienzo.client.core.shape.MultiPath().circle(25);
+    shapeview = new window.com.ait.lienzo.client.core.shape.MultiPath().circle(25);
     shapeview.fillColor = "green";
-    return shapeview;
   } else if (bean instanceof ns.Transition) {
-    return new window.org.kie.stunner.editor.shape.JsNativeConnector("#757575");
+    shapeview = new window.org.kie.stunner.editor.shape.JsNativeConnector("#757575");
   }
-  return null;
+  return shapeview;
 };
