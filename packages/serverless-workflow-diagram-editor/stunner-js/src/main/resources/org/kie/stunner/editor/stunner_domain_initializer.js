@@ -27,7 +27,7 @@ const ns = window;
 console.log("Execution of custom js domain initializer script.");
 
 class Start {
-  name = "start";
+  name = "";
 }
 ns.Start = Start;
 
@@ -37,7 +37,7 @@ class Activity {
 ns.Activity = Activity;
 
 class Transition {
-  name = "transition";
+  name = "";
 }
 ns.Transition = Transition;
 
@@ -52,6 +52,8 @@ if (true) {
   init.addDefinition(ns.Transition);
   init.setCategory(ns.Transition, "transitions");
   init.setLabels(ns.Transition, "transition");
+  init.addConnectionRule(ns.Transition, "activity", "activity");
+  init.initializeRules();
 }
 
 e.parser = function (context, raw) {
@@ -59,8 +61,10 @@ e.parser = function (context, raw) {
   context
     .addNode("start", new ns.Start())
     .setLocation("start", 350, 75)
-    .addNode("activity1", new window.org.kie.stunner.editor.workflow.Activity())
+    .addNode("activity1", new ns.Activity())
     .setLocation("activity1", 350, 120)
+    .addEdge("start_to_activity1", new ns.Transition(), "start")
+    .connect("start_to_activity1", "activity1")
     .addNode("activity2", new ns.Activity())
     .setLocation("activity2", 350, 300)
     .addEdge("activity1_to_activity2", new ns.Transition(), "activity1")
@@ -73,7 +77,9 @@ e.shapeViewFactory = function (bean) {
   if (bean instanceof ns.Activity) {
     return new window.com.ait.lienzo.client.core.shape.MultiPath().rect(0, 0, 250, 100);
   } else if (bean instanceof ns.Start) {
-    return new window.com.ait.lienzo.client.core.shape.MultiPath().circle(25);
+    let shapeview = new window.com.ait.lienzo.client.core.shape.MultiPath().circle(25);
+    shapeview.fillColor = "green";
+    return shapeview;
   } else if (bean instanceof ns.Transition) {
     return new window.org.kie.stunner.editor.shape.JsNativeConnector("#757575");
   }

@@ -17,9 +17,6 @@
 package org.kie.stunner.editor;
 
 import jsinterop.annotations.JsType;
-import org.kie.stunner.editor.workflow.Activity;
-
-import static org.kie.workbench.common.stunner.core.definition.jsadapter.JsDefinitionSetAdapter.toClassNames;
 
 @JsType
 public class StunnerJsDefinitionSet {
@@ -27,7 +24,7 @@ public class StunnerJsDefinitionSet {
     public String definitions;
 
     public StunnerJsDefinitionSet() {
-        // TODO Just for local testing.... value must be empty string.
-        definitions = toClassNames(Activity.class);
+        // TODO: Fix this.. It should be an empty string, but then fails somewhere once setting editor's content
+        definitions = "Activity";
     }
 }

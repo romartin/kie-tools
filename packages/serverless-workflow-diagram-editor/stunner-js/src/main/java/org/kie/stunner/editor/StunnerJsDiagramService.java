@@ -23,7 +23,6 @@ import javax.inject.Inject;
 import elemental2.core.Global;
 import elemental2.core.JsArray;
 import elemental2.promise.Promise;
-import org.kie.stunner.editor.workflow.Activity;
 import org.kie.workbench.common.stunner.client.widgets.api.JsStunnerWindow;
 import org.kie.workbench.common.stunner.core.api.DefinitionManager;
 import org.kie.workbench.common.stunner.core.api.FactoryManager;
@@ -78,26 +77,15 @@ public class StunnerJsDiagramService {
                                                   nodeFactory,
                                                   edgeFactory));
 
-        if (false) {
+        if (true) {
             JsStunnerWindow.editor
                     .parser
                     .parse(executionContext, content);
         }
 
-        if (true) {
+        if (false) {
             // TODO jsonGraphMarshaller.parse(executionContext, content);
             jsonGraphMarshaller.parseExample(executionContext);
-        }
-
-        if (false) {
-            executionContext
-                    // .addRootNode("sw_root_node", new Workflow())
-                    .addNode("activity1", new Activity().setName("Activity1"))
-                    .setLocation("activity1", 350, 220);
-            //.addNode("end", new End())
-            //.changeLocation("end", 420, 470)
-            //.addEdge("state1_to_end", new Transition(), "state1")
-            //.connect("state1_to_end", "end");
         }
 
         String ssid = shapeManager.getDefaultShapeSet(definitionSetId).getId();

@@ -19,9 +19,6 @@ import org.kie.workbench.common.stunner.core.client.shape.view.event.ShapeViewSu
 
 public abstract class JsNativeBaseShapeView<T extends JsNativeBaseShapeView> extends WiresShapeViewExt<T> {
 
-    protected final static String SHAPE_STROKE_COLOR = "#ccc";
-    protected final static String SHAPE_FILL_COLOR = "#fff";
-    protected final static double SHAPE_STROKE_WIDTH = 2.00;
     protected final static String SHAPE_TITLE_FONT_COLOR = "#929292";
     protected final static double SHAPE_TITLE_FONT_SIZE = 12.00;
     protected final static String SHAPE_TITLE_FONT_FAMILY = "Open Sans";
@@ -49,10 +46,8 @@ public abstract class JsNativeBaseShapeView<T extends JsNativeBaseShapeView> ext
         super(path
                       .setAlpha(1.00)
                       .setDraggable(false)
-                      .setListening(true)
-                      .setFillColor(SHAPE_FILL_COLOR)
-                      .setStrokeColor(SHAPE_STROKE_COLOR)
-                      .setStrokeWidth(SHAPE_STROKE_WIDTH), new WiresLayoutContainer());
+                      .setListening(true) ,
+              new WiresLayoutContainer());
 
         setEventHandlerManager(new ViewEventHandlerManager(getShape(), getShape(), ShapeViewSupportedEvents.ALL_DESKTOP_EVENT_TYPES));
 

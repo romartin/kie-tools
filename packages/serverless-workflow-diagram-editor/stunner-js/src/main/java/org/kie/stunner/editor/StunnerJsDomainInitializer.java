@@ -21,7 +21,6 @@ import java.lang.annotation.Annotation;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
-import org.kie.stunner.editor.workflow.Activity;
 import org.kie.workbench.common.stunner.core.api.DomainInitializer;
 
 @ApplicationScoped
@@ -39,10 +38,7 @@ public class StunnerJsDomainInitializer {
                     public Class<? extends Annotation> annotationType() {
                         return StunnerJSEditorQualifier.class;
                     }
-                })
-                // TODO Just for local testing.... drop it.
-                .setCategory(Activity.class, "Activities")
-                .setLabels(Activity.class, "activity");
+                });
     }
 
     public DomainInitializer getDomainInitializer() {

@@ -20,8 +20,6 @@ import javax.enterprise.context.ApplicationScoped;
 
 import com.ait.lienzo.client.core.shape.MultiPath;
 import jsinterop.base.Js;
-import org.kie.stunner.editor.workflow.Activity;
-import org.kie.stunner.editor.workflow.ActivityShape;
 import org.kie.workbench.common.stunner.client.widgets.api.JsStunnerWindow;
 import org.kie.workbench.common.stunner.core.client.shape.Shape;
 import org.kie.workbench.common.stunner.core.client.shape.factory.ShapeFactory;
@@ -33,10 +31,6 @@ public class StunnerJsShapeFactory implements ShapeFactory<Object, Shape> {
 
     @Override
     public Shape newShape(Object instance) {
-        // TODO Just for local testing.... drop it.
-        if (instance instanceof Activity) {
-            return ActivityShape.build((Activity) instance);
-        }
         return newJsShape(instance);
     }
 

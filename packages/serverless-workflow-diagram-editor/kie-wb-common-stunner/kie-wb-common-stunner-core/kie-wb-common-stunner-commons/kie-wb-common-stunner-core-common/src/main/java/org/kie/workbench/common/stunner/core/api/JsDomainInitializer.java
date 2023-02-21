@@ -47,6 +47,16 @@ public class JsDomainInitializer {
         return this;
     }
 
+    public JsDomainInitializer addConnectionRule(Object type, String[]... roles) {
+        domainInitializer.addConnectionRule(type, roles);
+        return this;
+    }
+
+    public JsDomainInitializer initializeRules() {
+        domainInitializer.initializeRules();
+        return this;
+    }
+
     public void injectScript(String src) {
         ScriptInjector.fromString(src).setWindow(ScriptInjector.TOP_WINDOW).inject();
     }

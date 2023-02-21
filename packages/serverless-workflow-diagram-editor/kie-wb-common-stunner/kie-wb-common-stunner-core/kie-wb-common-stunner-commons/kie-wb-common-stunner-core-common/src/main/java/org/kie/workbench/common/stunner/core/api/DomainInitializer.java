@@ -95,20 +95,22 @@ public class DomainInitializer {
         return this;
     }
 
-    public DomainInitializer addContainmentRule(Class type, String... roles) {
+    public DomainInitializer addContainmentRule(Object type, String... roles) {
+        String typeId = JsAdapterUtils.getClassId(type);
         final HashSet<String> allowedRoles = new HashSet<>(roles.length);
         allowedRoles.addAll(Arrays.asList(roles));
-        rules.add(new CanContain("CAN_CONTAIN" + rules.size(), type.getName(), allowedRoles));
+        rules.add(new CanContain("CAN_CONTAIN" + rules.size(), typeId, allowedRoles));
 
         return this;
     }
 
-    public DomainInitializer addConnectionRule(Class type, String[]... roles) {
+    public DomainInitializer addConnectionRule(Object type, String[]... roles) {
+        String typeId = JsAdapterUtils.getClassId(type);
         final ArrayList<CanConnect.PermittedConnection> allowedRoles = new ArrayList<>(roles.length);
         for (String[] role : roles) {
             allowedRoles.add(new CanConnect.PermittedConnection(role[0], role[1]));
         }
-        rules.add(new CanConnect("CAN_CONNECT" + rules.size(), type.getName(), allowedRoles));
+        rules.add(new CanConnect("CAN_CONNECT" + rules.size(), typeId, allowedRoles));
 
         return this;
     }

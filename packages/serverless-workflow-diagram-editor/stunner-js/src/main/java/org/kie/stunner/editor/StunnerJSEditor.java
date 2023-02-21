@@ -57,10 +57,11 @@ public class StunnerJSEditor {
     }
 
     public Promise<Void> setContent(final String path, final String value) {
+        stunnerEditor.close();
         return promises.create((success, failure) -> {
             diagramService.parse(getDefinitionSetId(StunnerJsDefinitionSet.class), "someRawContent")
                     .then(diagram -> {
-                        stunnerEditor.close().open(diagram, new SessionPresenter.SessionPresenterCallback() {
+                        stunnerEditor.open(diagram, new SessionPresenter.SessionPresenterCallback() {
                             @Override
                             public void onSuccess() {
                                 success.onInvoke((Void) null);
