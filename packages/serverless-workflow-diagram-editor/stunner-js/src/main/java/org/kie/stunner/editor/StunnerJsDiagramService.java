@@ -90,7 +90,9 @@ public class StunnerJsDiagramService {
 
         String ssid = shapeManager.getDefaultShapeSet(definitionSetId).getId();
         Diagram diagram = createDiagram(definitionSetId, "SW Test Diagram", executionContext.graph);
-        // TODO diagram.getMetadata().setCanvasRootUUID(executionContext.root.getUUID());
+        if (null != executionContext.root) {
+            diagram.getMetadata().setCanvasRootUUID(executionContext.root.getUUID());
+        }
         diagram.getMetadata().setShapeSetId(ssid);
 
         return promises.resolve(diagram);

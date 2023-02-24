@@ -30,17 +30,17 @@ public class StunnerJSEditor {
     private StunnerEditor stunnerEditor;
 
     @Inject
-    private StunnerJsDomainInitializer workflowDomainInitializer;
+    private StunnerJsDomainInitializer domainInitializer;
 
     @Inject
     private StunnerJsDiagramService diagramService;
 
     public void onStartup(PlaceRequest place) {
-        workflowDomainInitializer.initialize();
+        domainInitializer.initialize();
 
         stunnerEditor
                 .setReadOnly(false)
-                .initialize(workflowDomainInitializer.getDomainInitializer());
+                .initialize(domainInitializer.getDomainInitializer());
 
         JsStunnerWindow.editor.domainInitializer.injectScript(StunnerJsDomainInitializerBundle.INSTANCE.initialize().getText());
     }
@@ -56,10 +56,10 @@ public class StunnerJSEditor {
         stunnerEditor.close();
     }
 
-    public Promise<Void> setContent(final String path, final String value) {
+    public Promise<Void> setContent(final String domainScriptRaw, final String value) {
         stunnerEditor.close();
         return promises.create((success, failure) -> {
-            diagramService.parse(getDefinitionSetId(StunnerJsDefinitionSet.class), "someRawContent")
+            diagramService.parse(getDefinitionSetId(StunnerJsDefinitionSet.class), value)
                     .then(diagram -> {
                         stunnerEditor.open(diagram, new SessionPresenter.SessionPresenterCallback() {
                             @Override

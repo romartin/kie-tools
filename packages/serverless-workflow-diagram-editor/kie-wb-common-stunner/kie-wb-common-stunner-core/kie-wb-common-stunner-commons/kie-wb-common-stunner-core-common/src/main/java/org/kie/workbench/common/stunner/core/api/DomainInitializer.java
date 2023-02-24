@@ -71,6 +71,11 @@ public class DomainInitializer {
 
     public DomainInitializer addDefinition(Object type) {
         String typeId = JsAdapterUtils.getClassId(type);
+        addDefinitionById(typeId);
+        return this;
+    }
+
+    public DomainInitializer addDefinitionById(String typeId) {
         domains.getDomain().addDefinition(typeId);
         return this;
     }
@@ -78,6 +83,12 @@ public class DomainInitializer {
     @SuppressWarnings("all")
     public DomainInitializer setCategory(Object type, String category) {
         String typeId = JsAdapterUtils.getClassId(type);
+        setCategoryById(typeId, category);
+        return this;
+    }
+
+    @SuppressWarnings("all")
+    public DomainInitializer setCategoryById(String typeId, String category) {
         domains.getDomain().setCategory(typeId, category);
         return this;
     }
@@ -85,6 +96,12 @@ public class DomainInitializer {
     @SuppressWarnings("all")
     public DomainInitializer setLabels(Object type, String... definitionLabels) {
         String typeId = JsAdapterUtils.getClassId(type);
+        setLabelsById(typeId, definitionLabels);
+        return this;
+    }
+
+    @SuppressWarnings("all")
+    public DomainInitializer setLabelsById(String typeId, String... definitionLabels) {
         domains.getDomain().setLabels(typeId, definitionLabels);
         return this;
     }
@@ -97,21 +114,29 @@ public class DomainInitializer {
 
     public DomainInitializer addContainmentRule(Object type, String... roles) {
         String typeId = JsAdapterUtils.getClassId(type);
+        addContainmentRuleById(typeId, roles);
+        return this;
+    }
+
+    public DomainInitializer addContainmentRuleById(String typeId, String... roles) {
         final HashSet<String> allowedRoles = new HashSet<>(roles.length);
         allowedRoles.addAll(Arrays.asList(roles));
-        rules.add(new CanContain("CAN_CONTAIN" + rules.size(), typeId, allowedRoles));
-
+        rules.add(new CanContain("CAN_CONTAIN" + typeId, typeId, allowedRoles));
         return this;
     }
 
     public DomainInitializer addConnectionRule(Object type, String[]... roles) {
         String typeId = JsAdapterUtils.getClassId(type);
+        addConnectionRuleById(typeId, roles);
+        return this;
+    }
+
+    public DomainInitializer addConnectionRuleById(String typeId, String[]... roles) {
         final ArrayList<CanConnect.PermittedConnection> allowedRoles = new ArrayList<>(roles.length);
         for (String[] role : roles) {
             allowedRoles.add(new CanConnect.PermittedConnection(role[0], role[1]));
         }
         rules.add(new CanConnect("CAN_CONNECT" + rules.size(), typeId, allowedRoles));
-
         return this;
     }
 
@@ -119,13 +144,11 @@ public class DomainInitializer {
         final HashSet<String> allowedRoles = new HashSet<>(roles.length);
         allowedRoles.addAll(Arrays.asList(roles));
         rules.add(new CanDock("CAN_DOCK" + rules.size(), type.getName(), allowedRoles));
-
         return this;
     }
 
     public DomainInitializer addOccurrences(String role, int minOccurrences, int maxOccurrences) {
         rules.add(new Occurrences("OCCURRENCES" + rules.size(), role, minOccurrences, maxOccurrences));
-
         return this;
     }
 
@@ -135,14 +158,12 @@ public class DomainInitializer {
                                                 int minOccurrences,
                                                 int maxOccurrences) {
         final EdgeCardinalityContext.Direction direction = isIncoming ? EdgeCardinalityContext.Direction.INCOMING : EdgeCardinalityContext.Direction.OUTGOING;
-
         rules.add(new EdgeOccurrences("EDGE_OCCURRENCES" + rules.size(),
                                       type.getName(),
                                       role,
                                       direction,
                                       minOccurrences,
                                       maxOccurrences));
-
         return this;
     }
 

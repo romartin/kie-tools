@@ -114,7 +114,8 @@ public class StunnerEditor {
                                                                        jsDefinitionAdapter,
                                                                        jsPropertyAdapter,
                                                                        jsRuleAdapter);
-        JsStunnerWindow.editor.domainInitializer = JsDomainInitializer.build(domainInitializer);
+        JsStunnerWindow.editor.domainInitializer = JsDomainInitializer.build(JsStunnerWindow.editor.definitions,
+                                                                             domainInitializer);
         return this;
     }
 

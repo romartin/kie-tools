@@ -16,67 +16,102 @@ TODO: Check actual js scope.
         } else {
             g = this;
         }
-        g.ELK = f();
+        ELK = f();
     }
 })(function () {
 
 })*/
 
 const e = window.editor;
-const ns = window;
 console.log("Execution of custom js domain initializer script.");
+
+class Animal {
+  name;
+  kind = "Dog";
+  someField = 0;
+  static __SOME_STATIC_FIELD__ = "someValue";
+
+  #somePrivateField = 0;
+  static #SOME_STATIC_PRIVATE_FIELD = "someStaticValue";
+
+  constructor(name) {
+    this.name = name;
+  }
+
+  speak() {
+    console.log(`${this.name} speaks.`);
+  }
+}
+
+class Workflow {
+  name = "";
+}
 
 class Start {
   name = "";
 }
-ns.Start = Start;
 
 class Activity {
   name = "activity";
 }
-ns.Activity = Activity;
 
 class Transition {
   name = "";
 }
-ns.Transition = Transition;
 
-const init = e.domainInitializer;
-init.addDefinition(ns.Start);
-init.setCategory(ns.Start, "Activities");
-init.setLabels(ns.Start, "rootNode", "activity");
-init.addDefinition(ns.Activity);
-init.setCategory(ns.Activity, "Activities");
-init.setLabels(ns.Activity, "rootNode", "activity");
-init.addDefinition(ns.Transition);
-init.setCategory(ns.Transition, "transitions");
-init.setLabels(ns.Transition, "transition");
-init.addConnectionRule(ns.Transition, ["activity", "activity"]);
-init.initializeRules();
+e.domainInitializer
+  .addDefinition(Workflow, {
+    category: "workflow",
+    labels: ["workflow"],
+  })
+  .addDefinition(Start, {
+    category: "activities",
+    labels: ["rootNode", "activity"],
+  })
+  .addDefinition(Activity, {
+    category: "activities",
+    labels: ["rootNode", "activity"],
+  })
+  .addDefinition(Transition, {
+    category: "transitions",
+    labels: ["transition"],
+  })
+  .addContainmentRule(Workflow, ["rootNode"])
+  .addConnectionRules(Transition, [
+    {
+      from: "activity",
+      to: "activity",
+    },
+  ])
+  .done();
 
 e.parser = function (context, raw) {
   context
-    .addNode("start", new ns.Start())
+    .addRootNode("workflow", new Workflow())
+    .addNode("start", new Start())
     .setLocation("start", 350, 75)
-    .addNode("activity1", new ns.Activity())
+    .addNode("activity1", new Activity())
     .setLocation("activity1", 350, 120)
-    .addEdge("start_to_activity1", new ns.Transition(), "start")
+    .addEdge("start_to_activity1", new Transition(), "start")
     .connect("start_to_activity1", "activity1")
-    .addNode("activity2", new ns.Activity())
+    .addNode("activity2", new Activity())
     .setLocation("activity2", 350, 300)
-    .addEdge("activity1_to_activity2", new ns.Transition(), "activity1")
+    .addEdge("activity1_to_activity2", new Transition(), "activity1")
     .connect("activity1_to_activity2", "activity2");
 };
 
 e.shapeViewFactory = function (bean) {
   let shapeview;
-  if (bean instanceof ns.Activity) {
+  if (bean instanceof Workflow) {
+    // TODO: Makes no sense.
+    shapeview = new window.com.ait.lienzo.client.core.shape.MultiPath().rect(0, 0, 1200, 600);
+  } else if (bean instanceof Activity) {
     shapeview = new window.com.ait.lienzo.client.core.shape.MultiPath().rect(0, 0, 250, 100);
     shapeview.fillColor = "lightgrey";
-  } else if (bean instanceof ns.Start) {
+  } else if (bean instanceof Start) {
     shapeview = new window.com.ait.lienzo.client.core.shape.MultiPath().circle(25);
     shapeview.fillColor = "green";
-  } else if (bean instanceof ns.Transition) {
+  } else if (bean instanceof Transition) {
     shapeview = new window.org.kie.stunner.editor.shape.JsNativeConnector("#757575");
   }
   return shapeview;
