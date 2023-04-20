@@ -61,6 +61,7 @@ import { Position } from "monaco-editor";
 import { ServerlessWorkflowCombinedEditorChannelApi, SwfFeatureToggle, SwfPreviewOptions } from "../api";
 import { useSwfDiagramEditorChannelApi } from "./hooks/useSwfDiagramEditorChannelApi";
 import { useSwfTextEditorChannelApi } from "./hooks/useSwfTextEditorChannelApi";
+import { SwfStunnerEditorAPI } from "../api/SwfStunnerEditorAPI";
 
 interface Props {
   locale: string;
@@ -80,6 +81,12 @@ interface File {
 }
 
 const ENVELOPE_LOCATOR_TYPE = "swf";
+
+declare global {
+  interface Window {
+    editor: SwfStunnerEditorAPI;
+  }
+}
 
 const RefForwardingServerlessWorkflowCombinedEditor: ForwardRefRenderFunction<
   ServerlessWorkflowCombinedEditorRef | undefined,
@@ -408,6 +415,130 @@ const RefForwardingServerlessWorkflowCombinedEditor: ForwardRefRenderFunction<
       [textEditor]
     )
   );
+
+  window.editor = {
+    session: {
+      getEdgeByUUID: (uuid: string) => {
+        const swfDiagramEditorEnvelopeApi = diagramEditor?.getEnvelopeServer()
+          .envelopeApi as unknown as MessageBusClientApi<ServerlessWorkflowDiagramEditorEnvelopeApi>;
+        return swfDiagramEditorEnvelopeApi.requests.editor_session_getEdgeByUUID(uuid);
+      },
+      getNodeByUUID: (uuid: string) => {
+        const swfDiagramEditorEnvelopeApi = diagramEditor?.getEnvelopeServer()
+          .envelopeApi as unknown as MessageBusClientApi<ServerlessWorkflowDiagramEditorEnvelopeApi>;
+        return swfDiagramEditorEnvelopeApi.requests.editor_session_getNodeByUUID(uuid);
+      },
+      getDefinitionByElementUUID: (uuid: string) => {
+        const swfDiagramEditorEnvelopeApi = diagramEditor?.getEnvelopeServer()
+          .envelopeApi as unknown as MessageBusClientApi<ServerlessWorkflowDiagramEditorEnvelopeApi>;
+        return swfDiagramEditorEnvelopeApi.requests.editor_session_getDefinitionByElementUUID(uuid);
+      },
+      getNodeByName: (name: string) => {
+        const swfDiagramEditorEnvelopeApi = diagramEditor?.getEnvelopeServer()
+          .envelopeApi as unknown as MessageBusClientApi<ServerlessWorkflowDiagramEditorEnvelopeApi>;
+        return swfDiagramEditorEnvelopeApi.requests.editor_session_getNodeByName(name);
+      },
+      getNodeName: (uuid: string) => {
+        const swfDiagramEditorEnvelopeApi = diagramEditor?.getEnvelopeServer()
+          .envelopeApi as unknown as MessageBusClientApi<ServerlessWorkflowDiagramEditorEnvelopeApi>;
+        return swfDiagramEditorEnvelopeApi.requests.editor_session_getNodeName(uuid);
+      },
+      getSelectedElementUUID: () => {
+        const swfDiagramEditorEnvelopeApi = diagramEditor?.getEnvelopeServer()
+          .envelopeApi as unknown as MessageBusClientApi<ServerlessWorkflowDiagramEditorEnvelopeApi>;
+        return swfDiagramEditorEnvelopeApi.requests.editor_session_getSelectedElementUUID();
+      },
+      getSelectedNode: () => {
+        const swfDiagramEditorEnvelopeApi = diagramEditor?.getEnvelopeServer()
+          .envelopeApi as unknown as MessageBusClientApi<ServerlessWorkflowDiagramEditorEnvelopeApi>;
+        return swfDiagramEditorEnvelopeApi.requests.editor_session_getSelectedNode();
+      },
+      getSelectedEdge: () => {
+        const swfDiagramEditorEnvelopeApi = diagramEditor?.getEnvelopeServer()
+          .envelopeApi as unknown as MessageBusClientApi<ServerlessWorkflowDiagramEditorEnvelopeApi>;
+        return swfDiagramEditorEnvelopeApi.requests.editor_session_getSelectedEdge();
+      },
+      getSelectedDefinition: () => {
+        const swfDiagramEditorEnvelopeApi = diagramEditor?.getEnvelopeServer()
+          .envelopeApi as unknown as MessageBusClientApi<ServerlessWorkflowDiagramEditorEnvelopeApi>;
+        return swfDiagramEditorEnvelopeApi.requests.editor_session_getSelectedDefinition();
+      },
+      selectByUUID: (uuid: string) => {
+        const swfDiagramEditorEnvelopeApi = diagramEditor?.getEnvelopeServer()
+          .envelopeApi as unknown as MessageBusClientApi<ServerlessWorkflowDiagramEditorEnvelopeApi>;
+        swfDiagramEditorEnvelopeApi.requests.editor_session_selectByUUID(uuid);
+        return Promise.resolve();
+      },
+      selectByName: (name: string) => {
+        const swfDiagramEditorEnvelopeApi = diagramEditor?.getEnvelopeServer()
+          .envelopeApi as unknown as MessageBusClientApi<ServerlessWorkflowDiagramEditorEnvelopeApi>;
+        swfDiagramEditorEnvelopeApi.requests.editor_session_selectByName(name);
+        return Promise.resolve();
+      },
+      clearSelection: () => {
+        const swfDiagramEditorEnvelopeApi = diagramEditor?.getEnvelopeServer()
+          .envelopeApi as unknown as MessageBusClientApi<ServerlessWorkflowDiagramEditorEnvelopeApi>;
+        swfDiagramEditorEnvelopeApi.requests.editor_session_clearSelection();
+        return Promise.resolve();
+      },
+    },
+    canvas: {
+      getShapeIds: () => {
+        const swfDiagramEditorEnvelopeApi = diagramEditor?.getEnvelopeServer()
+          .envelopeApi as unknown as MessageBusClientApi<ServerlessWorkflowDiagramEditorEnvelopeApi>;
+        return swfDiagramEditorEnvelopeApi.requests.editor_canvas_getShapeIds();
+      },
+      getBackgroundColor: (uuid: string) => {
+        const swfDiagramEditorEnvelopeApi = diagramEditor?.getEnvelopeServer()
+          .envelopeApi as unknown as MessageBusClientApi<ServerlessWorkflowDiagramEditorEnvelopeApi>;
+        return swfDiagramEditorEnvelopeApi.requests.editor_canvas_getBackgroundColor(uuid);
+      },
+      setBackgroundColor: (uuid: string, color: string) => {
+        const swfDiagramEditorEnvelopeApi = diagramEditor?.getEnvelopeServer()
+          .envelopeApi as unknown as MessageBusClientApi<ServerlessWorkflowDiagramEditorEnvelopeApi>;
+        swfDiagramEditorEnvelopeApi.requests.editor_canvas_setBackgroundColor(uuid, color);
+        return Promise.resolve();
+      },
+      getBorderColor: (uuid: string) => {
+        const swfDiagramEditorEnvelopeApi = diagramEditor?.getEnvelopeServer()
+          .envelopeApi as unknown as MessageBusClientApi<ServerlessWorkflowDiagramEditorEnvelopeApi>;
+        return swfDiagramEditorEnvelopeApi.requests.editor_canvas_getBorderColor(uuid);
+      },
+      setBorderColor: (uuid: string, color: string) => {
+        const swfDiagramEditorEnvelopeApi = diagramEditor?.getEnvelopeServer()
+          .envelopeApi as unknown as MessageBusClientApi<ServerlessWorkflowDiagramEditorEnvelopeApi>;
+        swfDiagramEditorEnvelopeApi.requests.editor_canvas_setBorderColor(uuid, color);
+        return Promise.resolve();
+      },
+      getLocation: (uuid: string) => {
+        const swfDiagramEditorEnvelopeApi = diagramEditor?.getEnvelopeServer()
+          .envelopeApi as unknown as MessageBusClientApi<ServerlessWorkflowDiagramEditorEnvelopeApi>;
+        return swfDiagramEditorEnvelopeApi.requests.editor_canvas_getLocation(uuid);
+      },
+      getAbsoluteLocation: (uuid: string) => {
+        const swfDiagramEditorEnvelopeApi = diagramEditor?.getEnvelopeServer()
+          .envelopeApi as unknown as MessageBusClientApi<ServerlessWorkflowDiagramEditorEnvelopeApi>;
+        return swfDiagramEditorEnvelopeApi.requests.editor_canvas_getAbsoluteLocation(uuid);
+      },
+      getDimensions: (uuid: string) => {
+        const swfDiagramEditorEnvelopeApi = diagramEditor?.getEnvelopeServer()
+          .envelopeApi as unknown as MessageBusClientApi<ServerlessWorkflowDiagramEditorEnvelopeApi>;
+        return swfDiagramEditorEnvelopeApi.requests.editor_canvas_getDimensions(uuid);
+      },
+      center: (uuid: string) => {
+        const swfDiagramEditorEnvelopeApi = diagramEditor?.getEnvelopeServer()
+          .envelopeApi as unknown as MessageBusClientApi<ServerlessWorkflowDiagramEditorEnvelopeApi>;
+        swfDiagramEditorEnvelopeApi.requests.editor_canvas_center(uuid);
+        return Promise.resolve();
+      },
+      draw: () => {
+        const swfDiagramEditorEnvelopeApi = diagramEditor?.getEnvelopeServer()
+          .envelopeApi as unknown as MessageBusClientApi<ServerlessWorkflowDiagramEditorEnvelopeApi>;
+        swfDiagramEditorEnvelopeApi.requests.editor_canvas_draw();
+        return Promise.resolve();
+      },
+    },
+  };
 
   return (
     <div style={{ height: "100%" }}>

@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Red Hat, Inc. and/or its affiliates.
+ * Copyright 2021 Red Hat, Inc. and/or its affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,9 +14,8 @@
  * limitations under the License.
  */
 
-import { KogitoEditorEnvelopeApi } from "@kie-tools-core/editor/dist/api";
-import { StunnerEditorEnvelopeAPI } from "./StunnerEditorEnvelopeAPI";
+import { CanvasEditorApi } from "./CanvasEditorApi";
 
-export interface ServerlessWorkflowDiagramEditorEnvelopeApi extends KogitoEditorEnvelopeApi, StunnerEditorEnvelopeAPI {
-  kogitoSwfDiagramEditor__highlightNode(args: { nodeName: string | null }): void;
+export interface SwfEditorDiagramApi {
+  canvas: CanvasEditorApi;
 }

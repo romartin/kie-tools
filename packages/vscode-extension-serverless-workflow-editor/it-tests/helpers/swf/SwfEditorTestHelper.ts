@@ -29,6 +29,7 @@ export default class SwfEditorTestHelper {
   public async getAllNodeIds(): Promise<string[]> {
     await this.switchToEditorFrame();
     const driver = this.webview.getDriver();
+    // TODO: Change this API
     const nodeIds = (await driver.executeScript("return window.frames.canvas.getNodeIds()")) as string[];
     await this.switchBack();
     return Promise.resolve(nodeIds);

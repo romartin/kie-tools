@@ -174,6 +174,7 @@ public class StunnerEditor {
             }
         });
         JsWindow.canvas = jsCanvas;
+        JsWindow.editor.canvas = jsCanvas;
     }
 
     public int getCurrentContentHash() {

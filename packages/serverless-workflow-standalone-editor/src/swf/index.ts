@@ -21,7 +21,7 @@ import swfTextEditorEnvelopeIndex from "!!raw-loader!../../dist/resources/swf/sw
 import { createEditor, Editor, ServerlessWorkflowType, StandaloneEditorApi } from "../common/Editor";
 import { StateControl } from "@kie-tools-core/editor/dist/channel";
 import { EnvelopeServer } from "@kie-tools-core/envelope-bus/dist/channel";
-import { ChannelType, KogitoEditorChannelApi } from "@kie-tools-core/editor/dist/api";
+import { ChannelType, KogitoEditorChannelApi, KogitoEditorEnvelopeApi } from "@kie-tools-core/editor/dist/api";
 import { StandaloneEditorsEditorChannelApiImpl } from "../envelope/StandaloneEditorsEditorChannelApiImpl";
 import {
   SwfFeatureToggleChannelApiImpl,
@@ -32,6 +32,8 @@ import {
 import { StandaloneServerlessWorkflowCombinedEditorChannelApi } from "./channel";
 import { getLanguageServiceChannelApi } from "./languageService";
 import { SwfPreviewOptions } from "@kie-tools/serverless-workflow-combined-editor/dist/api";
+import { SwfEditorDiagramApi } from "./SwfEditorDiagramApi";
+import { ServerlessWorkflowDiagramEditorEnvelopeApi } from "@kie-tools/serverless-workflow-diagram-editor-envelope/dist/api/ServerlessWorkflowDiagramEditorEnvelopeApi";
 
 declare global {
   interface Window {
@@ -47,6 +49,7 @@ const createEnvelopeServer = (
   origin?: string
 ) => {
   const defaultOrigin = window.location.protocol === "file:" ? "*" : window.location.origin;
+  // TODO: return new EnvelopeServer<KogitoEditorChannelApi, ServerlessWorkflowDiagramEditorEnvelopeApi>(
   return new EnvelopeServer<KogitoEditorChannelApi, any>(
     { postMessage: (message) => iframe.contentWindow?.postMessage(message, "*") },
     origin ?? defaultOrigin,
@@ -77,7 +80,7 @@ export const open = (args: {
   origin?: string;
   onError?: () => any;
   swfPreviewOptions?: SwfPreviewOptions;
-}): StandaloneEditorApi => {
+}): StandaloneEditorApi & SwfEditorDiagramApi => {
   if (!args.languageType.match(/^(json|yaml|yml)$/)) {
     throw new Error('Specified language type is not correct. It must be one among these "json" | "yaml" | "yml" ');
   }
@@ -145,6 +148,11 @@ export const open = (args: {
   const editor = createEditor(envelopeServer.envelopeApi, stateControl, listener, iframe);
   return {
     ...editor,
+    canvas: {
+      getNodeIds: () => {
+        return envelopeServer.envelopeApi.requests.canvas_getNodeIds();
+      },
+    },
   };
 };
 

@@ -18,6 +18,8 @@
  * Bridge for Envelope to connect Javascript API for Lienzo with envelope.
  * See {@see CanvasConsumedInteropApi} for full documentation for the API.
  */
+
+// TODO: Rename functions by dropping the "canvas_" preffix, and replace this class by CanvasEditorApi.
 export interface CanvasEnvelopeApi {
   canvas_getNodeIds(): Promise<string[]>;
 
