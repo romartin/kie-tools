@@ -15,6 +15,7 @@
  */
 
 import {
+  createCompletionItem,
   EditorLanguageService,
   EditorLanguageServiceArgs,
   ELsCompletionsMap,
@@ -31,7 +32,15 @@ import {
 import { posix as posixPath } from "path";
 import { JSONSchema } from "vscode-json-languageservice";
 import { TextDocument } from "vscode-languageserver-textdocument";
-import { CodeLens, CompletionItem, Diagnostic, DiagnosticSeverity, Position, Range } from "vscode-languageserver-types";
+import {
+  CodeLens,
+  CompletionItem,
+  CompletionItemKind,
+  Diagnostic,
+  DiagnosticSeverity,
+  Position,
+  Range,
+} from "vscode-languageserver-types";
 import {
   SwfLanguageServiceCodeCompletion,
   SwfLanguageServiceCodeCompletionFunctionsArgs,
@@ -67,6 +76,9 @@ export type SwfLanguageServiceArgs = EditorLanguageServiceArgs & {
       registryName: string,
       swfServiceCatalogServiceId: string
     ) => Promise<string>;
+  };
+  ansibleCatalog: {
+    getPlaybooks: (textDocument: TextDocument) => Promise<string[]>;
   };
   jqCompletions: {
     remote: {
@@ -123,15 +135,18 @@ export class SwfLanguageService implements IEditorLanguageService {
       }))
     );
 
-    return this.els.getCompletionItems({
+    const catalogServices: Promise<CompletionItem[]> = this.els.getCompletionItems({
       ...args,
       completions,
       extraCompletionFunctionsArgs: {
         langServiceConfig: this.args.config,
         swfCompletionItemServiceCatalogServices,
         jqCompletions: this.args.jqCompletions,
+        ansiblePlaybooks: this.args.ansibleCatalog.getPlaybooks,
       },
     });
+
+    return catalogServices;
   }
 
   public async getCodeLenses(args: {
@@ -276,4 +291,14 @@ const completions: ELsCompletionsMap<SwfLanguageServiceCodeCompletionFunctionsAr
   [["states", "*", "dataConditions", "*", "transition"], SwfLanguageServiceCodeCompletion.getTransitionCompletions],
   [["states", "*", "defaultCondition", "transition"], SwfLanguageServiceCodeCompletion.getTransitionCompletions],
   [["states", "*", "eventConditions", "*", "transition"], SwfLanguageServiceCodeCompletion.getTransitionCompletions],
+
+  // Ansible cutomsized code completions.
+  [
+    ["states", "*", "actions", "*", "functionRef", "refName"],
+    SwfLanguageServiceCodeCompletion.getAnsibleFunctionRefCompletions,
+  ],
+  [
+    ["states", "*", "actions", "*", "functionRef", "arguments", "name"],
+    SwfLanguageServiceCodeCompletion.getAnsiblePlaybooksCompletions,
+  ],
 ]);
