@@ -52,6 +52,9 @@ export class DevWebAppSwfLanguageService {
           swfServiceCatalogServiceId: string
         ) => `${registryName}__${swfServiceCatalogServiceId}__latest.yaml`,
       },
+      ansibleCatalog: {
+        getPlaybooks: async (_textDocument) => [],
+      },
       config: {
         shouldDisplayServiceRegistriesIntegration: async () => false,
         shouldIncludeJsonSchemaDiagnostics: async () => true,

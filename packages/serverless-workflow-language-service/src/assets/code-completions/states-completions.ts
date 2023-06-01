@@ -21,6 +21,28 @@ export const genericStateCompletion = {
   transition: "${10:Next transition of the workflow}",
 };
 
+export const ansibleCallPlaybookStateCompletion: OmitRecursively<Specification.Operationstate, "normalize"> = {
+  name: genericStateCompletion.name,
+  type: "operation",
+  metadata: {
+    type: "ansible",
+  },
+  actions: [
+    {
+      name: "${5:Unique Action name}",
+      functionRef: {
+        refName: "ansible:playbook",
+        arguments: {
+          name: "${6:playbooks/playbook.yml}",
+          args: "${7:-i stdio}",
+        },
+      },
+    },
+  ] as Specification.Action[] & undefined,
+  transition: genericStateCompletion.transition,
+  end: false,
+};
+
 export const operationStateCompletion: OmitRecursively<Specification.Operationstate, "normalize"> = {
   name: genericStateCompletion.name,
   type: "operation",

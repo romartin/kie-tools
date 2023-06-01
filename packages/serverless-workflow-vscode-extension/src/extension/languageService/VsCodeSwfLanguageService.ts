@@ -32,6 +32,7 @@ import { getFileLanguageOrThrow } from "@kie-tools/serverless-workflow-language-
 import { KogitoEditorDocument } from "@kie-tools-core/vscode-extension/dist/VsCodeKieEditorController";
 import { JqExpressionsReadSchemaFromFs } from "../jqExpressionCompletion/fs/JqExpressionsReadSchemaFromFs";
 import { removeDuplicatedKeyValuePairs } from "@kie-tools/serverless-workflow-jq-expressions/dist/utils";
+import { FsWatchingServiceAnsiblePlaybookStore } from "../ansible/FsWatchingServiceAnsiblePlaybookStore";
 export const SWF_YAML_LANGUAGE_ID = "serverless-workflow-yaml";
 export const SWF_JSON_LANGUAGE_ID = "serverless-workflow-json";
 
@@ -111,6 +112,16 @@ export class VsCodeSwfLanguageService {
         },
         getServiceFileNameFromSwfServiceCatalogServiceId: async (registryName, swfServiceCatalogServiceId) => {
           return getServiceFileNameFromSwfServiceCatalogServiceId(registryName, swfServiceCatalogServiceId);
+        },
+      },
+      ansibleCatalog: {
+        getPlaybooks: async (textDocument) => {
+          const playbookStore = new FsWatchingServiceAnsiblePlaybookStore({
+            baseFileAbsolutePosixPath: vscode.Uri.parse(textDocument.uri).path,
+            configuration: this.args.configuration,
+          });
+          await playbookStore.init();
+          return playbookStore.getPlaybooks();
         },
       },
       jqCompletions: {

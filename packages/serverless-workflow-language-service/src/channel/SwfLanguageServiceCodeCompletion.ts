@@ -33,6 +33,7 @@ import {
   SwfServiceCatalogServiceType,
 } from "@kie-tools/serverless-workflow-service-catalog/dist/api";
 import { Specification } from "@severlessworkflow/sdk-typescript";
+import { TextDocument } from "vscode-json-languageservice";
 import { CompletionItem, CompletionItemKind, InsertTextFormat, Position, Range } from "vscode-languageserver-types";
 import { SwfLanguageServiceCommandExecution } from "../api";
 import {
@@ -42,8 +43,10 @@ import {
   functionCompletion,
   injectStateCompletion,
   operationStateCompletion,
+  ansibleCallPlaybookStateCompletion,
   switchStateCompletion,
   workflowCompletion,
+  ansibleWorkflowCompletion,
 } from "../assets/code-completions";
 import * as swfModelQueries from "./modelQueries";
 import { SwfLanguageServiceConfig } from "./SwfLanguageService";
@@ -60,7 +63,11 @@ export type SwfLanguageServiceCodeCompletionFunctionsArgs = EditorLanguageServic
   langServiceConfig: SwfLanguageServiceConfig;
   swfCompletionItemServiceCatalogServices: SwfCompletionItemServiceCatalogService[];
   jqCompletions: JqCompletions;
+  ansiblePlaybooks: AnsibleCompletions;
 };
+interface AnsibleCompletions {
+  (textDocument: TextDocument): Promise<string[]>;
+}
 interface JqFunctionCompletion {
   /**
    * @param wordToSearch The wordToSearch is empty to show all the completion. Otherwise it completes the word.
@@ -316,6 +323,7 @@ export const SwfLanguageServiceCodeCompletion: EditorLanguageServiceCodeCompleti
     const kind = CompletionItemKind.Text;
     const emptyWorkflowLabel = "Empty Serverless Workflow";
     const exampleWorkflowLabel = "Serverless Workflow Example";
+    const ansibleWorkflowLabel = "Ansible Workflow Example";
 
     return Promise.resolve([
       {
@@ -342,6 +350,22 @@ export const SwfLanguageServiceCodeCompletion: EditorLanguageServiceCodeCompleti
           newText: args.codeCompletionStrategy.translate({
             ...args,
             completion: emptyWorkflowCompletion,
+            completionItemKind: kind,
+          }),
+          range: Range.create(args.cursorPosition, args.cursorPosition),
+        },
+        insertTextFormat: InsertTextFormat.Snippet,
+      },
+      // Ansible cutomsized empty code completion.
+      {
+        kind,
+        label: ansibleWorkflowLabel,
+        detail: "Start with a simple Ansible Workflow",
+        sortText: `100_${ansibleWorkflowLabel}`, //place the completion on top in the menu
+        textEdit: {
+          newText: args.codeCompletionStrategy.translate({
+            ...args,
+            completion: ansibleWorkflowCompletion,
             completionItemKind: kind,
           }),
           range: Range.create(args.cursorPosition, args.cursorPosition),
@@ -428,6 +452,13 @@ export const SwfLanguageServiceCodeCompletion: EditorLanguageServiceCodeCompleti
     const kind = CompletionItemKind.Interface;
 
     return Promise.resolve([
+      createCompletionItem({
+        ...args,
+        completion: ansibleCallPlaybookStateCompletion,
+        kind,
+        label: "New Ansible Call Playbook state",
+        detail: "Add a new Ansible Call Playbook state",
+      }),
       createCompletionItem({
         ...args,
         completion: operationStateCompletion,
@@ -534,6 +565,7 @@ export const SwfLanguageServiceCodeCompletion: EditorLanguageServiceCodeCompleti
 
     return Promise.resolve([...result, genericFunctionCompletion]);
   },
+
   getFunctionOperationCompletions: async (
     args: SwfLanguageServiceCodeCompletionFunctionsArgs
   ): Promise<CompletionItem[]> => {
@@ -733,5 +765,48 @@ export const SwfLanguageServiceCodeCompletion: EditorLanguageServiceCodeCompleti
       return Promise.resolve(jqCompletions);
     }
     return Promise.resolve([]);
+  },
+
+  // Ansible cutomsized code completion providers.
+
+  getAnsibleFunctionRefCompletions: async (
+    args: SwfLanguageServiceCodeCompletionFunctionsArgs
+  ): Promise<CompletionItem[]> => {
+    if (!args.currentNode.parent?.parent) {
+      return Promise.resolve([]);
+    }
+
+    const functionRefNames: CompletionItem[] = ["ansible:playbook"].map((name) => {
+      return createCompletionItem({
+        ...args,
+        completion: `${name}`,
+        kind: CompletionItemKind.Function,
+        label: name,
+        detail: name,
+      });
+    });
+
+    return Promise.resolve(functionRefNames);
+  },
+
+  getAnsiblePlaybooksCompletions: async (
+    args: SwfLanguageServiceCodeCompletionFunctionsArgs
+  ): Promise<CompletionItem[]> => {
+    if (!args.currentNode.parent?.parent) {
+      return Promise.resolve([]);
+    }
+
+    const playbooksResult: string[] = await args.ansiblePlaybooks(args.document);
+    const playbookItems: CompletionItem[] = playbooksResult.map((p) => {
+      return createCompletionItem({
+        ...args,
+        completion: `${p}`,
+        kind: CompletionItemKind.Function,
+        label: p,
+        detail: p,
+      });
+    });
+
+    return Promise.resolve(playbookItems);
   },
 };
