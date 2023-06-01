@@ -50,14 +50,6 @@ public class ClassUtils {
         initialized = true;
     }
 
-    /**
-     * Server and client side oriented type checking.
-     */
-    public static boolean isTypeOf(Class<?> type,
-                                   Object instance) {
-        return instance.getClass().getName().equals(type.getName());
-    }
-
     public static String getName(Class<?> type) {
         return type.getName();
     }

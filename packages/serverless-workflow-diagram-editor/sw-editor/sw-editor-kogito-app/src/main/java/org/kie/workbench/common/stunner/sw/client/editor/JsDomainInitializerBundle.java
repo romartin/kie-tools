@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Red Hat, Inc. and/or its affiliates.
+ * Copyright 2023 Red Hat, Inc. and/or its affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,9 +14,16 @@
  * limitations under the License.
  */
 
-package org.kie.workbench.common.stunner.core.definition.adapter.binding;
+package org.kie.workbench.common.stunner.sw.client.editor;
 
-class BindableTestProperty2 {
+import com.google.gwt.core.client.GWT;
+import com.google.gwt.resources.client.ClientBundle;
+import com.google.gwt.resources.client.TextResource;
 
-    String someValue;
+public interface JsDomainInitializerBundle extends ClientBundle {
+
+    JsDomainInitializerBundle INSTANCE = GWT.create(JsDomainInitializerBundle.class);
+
+    @Source("stunner_domain_initializer.js")
+    TextResource initialize();
 }

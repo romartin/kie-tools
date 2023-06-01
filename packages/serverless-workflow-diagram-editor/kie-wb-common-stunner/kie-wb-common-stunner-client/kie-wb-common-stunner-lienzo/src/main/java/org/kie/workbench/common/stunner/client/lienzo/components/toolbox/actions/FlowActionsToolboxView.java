@@ -32,6 +32,7 @@ import com.ait.lienzo.client.core.shape.toolbox.items.tooltip.ToolboxTextTooltip
 import com.ait.lienzo.shared.core.types.ColorName;
 import com.ait.lienzo.shared.core.types.Direction;
 import org.kie.workbench.common.stunner.client.lienzo.components.glyph.LienzoGlyphRenderers;
+import org.kie.workbench.common.stunner.core.client.api.JsWindow;
 import org.kie.workbench.common.stunner.core.client.components.toolbox.actions.ActionsToolbox;
 import org.kie.workbench.common.stunner.core.client.components.toolbox.actions.ActionsToolboxView;
 import org.kie.workbench.common.stunner.core.client.components.toolbox.actions.FlowActionsToolbox;
@@ -69,14 +70,14 @@ public class FlowActionsToolboxView
                 .at(TOOLBOX_AT)
                 .grid(new AutoGrid.Builder()
                               .forBoundingBox(getToolboxView().getBoundingBox())
-                              .withPadding(BUTTON_PADDING)
+                              .withPadding(JsWindow.editor.configuration.toolbox.buttonSizePx)
                               .withIconSize(getGlyphSize())
                               .towards(GRID_TOWARDS)
                               .build())
                 .decorate(getToolboxFactory()
                                   .decorators()
                                   .box()
-                                  .setPadding(BUTTON_PADDING)
+                                  .setPadding(JsWindow.editor.configuration.toolbox.buttonPaddingPx)
                                   .configure(path -> {
                                       path.setFillAlpha(0.95);
                                       path.setFillColor(ColorName.WHITE);
@@ -116,7 +117,7 @@ public class FlowActionsToolboxView
 
     @Override
     protected double getGlyphSize() {
-        return BUTTON_SIZE;
+        return JsWindow.editor.configuration.toolbox.buttonSizePx;
     }
 
     @Override

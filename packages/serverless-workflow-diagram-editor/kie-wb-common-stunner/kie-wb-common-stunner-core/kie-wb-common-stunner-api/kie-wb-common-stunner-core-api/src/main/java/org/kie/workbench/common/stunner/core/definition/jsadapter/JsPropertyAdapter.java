@@ -17,6 +17,7 @@
 package org.kie.workbench.common.stunner.core.definition.jsadapter;
 
 import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Inject;
 
 import elemental2.core.Reflect;
 import org.kie.workbench.common.stunner.core.definition.adapter.PropertyAdapter;
@@ -27,7 +28,10 @@ import static org.kie.workbench.common.stunner.core.definition.jsadapter.JsDefin
 @ApplicationScoped
 public class JsPropertyAdapter implements PropertyAdapter<JsDefinitionProperty, Object> {
 
-    private StunnerTranslationService translationService;
+    @Inject
+    StunnerTranslationService translationService;
+    @Inject
+    JsDomains domains;
 
     @Override
     public String getId(JsDefinitionProperty property) {
@@ -61,9 +65,5 @@ public class JsPropertyAdapter implements PropertyAdapter<JsDefinitionProperty, 
     @Override
     public boolean accepts(Class<?> type) {
         return JsDefinitionProperty.class.equals(type);
-    }
-
-    public void setTranslationService(StunnerTranslationService translationService) {
-        this.translationService = translationService;
     }
 }

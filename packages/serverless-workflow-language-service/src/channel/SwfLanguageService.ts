@@ -305,10 +305,20 @@ const completions: ELsCompletionsMap<SwfLanguageServiceCodeCompletionFunctionsAr
     SwfLanguageServiceCodeCompletion.getFunctionRefRefnameCompletions,
   ],
   [
+    ["states", "*", "actions", "*", "functionRef", "refName"],
+    SwfLanguageServiceCodeCompletion.getAnsibleFunctionRefCompletions,
+  ],
+  [
     ["states", "*", "actions", "*", "functionRef", "arguments"],
     SwfLanguageServiceCodeCompletion.getFunctionRefArgumentsCompletions,
   ],
+  [
+    ["states", "*", "actions", "*", "functionRef", "arguments", "name"],
+    SwfLanguageServiceCodeCompletion.getAnsiblePlaybooksCompletions,
+  ],
+  /* TODO: RE-ENABLE and test properly, sometimes enabling this ends up on getAnsiblePlaybooksCompletions stop working.
   [["states", "*", "actions", "*", "functionRef", "arguments", "*"], SwfLanguageServiceCodeCompletion.getJqcompletions],
+  */
   [["states", "*", "actions", "*", "actionDataFilter", "*"], SwfLanguageServiceCodeCompletion.getJqcompletions],
   [["states", "*", "stateDataFilter", "*"], SwfLanguageServiceCodeCompletion.getJqcompletions],
   [["states", "*", "onEvents", "*", "eventDataFilter", "*"], SwfLanguageServiceCodeCompletion.getJqcompletions],

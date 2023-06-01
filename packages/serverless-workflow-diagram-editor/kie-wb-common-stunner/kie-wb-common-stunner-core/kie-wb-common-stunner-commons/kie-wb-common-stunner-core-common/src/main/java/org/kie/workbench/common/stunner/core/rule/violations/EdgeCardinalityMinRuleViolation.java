@@ -18,11 +18,10 @@ package org.kie.workbench.common.stunner.core.rule.violations;
 
 import java.util.Optional;
 
-import org.jboss.errai.common.client.api.annotations.MapsTo;
-import org.jboss.errai.common.client.api.annotations.Portable;
+import jsinterop.annotations.JsType;
 import org.kie.workbench.common.stunner.core.rule.context.EdgeCardinalityContext;
 
-@Portable
+@JsType
 public class EdgeCardinalityMinRuleViolation extends AbstractRuleViolation {
 
     private final String node;
@@ -31,12 +30,12 @@ public class EdgeCardinalityMinRuleViolation extends AbstractRuleViolation {
     private final Integer currentOccurrences;
     private final EdgeCardinalityContext.Direction direction;
 
-    public EdgeCardinalityMinRuleViolation(final @MapsTo("node") String node,
-                                           final @MapsTo("edge") String edge,
-                                           final @MapsTo("restrictedOccurrences") Integer restrictedOccurrences,
-                                           final @MapsTo("currentOccurrences") Integer currentOccurrences,
-                                           final @MapsTo("direction") EdgeCardinalityContext.Direction direction,
-                                           final @MapsTo("type") Type type) {
+    public EdgeCardinalityMinRuleViolation(String node,
+                                           String edge,
+                                           Integer restrictedOccurrences,
+                                           Integer currentOccurrences,
+                                           EdgeCardinalityContext.Direction direction,
+                                           Type type) {
         super(type);
         this.node = node;
         this.edge = edge;

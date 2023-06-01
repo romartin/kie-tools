@@ -33,6 +33,7 @@ import com.ait.lienzo.test.LienzoMockitoTestRunner;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.kie.workbench.common.stunner.core.client.api.JsWindow;
 import org.kie.workbench.common.stunner.core.client.shape.view.event.MouseClickEvent;
 import org.kie.workbench.common.stunner.core.definition.shape.Glyph;
 import org.mockito.ArgumentCaptor;
@@ -137,10 +138,10 @@ public class MorphActionsToolboxViewTest
                      grid.getRows());
         assertEquals(1,
                      grid.getCols());
-        assertEquals(AbstractActionsToolboxView.BUTTON_SIZE,
+        assertEquals(JsWindow.editor.configuration.toolbox.buttonSizePx,
                      grid.getIconSize(),
                      0);
-        assertEquals(AbstractActionsToolboxView.BUTTON_PADDING,
+        assertEquals(JsWindow.editor.configuration.toolbox.buttonPaddingPx,
                      grid.getPadding(),
                      0);
     }
@@ -155,10 +156,10 @@ public class MorphActionsToolboxViewTest
                      grid.getRows());
         assertEquals(2,
                      grid.getCols());
-        assertEquals(AbstractActionsToolboxView.BUTTON_SIZE,
+        assertEquals(JsWindow.editor.configuration.toolbox.buttonSizePx,
                      grid.getIconSize(),
                      0);
-        assertEquals(AbstractActionsToolboxView.BUTTON_PADDING,
+        assertEquals(JsWindow.editor.configuration.toolbox.buttonPaddingPx,
                      grid.getPadding(),
                      0);
         verify(buttonGridItem,

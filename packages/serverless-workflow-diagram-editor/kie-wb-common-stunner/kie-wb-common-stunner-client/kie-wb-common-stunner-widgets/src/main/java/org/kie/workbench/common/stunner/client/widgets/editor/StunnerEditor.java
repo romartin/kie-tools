@@ -70,11 +70,6 @@ public class StunnerEditor {
     private Consumer<Throwable> exceptionProcessor;
     private AlertsControl<AbstractCanvas> alertsControl;
 
-    // CDI proxy.
-    public StunnerEditor() {
-        this(null, null, null, null, null);
-    }
-
     @Inject
     public StunnerEditor(ManagedInstance<SessionEditorPresenter<EditorSession>> editorSessionPresenterInstances,
                          ManagedInstance<SessionViewerPresenter<ViewerSession>> viewerSessionPresenterInstances,
@@ -158,7 +153,7 @@ public class StunnerEditor {
 
     @SuppressWarnings("all")
     private void initializeJsSession(AbstractSession session) {
-        JsStunnerSession jssession = new JsStunnerSession(session);
+        JsStunnerSession jssession = new JsStunnerSession(session, JsWindow.editor.definitions);
         JsWindow.editor.session = jssession;
         initializeJsCanvas(session);
     }

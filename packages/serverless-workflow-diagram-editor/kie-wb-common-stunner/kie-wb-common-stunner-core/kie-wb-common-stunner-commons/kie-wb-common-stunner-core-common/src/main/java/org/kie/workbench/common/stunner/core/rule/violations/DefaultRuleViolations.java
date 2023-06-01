@@ -20,11 +20,12 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.jboss.errai.common.client.api.annotations.Portable;
+import jsinterop.annotations.JsIgnore;
+import jsinterop.annotations.JsType;
 import org.kie.workbench.common.stunner.core.rule.RuleViolation;
 import org.kie.workbench.common.stunner.core.rule.RuleViolations;
 
-@Portable
+@JsType
 public class DefaultRuleViolations implements RuleViolations {
 
     private final List<RuleViolation> violations = new LinkedList<RuleViolation>();
@@ -55,6 +56,7 @@ public class DefaultRuleViolations implements RuleViolations {
         return violations;
     }
 
+    @JsIgnore
     @Override
     public Iterable<RuleViolation> violations(final RuleViolation.Type violationType) {
         return violations.stream()

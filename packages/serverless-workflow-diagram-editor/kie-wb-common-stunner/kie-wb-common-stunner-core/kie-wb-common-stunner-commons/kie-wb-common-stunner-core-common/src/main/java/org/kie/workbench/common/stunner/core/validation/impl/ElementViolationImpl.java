@@ -22,17 +22,15 @@ import java.util.LinkedHashSet;
 import java.util.Objects;
 import java.util.Optional;
 
-import org.jboss.errai.common.client.api.annotations.MapsTo;
-import org.jboss.errai.common.client.api.annotations.NonPortable;
-import org.jboss.errai.common.client.api.annotations.Portable;
+import jsinterop.annotations.JsType;
 import org.kie.workbench.common.stunner.core.rule.RuleViolation;
 import org.kie.workbench.common.stunner.core.validation.DiagramElementViolation;
 import org.kie.workbench.common.stunner.core.validation.DomainViolation;
 import org.kie.workbench.common.stunner.core.validation.ModelBeanViolation;
 import org.kie.workbench.common.stunner.core.validation.Violation;
 
-@Portable
-public final class ElementViolationImpl
+@JsType
+public class ElementViolationImpl
         implements DiagramElementViolation<RuleViolation> {
 
     private final String uuid;
@@ -41,11 +39,11 @@ public final class ElementViolationImpl
     private final Collection<DomainViolation> domainViolations;
     private final Type type;
 
-    ElementViolationImpl(final @MapsTo("uuid") String uuid,
-                         final @MapsTo("graphViolations") Collection<RuleViolation> graphViolations,
-                         final @MapsTo("modelViolations") Collection<ModelBeanViolation> modelViolations,
-                         final @MapsTo("domainViolations") Collection<DomainViolation> domainViolations,
-                         final @MapsTo("type") Type type) {
+    ElementViolationImpl(String uuid,
+                         Collection<RuleViolation> graphViolations,
+                         Collection<ModelBeanViolation> modelViolations,
+                         Collection<DomainViolation> domainViolations,
+                         Type type) {
         this.uuid = uuid;
         this.graphViolations = graphViolations;
         this.modelViolations = modelViolations;
@@ -83,7 +81,6 @@ public final class ElementViolationImpl
         return type;
     }
 
-    @NonPortable
     public static class Builder {
 
         private String uuid;

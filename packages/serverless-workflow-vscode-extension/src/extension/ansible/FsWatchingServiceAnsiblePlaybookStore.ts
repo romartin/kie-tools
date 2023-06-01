@@ -27,7 +27,7 @@ import { SwfVsCodeExtensionConfiguration } from "../configuration";
  * The playbook store looks for all YAML files inside the workspace's /playbooks directory.
  */
 
-const PLAYBOOKS_PATH = "/playbooks";
+const PLAYBOOKS_PATH = "playbooks";
 const PLAYBOOK_EXTENSIONS_REGEX = new RegExp("^.*\\.(yaml|yml)$");
 
 export class FsWatchingServiceAnsiblePlaybookStore {
@@ -41,7 +41,7 @@ export class FsWatchingServiceAnsiblePlaybookStore {
   public init() {
     const playbooksDirAbsolutePosixPath = getInterpolatedConfigurationValue({
       currentFileAbsolutePosixPath: this.args.baseFileAbsolutePosixPath,
-      value: definitelyPosixPath(path.join(configurationTokenKeys["${fileDirname}"], PLAYBOOKS_PATH)),
+      value: definitelyPosixPath(path.join(configurationTokenKeys["${fileDirname}"], "/" + PLAYBOOKS_PATH)),
     });
 
     this.fsWatcher = this.setupFsWatcher({
@@ -128,7 +128,7 @@ export class FsWatchingServiceAnsiblePlaybookStore {
                 const rawData = await vscode.workspace.fs.readFile(fileUri);
                 */
 
-              promises.push(Promise.resolve([fileName]));
+              promises.push(Promise.resolve([PLAYBOOKS_PATH + "/" + fileName]));
             });
 
             if (promises.length > 0) {

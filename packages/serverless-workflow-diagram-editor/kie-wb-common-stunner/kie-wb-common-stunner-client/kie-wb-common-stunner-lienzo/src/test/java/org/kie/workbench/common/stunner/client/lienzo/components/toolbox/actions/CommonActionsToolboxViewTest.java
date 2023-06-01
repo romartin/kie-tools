@@ -25,6 +25,7 @@ import com.ait.lienzo.test.LienzoMockitoTestRunner;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.kie.workbench.common.stunner.core.client.api.JsWindow;
 import org.kie.workbench.common.stunner.core.client.shape.view.event.MouseClickEvent;
 import org.kie.workbench.common.stunner.core.definition.shape.Glyph;
 import org.mockito.ArgumentCaptor;
@@ -69,10 +70,10 @@ public class CommonActionsToolboxViewTest
                times(1))
                 .grid(gridCaptor.capture());
         final AutoGrid grid = (AutoGrid) gridCaptor.getValue();
-        assertEquals(AbstractActionsToolboxView.BUTTON_SIZE,
+        assertEquals(JsWindow.editor.configuration.toolbox.buttonSizePx,
                      grid.getIconSize(),
                      0);
-        assertEquals(AbstractActionsToolboxView.BUTTON_PADDING,
+        assertEquals(JsWindow.editor.configuration.toolbox.buttonPaddingPx,
                      grid.getPadding(),
                      0);
         assertEquals(CommonActionsToolboxView.GRID_TOWARDS,

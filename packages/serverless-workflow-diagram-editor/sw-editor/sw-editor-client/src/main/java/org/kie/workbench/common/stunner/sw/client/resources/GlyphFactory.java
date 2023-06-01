@@ -24,6 +24,8 @@ public interface GlyphFactory {
 
     ImageDataUriGlyph END = ImageDataUriGlyph.create(ImageResources.INSTANCE.end().getSafeUri());
 
+    ImageDataUriGlyph STATE_ANSIBLE = ImageDataUriGlyph.create(ImageResources.INSTANCE.stateAnsible().getSafeUri());
+
     ImageDataUriGlyph STATE_INJECT = ImageDataUriGlyph.create(ImageResources.INSTANCE.stateInject().getSafeUri());
 
     ImageDataUriGlyph STATE_SLEEP = ImageDataUriGlyph.create(ImageResources.INSTANCE.stateSleep().getSafeUri());

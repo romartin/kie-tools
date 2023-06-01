@@ -30,6 +30,9 @@ public interface ImageResources extends ClientBundleWithLookup {
     @Source("images/icons/end.png")
     ImageResource end();
 
+    @Source("images/icons/ansible_icon_small.png")
+    ImageResource stateAnsible();
+
     @Source("images/icons/state-inject.png")
     ImageResource stateInject();
 

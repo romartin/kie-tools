@@ -23,13 +23,14 @@ import org.kie.workbench.common.stunner.core.util.HashUtil;
 @JsType
 public class DefinitionId {
 
-    public final static String DYNAMIC_ID_DELIMITER = ".";
+    public final static String DYNAMIC_ID_DELIMITER = "#";
 
     private final String id;
     private final int dynamicIdStartIndex;
 
     public static DefinitionId build(final String id) {
-        return build(id, -1);
+        int dynamicIndex = id.lastIndexOf(DYNAMIC_ID_DELIMITER);
+        return build(id, dynamicIndex);
     }
 
     @JsIgnore
@@ -57,16 +58,18 @@ public class DefinitionId {
     }
 
     public String value() {
-        return id;
+        return isDynamic() ?
+                id.substring(0, dynamicIdStartIndex) :
+                id;
     }
 
     public boolean isDynamic() {
-        return dynamicIdStartIndex >= 0;
+        return dynamicIdStartIndex > -1;
     }
 
-    public String type() {
+    public String dynamicId() {
         return isDynamic() ?
-                id.substring(0, dynamicIdStartIndex) :
+                id.substring(dynamicIdStartIndex + 1) :
                 id;
     }
 

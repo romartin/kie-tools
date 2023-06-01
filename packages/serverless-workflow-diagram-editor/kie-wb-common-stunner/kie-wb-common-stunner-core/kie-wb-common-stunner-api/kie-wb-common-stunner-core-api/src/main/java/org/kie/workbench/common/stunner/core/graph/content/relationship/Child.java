@@ -16,13 +16,13 @@
 
 package org.kie.workbench.common.stunner.core.graph.content.relationship;
 
-import org.jboss.errai.common.client.api.annotations.Portable;
+import jsinterop.annotations.JsType;
 
 /**
  * Indicates that the target node is a child of the source node.
  * This content has no view representation on the canvas.
  */
-@Portable
+@JsType
 public class Child implements Relationship {
 
     private static final transient String RELATIONSHIP = "child";

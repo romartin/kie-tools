@@ -29,6 +29,7 @@ import javax.enterprise.inject.Any;
 import javax.inject.Inject;
 
 import org.jboss.errai.ioc.client.api.ManagedInstance;
+import org.kie.workbench.common.stunner.core.client.api.JsWindow;
 import org.kie.workbench.common.stunner.core.client.canvas.AbstractCanvasHandler;
 import org.kie.workbench.common.stunner.core.client.components.toolbox.Toolbox;
 import org.kie.workbench.common.stunner.core.diagram.Diagram;
@@ -96,7 +97,9 @@ public class GroupActionsToolboxFactory
         HashMap<ToolboxAction<AbstractCanvasHandler>, String> connectorActionsMap = new HashMap<>();
 
         for (String connectorDefId : targetConnectors) {
-            connectorActionsMap.put(newCreateConnectorToolboxAction(qualifier).setEdgeId(connectorDefId), connectorDefId);
+            if (JsWindow.editor.configuration.toolbox.isConnectorIdAllowed.test(connectorDefId)) {
+                connectorActionsMap.put(newCreateConnectorToolboxAction(qualifier).setEdgeId(connectorDefId), connectorDefId);
+            }
         }
 
         return connectorActionsMap;
@@ -123,8 +126,10 @@ public class GroupActionsToolboxFactory
                                                            definitionsAllowedFilter);
 
             for (String defId : targets) {
-                CreateNodeToolboxAction nodeAction = newCreateNodeToolboxAction(qualifier).setEdgeId(connectorDefId).setNodeId(defId);
-                connectorNodeActionsMap.put(nodeAction, connectorDefId);
+                if (JsWindow.editor.configuration.toolbox.isNodeIdAllowed.test(defId)) {
+                    CreateNodeToolboxAction nodeAction = newCreateNodeToolboxAction(qualifier).setEdgeId(connectorDefId).setNodeId(defId);
+                    connectorNodeActionsMap.put(nodeAction, connectorDefId);
+                }
             }
         }
 

@@ -29,7 +29,9 @@ import com.ait.lienzo.client.core.shape.toolbox.items.ButtonItem;
 import com.ait.lienzo.client.core.shape.toolbox.items.impl.ToolboxFactory;
 import com.ait.lienzo.client.core.shape.toolbox.items.tooltip.ToolboxTextTooltip;
 import com.ait.lienzo.shared.core.types.Direction;
+import elemental2.dom.DomGlobal;
 import org.kie.workbench.common.stunner.client.lienzo.components.glyph.LienzoGlyphRenderers;
+import org.kie.workbench.common.stunner.core.client.api.JsWindow;
 import org.kie.workbench.common.stunner.core.client.canvas.AbstractCanvasHandler;
 import org.kie.workbench.common.stunner.core.client.components.toolbox.actions.ActionsToolbox;
 import org.kie.workbench.common.stunner.core.client.components.toolbox.actions.ActionsToolboxView;
@@ -42,14 +44,6 @@ import org.kie.workbench.common.stunner.core.definition.shape.Glyph;
 @GroupActionsToolbox
 public class GroupActionsToolboxView
         extends AbstractActionsToolboxView<GroupActionsToolboxView> {
-
-    static final double GRID_BUTTON_SIZE = 15;
-    static final double GRID_BUTTON_PADDING = 5;
-    static final double GRID_DECORATOR_PADDING = 10;
-    static final Direction TOOLBOX_AT = Direction.NORTH_EAST;
-    static final Direction ITEMS_GRID_TOWARDS = Direction.SOUTH_EAST;
-    static final Direction TOOLTIP_AT = Direction.SOUTH;
-    static final Direction TOOLTIP_TOWARDS = Direction.SOUTH;
 
     private HashMap<String, ButtonGridItem> gridItems;
 
@@ -82,19 +76,24 @@ public class GroupActionsToolboxView
         }
     }
 
+    protected static Direction toDirection(String s) {
+        return Direction.valueOf(s);
+    }
+
     @Override
     protected ToolboxTextTooltip createTooltip(final ActionsToolbox toolbox) {
         return getToolboxFactory()
                 .tooltips()
                 .forToolbox(getToolboxView())
-                .at(TOOLTIP_AT)
-                .towards(TOOLTIP_TOWARDS)
+                .at(toDirection(JsWindow.editor.configuration.toolbox.tooltipAt))
+                .towards(toDirection(JsWindow.editor.configuration.toolbox.tooltipTowards))
                 .withText(defaultTextConsumer());
     }
 
     @Override
     protected double getGlyphSize() {
-        return GRID_BUTTON_SIZE;
+        DomGlobal.console.error("TOOLBOX VIEW USING CONFIGURATION INSTANCE: " + JsWindow.editor.configuration.toolbox);
+        return JsWindow.editor.configuration.toolbox.buttonSizePx;
     }
 
     @SuppressWarnings("unchecked")
@@ -133,9 +132,9 @@ public class GroupActionsToolboxView
 
     private void configureToolbox(final GroupedActionsToolbox toolbox) {
         getToolboxView()
-                .at(TOOLBOX_AT)
-                .grid(createFixedGrid(BUTTON_SIZE,
-                                      BUTTON_PADDING,
+                .at(toDirection(JsWindow.editor.configuration.toolbox.toolboxAt))
+                .grid(createFixedGrid(JsWindow.editor.configuration.toolbox.buttonSizePx,
+                                      JsWindow.editor.configuration.toolbox.buttonPaddingPx,
                                       toolbox.getConnectorSize(),
                                       1));
     }
@@ -144,9 +143,9 @@ public class GroupActionsToolboxView
         if (null != toolbox.getConnectorActions()) {
             toolbox.getConnectorActions().forEach((toolboxItem, definitionId) -> {
                 Group glyphView = renderGlyph(toolbox.getGlyph((ToolboxAction<AbstractCanvasHandler>) toolboxItem),
-                                              BUTTON_SIZE);
-                Point2DGrid grid = createFixedGrid(GRID_BUTTON_SIZE,
-                                                   GRID_BUTTON_PADDING,
+                                              JsWindow.editor.configuration.toolbox.buttonSizePx);
+                Point2DGrid grid = createFixedGrid(JsWindow.editor.configuration.toolbox.buttonSizePx,
+                                                   JsWindow.editor.configuration.toolbox.buttonPaddingPx,
                                                    toolbox.getConnectorSize(),
                                                    toolbox.getNodeSize((String) definitionId));
 
@@ -158,7 +157,7 @@ public class GroupActionsToolboxView
                                 .decorateGrid(getToolboxFactory()
                                                       .decorators()
                                                       .button()
-                                                      .setPadding(GRID_DECORATOR_PADDING)
+                                                      .setPadding(JsWindow.editor.configuration.toolbox.decoratorPaddingPx)
                                                       .configure(path -> {
                                                           path.setFillColor("#f2f2f2");
                                                           path.setFillAlpha(0.95);
@@ -177,7 +176,7 @@ public class GroupActionsToolboxView
                                         final int cols) {
         return new FixedLayoutGrid(padding,
                                    buttonSize,
-                                   ITEMS_GRID_TOWARDS,
+                                   toDirection(JsWindow.editor.configuration.toolbox.itemGridTowards),
                                    rows,
                                    cols);
     }

@@ -16,13 +16,13 @@
 
 package org.kie.workbench.common.stunner.core.graph.content.relationship;
 
-import org.jboss.errai.common.client.api.annotations.Portable;
+import jsinterop.annotations.JsType;
 
 /**
  * Indicates that the target node is docked into the parent one.
  * This content has no view representation on the canvas.
  */
-@Portable
+@JsType
 public class Dock implements Relationship {
 
     private static final transient String RELATIONSHIP = "dock";

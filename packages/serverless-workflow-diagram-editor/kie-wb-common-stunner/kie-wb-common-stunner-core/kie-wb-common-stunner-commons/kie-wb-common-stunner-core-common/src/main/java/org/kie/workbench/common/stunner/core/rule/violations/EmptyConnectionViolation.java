@@ -18,22 +18,21 @@ package org.kie.workbench.common.stunner.core.rule.violations;
 
 import java.util.Optional;
 
-import org.jboss.errai.common.client.api.annotations.MapsTo;
+import jsinterop.annotations.JsType;
 import org.jboss.errai.common.client.api.annotations.NonPortable;
-import org.jboss.errai.common.client.api.annotations.Portable;
 import org.kie.workbench.common.stunner.core.graph.Edge;
 import org.kie.workbench.common.stunner.core.graph.Element;
 import org.kie.workbench.common.stunner.core.graph.Node;
 import org.kie.workbench.common.stunner.core.graph.content.view.View;
 
-@Portable
+@JsType
 public class EmptyConnectionViolation extends AbstractRuleViolation {
 
     private final String sourceUUID;
     private final String targetUUID;
 
-    public EmptyConnectionViolation(final @MapsTo("sourceUUID") String sourceUUID,
-                                    final @MapsTo("targetUUID") String targetUUID) {
+    public EmptyConnectionViolation(String sourceUUID,
+                                    String targetUUID) {
         this.sourceUUID = sourceUUID;
         this.targetUUID = targetUUID;
     }
