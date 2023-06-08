@@ -25,6 +25,7 @@ import java.util.Set;
 import org.kie.workbench.common.stunner.core.definition.adapter.binding.BindableAdapterUtils;
 import org.kie.workbench.common.stunner.core.definition.clone.ClonePolicy;
 
+// TODO: Dro?
 public abstract class BindableMorphDefinition implements MorphDefinition {
 
     protected abstract Class<?> getDefaultType();

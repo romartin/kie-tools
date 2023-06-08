@@ -23,9 +23,8 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Inject;
 
-import jsinterop.base.Js;
-import jsinterop.base.JsPropertyMap;
 import org.kie.workbench.common.stunner.core.definition.adapter.DefinitionSetAdapter;
 import org.kie.workbench.common.stunner.core.definition.adapter.binding.BindableAdapterUtils;
 import org.kie.workbench.common.stunner.core.factory.graph.ElementFactory;
@@ -35,31 +34,32 @@ import org.kie.workbench.common.stunner.core.i18n.StunnerTranslationService;
 @ApplicationScoped
 public class JsDefinitionSetAdapter implements DefinitionSetAdapter<Object> {
 
-    private StunnerTranslationService translationService;
-    private String definitionsField;
-    private Annotation domainQualifier;
+    @Inject
+    StunnerTranslationService translationService;
+    @Inject
+    JsDomains domains;
 
     @Override
     public String getId(Object pojo) {
-        return BindableAdapterUtils.getDefinitionSetId(pojo.getClass());
+        // return BindableAdapterUtils.getDefinitionSetId(pojo.getClass());
+        return JsAdapterUtils.getObjectId(pojo);
     }
 
     @Override
     public String getDomain(Object pojo) {
+        // TODO
         return BindableAdapterUtils.getDefinitionSetDomain(pojo.getClass());
     }
 
     @Override
     public String getDescription(Object pojo) {
+        // TODO
         return translationService.getDefinitionSetDescription(getId(pojo));
     }
 
     @Override
     public Set<String> getDefinitions(Object pojo) {
-        JsPropertyMap<Object> map = Js.asPropertyMap(pojo);
-        String definitions = Js.uncheckedCast(map.get(definitionsField));
-        String[] split = definitions.split(",");
-        return Arrays.stream(split).collect(Collectors.toSet());
+        return domains.getDomain(pojo).getDefinitions();
     }
 
     @Override
@@ -69,11 +69,12 @@ public class JsDefinitionSetAdapter implements DefinitionSetAdapter<Object> {
 
     @Override
     public Annotation getQualifier(Object pojo) {
-        return domainQualifier;
+        return domains.getDomain(pojo).domainQualifier;
     }
 
     @Override
     public Optional<String> getSvgNodeId(Object pojo) {
+        // TODO
         return translationService.getDefinitionSetSvgNodeId(getId(pojo));
     }
 
@@ -85,18 +86,6 @@ public class JsDefinitionSetAdapter implements DefinitionSetAdapter<Object> {
     @Override
     public boolean accepts(Class<?> type) {
         return true;
-    }
-
-    public void setDomainQualifier(Annotation domainQualifier) {
-        this.domainQualifier = domainQualifier;
-    }
-
-    public void setDefinitionsField(String definitionsField) {
-        this.definitionsField = definitionsField;
-    }
-
-    public void setTranslationService(StunnerTranslationService translationService) {
-        this.translationService = translationService;
     }
 
     public static String toClassNames(Class... types) {

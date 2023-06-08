@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Red Hat, Inc. and/or its affiliates.
+ * Copyright 2023 Red Hat, Inc. and/or its affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,17 +14,12 @@
  * limitations under the License.
  */
 
-package org.kie.workbench.common.stunner.core.definition.adapter.binding;
+package org.kie.workbench.common.stunner.core.client.api;
 
-class BindableTestBean1 extends BindableTestBean {
+import jsinterop.annotations.JsFunction;
 
-    String idField;
-    String categoryField;
-    String titleField;
-    String descriptionField;
-    String[] labelsField;
+@JsFunction
+public interface JsShapeViewFactory {
 
-    String nameField;
-    String stringField;
-    BindableTestProperty1 propertyField;
+    Object buildView(Object bean);
 }

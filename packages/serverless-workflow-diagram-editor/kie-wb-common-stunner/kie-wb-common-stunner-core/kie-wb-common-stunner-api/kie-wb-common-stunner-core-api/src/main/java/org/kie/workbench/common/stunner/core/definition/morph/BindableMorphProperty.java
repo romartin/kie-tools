@@ -23,6 +23,7 @@ import java.util.Set;
 
 import org.kie.workbench.common.stunner.core.definition.adapter.binding.BindableAdapterUtils;
 
+// TODO: Dro?
 public abstract class BindableMorphProperty<P, V> implements MorphProperty<V> {
 
     public abstract Class<?> getPropertyClass();

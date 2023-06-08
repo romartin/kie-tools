@@ -18,15 +18,14 @@ package org.kie.workbench.common.stunner.core.rule.violations;
 
 import java.util.Optional;
 
-import org.jboss.errai.common.client.api.annotations.MapsTo;
-import org.jboss.errai.common.client.api.annotations.Portable;
+import jsinterop.annotations.JsType;
 
-@Portable
+@JsType
 public final class RuleViolationImpl extends AbstractRuleViolation {
 
     private final String message;
 
-    public RuleViolationImpl(final @MapsTo("message") String message) {
+    public RuleViolationImpl(String message) {
         this.message = message;
     }
 

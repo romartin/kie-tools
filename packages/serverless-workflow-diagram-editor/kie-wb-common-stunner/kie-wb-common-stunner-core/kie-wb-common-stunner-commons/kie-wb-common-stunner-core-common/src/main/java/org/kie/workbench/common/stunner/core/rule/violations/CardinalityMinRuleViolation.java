@@ -18,20 +18,19 @@ package org.kie.workbench.common.stunner.core.rule.violations;
 
 import java.util.Optional;
 
-import org.jboss.errai.common.client.api.annotations.MapsTo;
-import org.jboss.errai.common.client.api.annotations.Portable;
+import jsinterop.annotations.JsType;
 
-@Portable
+@JsType
 public class CardinalityMinRuleViolation extends AbstractRuleViolation {
 
     private final String candidate;
     private final Integer restrictedOccurrences;
     private final Integer currentOccurrences;
 
-    public CardinalityMinRuleViolation(final @MapsTo("candidate") String candidate,
-                                       final @MapsTo("restrictedOccurrences") Integer restrictedOccurrences,
-                                       final @MapsTo("currentOccurrences") Integer currentOccurrences,
-                                       final @MapsTo("type") Type type) {
+    public CardinalityMinRuleViolation(String candidate,
+                                       Integer restrictedOccurrences,
+                                       Integer currentOccurrences,
+                                       Type type) {
         super(type);
         this.candidate = candidate;
         this.restrictedOccurrences = restrictedOccurrences;

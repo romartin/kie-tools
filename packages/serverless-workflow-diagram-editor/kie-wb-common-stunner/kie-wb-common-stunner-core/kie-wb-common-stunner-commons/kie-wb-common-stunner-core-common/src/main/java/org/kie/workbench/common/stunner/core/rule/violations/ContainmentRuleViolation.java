@@ -18,17 +18,16 @@ package org.kie.workbench.common.stunner.core.rule.violations;
 
 import java.util.Optional;
 
-import org.jboss.errai.common.client.api.annotations.MapsTo;
-import org.jboss.errai.common.client.api.annotations.Portable;
+import jsinterop.annotations.JsType;
 
-@Portable
+@JsType
 public class ContainmentRuleViolation extends AbstractRuleViolation {
 
     private String parent;
     private String candidate;
 
-    public ContainmentRuleViolation(final @MapsTo("parent") String parent,
-                                    final @MapsTo("candidate") String candidate) {
+    public ContainmentRuleViolation(String parent,
+                                    String candidate) {
         this.parent = parent;
         this.candidate = candidate;
     }

@@ -23,6 +23,7 @@ import org.kie.workbench.common.stunner.core.client.i18n.ClientTranslationServic
 import org.kie.workbench.common.stunner.core.definition.adapter.binding.DefinitionBindableProperty;
 import org.kie.workbench.common.stunner.core.definition.adapter.binding.DefinitionBindablePropertyAdapter;
 
+// TODO: Drop?
 @ApplicationScoped
 public class ClientDefinitionBindablePropertyAdapter implements DefinitionBindablePropertyAdapter<Object, Object> {
 

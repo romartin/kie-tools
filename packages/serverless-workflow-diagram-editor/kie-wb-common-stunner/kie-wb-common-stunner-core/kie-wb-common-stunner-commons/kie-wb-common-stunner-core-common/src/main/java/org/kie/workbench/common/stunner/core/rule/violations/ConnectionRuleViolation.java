@@ -19,17 +19,16 @@ package org.kie.workbench.common.stunner.core.rule.violations;
 import java.util.Optional;
 import java.util.Set;
 
-import org.jboss.errai.common.client.api.annotations.MapsTo;
-import org.jboss.errai.common.client.api.annotations.Portable;
+import jsinterop.annotations.JsType;
 
-@Portable
+@JsType
 public class ConnectionRuleViolation extends AbstractRuleViolation {
 
     private String role;
     private Set<String> allowedConnections;
 
-    public ConnectionRuleViolation(final @MapsTo("role") String role,
-                                   final @MapsTo("allowedConnections") Set<String> allowedConnections) {
+    public ConnectionRuleViolation(String role,
+                                   Set<String> allowedConnections) {
         this.role = role;
         this.allowedConnections = allowedConnections;
     }

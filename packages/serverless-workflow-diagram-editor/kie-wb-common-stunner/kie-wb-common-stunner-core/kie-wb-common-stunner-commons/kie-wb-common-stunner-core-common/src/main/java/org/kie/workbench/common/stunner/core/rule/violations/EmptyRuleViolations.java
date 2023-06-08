@@ -18,9 +18,12 @@ package org.kie.workbench.common.stunner.core.rule.violations;
 
 import java.util.Collections;
 
+import jsinterop.annotations.JsIgnore;
+import jsinterop.annotations.JsType;
 import org.kie.workbench.common.stunner.core.rule.RuleViolation;
 import org.kie.workbench.common.stunner.core.rule.RuleViolations;
 
+@JsType
 public class EmptyRuleViolations implements RuleViolations {
 
     public static final RuleViolations INSTANCE = new EmptyRuleViolations();
@@ -30,6 +33,7 @@ public class EmptyRuleViolations implements RuleViolations {
         return Collections.emptyList();
     }
 
+    @JsIgnore
     @Override
     public Iterable<RuleViolation> violations(RuleViolation.Type violationType) {
         return Collections.emptyList();

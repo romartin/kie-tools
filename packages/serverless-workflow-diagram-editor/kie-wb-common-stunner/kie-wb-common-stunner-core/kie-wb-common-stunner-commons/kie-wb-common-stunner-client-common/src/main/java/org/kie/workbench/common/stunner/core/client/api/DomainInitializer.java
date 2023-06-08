@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Red Hat, Inc. and/or its affiliates.
+ * Copyright 2023 Red Hat, Inc. and/or its affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
 import javax.enterprise.context.ApplicationScoped;
@@ -28,12 +29,14 @@ import javax.inject.Inject;
 
 import org.kie.workbench.common.stunner.core.api.DefinitionManager;
 import org.kie.workbench.common.stunner.core.api.JsDefinitionManager;
+import org.kie.workbench.common.stunner.core.definition.jsadapter.JsAdapterUtils;
 import org.kie.workbench.common.stunner.core.definition.jsadapter.JsDefinitionAdapter;
 import org.kie.workbench.common.stunner.core.definition.jsadapter.JsDefinitionSetAdapter;
+import org.kie.workbench.common.stunner.core.definition.jsadapter.JsDomains;
 import org.kie.workbench.common.stunner.core.definition.jsadapter.JsPropertyAdapter;
 import org.kie.workbench.common.stunner.core.definition.jsadapter.JsRuleAdapter;
 import org.kie.workbench.common.stunner.core.factory.graph.ElementFactory;
-import org.kie.workbench.common.stunner.core.i18n.StunnerTranslationService;
+import org.kie.workbench.common.stunner.core.registry.DynamicRegistry;
 import org.kie.workbench.common.stunner.core.rule.Rule;
 import org.kie.workbench.common.stunner.core.rule.RuleSetImpl;
 import org.kie.workbench.common.stunner.core.rule.context.EdgeCardinalityContext;
@@ -49,121 +52,159 @@ public class DomainInitializer {
     @Inject
     DefinitionManager definitionManager;
     @Inject
+    DomainInitializer domainInitializer;
+    @Inject
+    JsDomains domains;
+    @Inject
+    JsDefinitionSetAdapter jsDefinitionSetAdapter;
+    @Inject
     JsDefinitionAdapter jsDefinitionAdapter;
     @Inject
     JsPropertyAdapter jsPropertyAdapter;
     @Inject
-    private JsRuleAdapter jsRuleAdapter;
-    @Inject
-    StunnerTranslationService translationService;
-    @Inject
-    JsDefinitionSetAdapter jsDefinitionSetAdapter;
+    JsRuleAdapter jsRuleAdapter;
 
-    Collection<Rule> rules;
+    private Collection<Rule> rules;
 
     @PostConstruct
     public void build() {
-        JsDefinitionManager jsDefinitionManager = JsDefinitionManager.build(translationService,
-                                                                            definitionManager.definitionSets(),
-                                                                            jsDefinitionSetAdapter,
+        JsDefinitionManager jsDefinitionManager = JsDefinitionManager.build(jsDefinitionSetAdapter,
                                                                             jsDefinitionAdapter,
                                                                             jsPropertyAdapter,
                                                                             jsRuleAdapter);
         JsWindow.editor = new JsStunnerEditor();
         JsWindow.editor.definitions = jsDefinitionManager;
+        JsWindow.editor.domainInitializer = JsDomainInitializer.build(JsWindow.editor.definitions,
+                                                                      domainInitializer);
+
         this.rules = new HashSet<>();
     }
 
-    public DomainInitializer initializeDefinitionSet(Object definitionSet) {
-        JsWindow.editor.definitions.initializeDefinitionSet(definitionSet);
+    @SuppressWarnings("all")
+    public DomainInitializer setDefinitionSet(Object definitionSet) {
+        domains.getDomain().definitionSet = definitionSet;
+        ((DynamicRegistry) definitionManager.definitionSets()).register(definitionSet);
         return this;
     }
 
-    public DomainInitializer initializeDefinitionsField(String definitionsField) {
-        JsWindow.editor.definitions.initializeDefinitionsField(definitionsField);
+    public DomainInitializer setDefinitionsField(String definitionsField) {
+        domains.getDomain().definitionsField = definitionsField;
         return this;
     }
 
-    public DomainInitializer initializeDomainQualifier(Annotation domainQualifier) {
-        JsWindow.editor.definitions.initializeDomainQualifier(domainQualifier);
+    public DomainInitializer setDomainQualifier(Annotation domainQualifier) {
+        domains.getDomain().domainQualifier = domainQualifier;
+        return this;
+    }
+
+    public DomainInitializer addDefinition(Object type) {
+        String typeId = JsAdapterUtils.getClassId(type);
+        addDefinitionById(typeId);
+        return this;
+    }
+
+    public DomainInitializer addDefinitionById(String typeId) {
+        domains.getDomain().addDefinition(typeId);
         return this;
     }
 
     @SuppressWarnings("all")
-    public DomainInitializer initializeCategory(Class type, String category) {
-        JsWindow.editor.definitions.initializeCategory(type.getName(), category);
+    public DomainInitializer setCategory(Object type, String category) {
+        String typeId = JsAdapterUtils.getClassId(type);
+        setCategoryById(typeId, category);
         return this;
     }
 
     @SuppressWarnings("all")
-    public DomainInitializer initializeLabels(Class type, String... definitionLabels) {
-        JsWindow.editor.definitions.initializeLabels(type.getName(), definitionLabels);
+    public DomainInitializer setCategoryById(String typeId, String category) {
+        domains.getDomain().setCategory(typeId, category);
         return this;
     }
 
     @SuppressWarnings("all")
-    public DomainInitializer initializeDefinitionNameField(Class type, String nameField) {
-        JsWindow.editor.definitions.initializeDefinitionNameField(type.getName(), nameField);
+    public DomainInitializer setLabels(Object type, String... definitionLabels) {
+        String typeId = JsAdapterUtils.getClassId(type);
+        setLabelsById(typeId, definitionLabels);
         return this;
     }
 
     @SuppressWarnings("all")
-    public DomainInitializer initializeElementFactory(Class<? extends ElementFactory> factory, String category) {
-        JsWindow.editor.definitions.initializeElementFactory(category, factory);
+    public DomainInitializer setLabelsById(String typeId, String... definitionLabels) {
+        domains.getDomain().setLabels(typeId, definitionLabels);
         return this;
     }
 
-    public DomainInitializer initializeRules() {
-        JsWindow.editor.definitions.initializeRules(new RuleSetImpl("DefinitionsRuleAdapterImpl", rules));
+    @SuppressWarnings("all")
+    public DomainInitializer setDefinitionNameField(Class type, String nameField) {
+        domains.getDomain().setDefinitionNameField(JsAdapterUtils.getClassId(type), nameField);
         return this;
     }
 
-    public DomainInitializer setContainmentRule(Class type, String... roles) {
+    public DomainInitializer addContainmentRule(Object type, String... roles) {
+        String typeId = JsAdapterUtils.getClassId(type);
+        addContainmentRuleById(typeId, roles);
+        return this;
+    }
+
+    public DomainInitializer addContainmentRuleById(String typeId, String... roles) {
         final HashSet<String> allowedRoles = new HashSet<>(roles.length);
         allowedRoles.addAll(Arrays.asList(roles));
-        rules.add(new CanContain("CAN_CONTAIN" + rules.size(), type.getName(), allowedRoles));
-
+        rules.add(new CanContain("CAN_CONTAIN" + typeId, typeId, allowedRoles));
         return this;
     }
 
-    public DomainInitializer setConnectionRule(Class type, String[]... roles) {
+    public DomainInitializer addConnectionRule(Object type, String[]... roles) {
+        String typeId = JsAdapterUtils.getClassId(type);
+        addConnectionRuleById(typeId, roles);
+        return this;
+    }
+
+    public DomainInitializer addConnectionRuleById(String typeId, String[]... roles) {
         final ArrayList<CanConnect.PermittedConnection> allowedRoles = new ArrayList<>(roles.length);
         for (String[] role : roles) {
             allowedRoles.add(new CanConnect.PermittedConnection(role[0], role[1]));
         }
-        rules.add(new CanConnect("CAN_CONNECT" + rules.size(), type.getName(), allowedRoles));
-
+        rules.add(new CanConnect("CAN_CONNECT" + rules.size(), typeId, allowedRoles));
         return this;
     }
 
-    public DomainInitializer setDockingRule(Class type, String... roles) {
+    public DomainInitializer addDockingRule(Class type, String... roles) {
         final HashSet<String> allowedRoles = new HashSet<>(roles.length);
         allowedRoles.addAll(Arrays.asList(roles));
         rules.add(new CanDock("CAN_DOCK" + rules.size(), type.getName(), allowedRoles));
-
         return this;
     }
 
-    public DomainInitializer setOccurrences(String role, int minOccurrences, int maxOccurrences) {
+    public DomainInitializer addOccurrences(String role, int minOccurrences, int maxOccurrences) {
         rules.add(new Occurrences("OCCURRENCES" + rules.size(), role, minOccurrences, maxOccurrences));
-
         return this;
     }
 
-    public DomainInitializer setEdgeOccurrences(Class type,
+    public DomainInitializer addEdgeOccurrences(Class type,
                                                 String role,
                                                 boolean isIncoming,
                                                 int minOccurrences,
                                                 int maxOccurrences) {
         final EdgeCardinalityContext.Direction direction = isIncoming ? EdgeCardinalityContext.Direction.INCOMING : EdgeCardinalityContext.Direction.OUTGOING;
-
         rules.add(new EdgeOccurrences("EDGE_OCCURRENCES" + rules.size(),
                                       type.getName(),
                                       role,
                                       direction,
                                       minOccurrences,
                                       maxOccurrences));
+        return this;
+    }
 
+    @SuppressWarnings("all")
+    public DomainInitializer initializeElementFactory(Class<? extends ElementFactory> factory, String category) {
+        domains.getDomain().setElementFactory(category, factory);
+        return this;
+    }
+
+    public DomainInitializer initializeRules() {
+        RuleSetImpl ruleSet = new RuleSetImpl("DefinitionsRuleAdapterImpl", rules.stream().collect(Collectors.<Rule>toSet()));
+        domains.getDomain().setRuleSet(ruleSet);
+        rules.clear();
         return this;
     }
 }

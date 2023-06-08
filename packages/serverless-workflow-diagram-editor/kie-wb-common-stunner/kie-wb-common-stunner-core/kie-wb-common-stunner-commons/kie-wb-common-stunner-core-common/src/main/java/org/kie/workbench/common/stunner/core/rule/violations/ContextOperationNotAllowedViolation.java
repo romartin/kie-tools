@@ -18,20 +18,17 @@ package org.kie.workbench.common.stunner.core.rule.violations;
 
 import java.util.Optional;
 
-import org.jboss.errai.common.client.api.annotations.MapsTo;
-import org.jboss.errai.common.client.api.annotations.Portable;
 import org.kie.workbench.common.stunner.core.rule.RuleEvaluationContext;
 
-@Portable
 public final class ContextOperationNotAllowedViolation extends AbstractRuleViolation {
 
     private final String context;
 
-    public ContextOperationNotAllowedViolation(final @MapsTo("context") String context) {
+    public ContextOperationNotAllowedViolation(String context) {
         this.context = context;
     }
 
-    public ContextOperationNotAllowedViolation(final RuleEvaluationContext context) {
+    public ContextOperationNotAllowedViolation(RuleEvaluationContext context) {
         this(context.getName());
     }
 

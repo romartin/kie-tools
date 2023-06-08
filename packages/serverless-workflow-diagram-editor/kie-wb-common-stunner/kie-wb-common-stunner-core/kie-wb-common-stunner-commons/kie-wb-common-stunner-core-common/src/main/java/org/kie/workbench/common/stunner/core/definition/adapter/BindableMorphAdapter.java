@@ -27,6 +27,7 @@ import org.kie.workbench.common.stunner.core.definition.morph.MorphDefinition;
 import org.kie.workbench.common.stunner.core.definition.morph.MorphProperty;
 import org.kie.workbench.common.stunner.core.util.DefinitionUtils;
 
+// TODO: Drop?
 public abstract class BindableMorphAdapter<S> extends AbstractMorphAdapter<S> {
 
     private final CloneManager cloneManager;

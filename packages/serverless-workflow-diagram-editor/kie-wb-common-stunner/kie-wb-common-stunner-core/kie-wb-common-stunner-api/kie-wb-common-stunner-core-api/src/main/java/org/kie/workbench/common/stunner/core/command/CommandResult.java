@@ -16,11 +16,14 @@
 
 package org.kie.workbench.common.stunner.core.command;
 
+import jsinterop.annotations.JsType;
+
 /**
  * Result from the execution of a command
  */
 public interface CommandResult<T> {
 
+    @JsType
     enum Type {
         ERROR(3),
         WARNING(2),
