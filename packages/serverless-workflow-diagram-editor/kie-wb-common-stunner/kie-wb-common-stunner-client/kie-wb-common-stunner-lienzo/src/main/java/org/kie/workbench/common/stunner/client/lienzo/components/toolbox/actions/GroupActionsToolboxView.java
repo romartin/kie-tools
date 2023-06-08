@@ -35,6 +35,7 @@ import org.kie.workbench.common.stunner.core.client.components.toolbox.actions.A
 import org.kie.workbench.common.stunner.core.client.components.toolbox.actions.ActionsToolboxView;
 import org.kie.workbench.common.stunner.core.client.components.toolbox.actions.GroupActionsToolbox;
 import org.kie.workbench.common.stunner.core.client.components.toolbox.actions.GroupedActionsToolbox;
+import org.kie.workbench.common.stunner.core.client.components.toolbox.actions.JsToolboxConfig;
 import org.kie.workbench.common.stunner.core.client.components.toolbox.actions.ToolboxAction;
 import org.kie.workbench.common.stunner.core.definition.shape.Glyph;
 
@@ -42,14 +43,6 @@ import org.kie.workbench.common.stunner.core.definition.shape.Glyph;
 @GroupActionsToolbox
 public class GroupActionsToolboxView
         extends AbstractActionsToolboxView<GroupActionsToolboxView> {
-
-    static final double GRID_BUTTON_SIZE = 15;
-    static final double GRID_BUTTON_PADDING = 5;
-    static final double GRID_DECORATOR_PADDING = 10;
-    static final Direction TOOLBOX_AT = Direction.NORTH_EAST;
-    static final Direction ITEMS_GRID_TOWARDS = Direction.SOUTH_EAST;
-    static final Direction TOOLTIP_AT = Direction.SOUTH;
-    static final Direction TOOLTIP_TOWARDS = Direction.SOUTH;
 
     private HashMap<String, ButtonGridItem> gridItems;
 
@@ -82,19 +75,23 @@ public class GroupActionsToolboxView
         }
     }
 
+    protected static Direction toDirection(String s) {
+        return Direction.valueOf(s);
+    }
+
     @Override
     protected ToolboxTextTooltip createTooltip(final ActionsToolbox toolbox) {
         return getToolboxFactory()
                 .tooltips()
                 .forToolbox(getToolboxView())
-                .at(TOOLTIP_AT)
-                .towards(TOOLTIP_TOWARDS)
+                .at(toDirection(JsToolboxConfig.INSTANCE.getTooltipAt()))
+                .towards(toDirection(JsToolboxConfig.INSTANCE.getTooltipTowards()))
                 .withText(defaultTextConsumer());
     }
 
     @Override
     protected double getGlyphSize() {
-        return GRID_BUTTON_SIZE;
+        return JsToolboxConfig.INSTANCE.getButtonSize();
     }
 
     @SuppressWarnings("unchecked")
@@ -133,9 +130,9 @@ public class GroupActionsToolboxView
 
     private void configureToolbox(final GroupedActionsToolbox toolbox) {
         getToolboxView()
-                .at(TOOLBOX_AT)
-                .grid(createFixedGrid(BUTTON_SIZE,
-                                      BUTTON_PADDING,
+                .at(toDirection(JsToolboxConfig.INSTANCE.getToolboxAt()))
+                .grid(createFixedGrid(JsToolboxConfig.INSTANCE.getButtonSize(),
+                                      JsToolboxConfig.INSTANCE.getButtonPadding(),
                                       toolbox.getConnectorSize(),
                                       1));
     }
@@ -144,9 +141,9 @@ public class GroupActionsToolboxView
         if (null != toolbox.getConnectorActions()) {
             toolbox.getConnectorActions().forEach((toolboxItem, definitionId) -> {
                 Group glyphView = renderGlyph(toolbox.getGlyph((ToolboxAction<AbstractCanvasHandler>) toolboxItem),
-                                              BUTTON_SIZE);
-                Point2DGrid grid = createFixedGrid(GRID_BUTTON_SIZE,
-                                                   GRID_BUTTON_PADDING,
+                                              JsToolboxConfig.INSTANCE.getButtonSize());
+                Point2DGrid grid = createFixedGrid(JsToolboxConfig.INSTANCE.getButtonSize(),
+                                                   JsToolboxConfig.INSTANCE.getButtonPadding(),
                                                    toolbox.getConnectorSize(),
                                                    toolbox.getNodeSize((String) definitionId));
 
@@ -158,7 +155,7 @@ public class GroupActionsToolboxView
                                 .decorateGrid(getToolboxFactory()
                                                       .decorators()
                                                       .button()
-                                                      .setPadding(GRID_DECORATOR_PADDING)
+                                                      .setPadding(JsToolboxConfig.INSTANCE.getDecoratorPadding())
                                                       .configure(path -> {
                                                           path.setFillColor("#f2f2f2");
                                                           path.setFillAlpha(0.95);
@@ -177,7 +174,7 @@ public class GroupActionsToolboxView
                                         final int cols) {
         return new FixedLayoutGrid(padding,
                                    buttonSize,
-                                   ITEMS_GRID_TOWARDS,
+                                   toDirection(JsToolboxConfig.INSTANCE.getItemGridTowards()),
                                    rows,
                                    cols);
     }

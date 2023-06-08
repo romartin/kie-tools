@@ -36,6 +36,7 @@ import org.kie.workbench.common.stunner.core.client.components.toolbox.actions.A
 import org.kie.workbench.common.stunner.core.client.components.toolbox.actions.ActionsToolboxView;
 import org.kie.workbench.common.stunner.core.client.components.toolbox.actions.FlowActionsToolbox;
 import org.kie.workbench.common.stunner.core.client.components.toolbox.actions.IsToolboxActionDraggable;
+import org.kie.workbench.common.stunner.core.client.components.toolbox.actions.JsToolboxConfig;
 import org.kie.workbench.common.stunner.core.client.components.toolbox.actions.ToolboxAction;
 
 /**
@@ -69,14 +70,14 @@ public class FlowActionsToolboxView
                 .at(TOOLBOX_AT)
                 .grid(new AutoGrid.Builder()
                               .forBoundingBox(getToolboxView().getBoundingBox())
-                              .withPadding(BUTTON_PADDING)
+                              .withPadding(JsToolboxConfig.INSTANCE.getButtonSize())
                               .withIconSize(getGlyphSize())
                               .towards(GRID_TOWARDS)
                               .build())
                 .decorate(getToolboxFactory()
                                   .decorators()
                                   .box()
-                                  .setPadding(BUTTON_PADDING)
+                                  .setPadding(JsToolboxConfig.INSTANCE.getButtonPadding())
                                   .configure(path -> {
                                       path.setFillAlpha(0.95);
                                       path.setFillColor(ColorName.WHITE);
@@ -116,7 +117,7 @@ public class FlowActionsToolboxView
 
     @Override
     protected double getGlyphSize() {
-        return BUTTON_SIZE;
+        return JsToolboxConfig.INSTANCE.getButtonSize();
     }
 
     @Override

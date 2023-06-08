@@ -96,7 +96,9 @@ public class GroupActionsToolboxFactory
         HashMap<ToolboxAction<AbstractCanvasHandler>, String> connectorActionsMap = new HashMap<>();
 
         for (String connectorDefId : targetConnectors) {
-            connectorActionsMap.put(newCreateConnectorToolboxAction(qualifier).setEdgeId(connectorDefId), connectorDefId);
+            if (JsToolboxConfig.INSTANCE.isConnectorIdAllowed(connectorDefId)) {
+                connectorActionsMap.put(newCreateConnectorToolboxAction(qualifier).setEdgeId(connectorDefId), connectorDefId);
+            }
         }
 
         return connectorActionsMap;
@@ -123,8 +125,10 @@ public class GroupActionsToolboxFactory
                                                            definitionsAllowedFilter);
 
             for (String defId : targets) {
-                CreateNodeToolboxAction nodeAction = newCreateNodeToolboxAction(qualifier).setEdgeId(connectorDefId).setNodeId(defId);
-                connectorNodeActionsMap.put(nodeAction, connectorDefId);
+                if (JsToolboxConfig.INSTANCE.isNodeIdAllowed(defId)) {
+                    CreateNodeToolboxAction nodeAction = newCreateNodeToolboxAction(qualifier).setEdgeId(connectorDefId).setNodeId(defId);
+                    connectorNodeActionsMap.put(nodeAction, connectorDefId);
+                }
             }
         }
 

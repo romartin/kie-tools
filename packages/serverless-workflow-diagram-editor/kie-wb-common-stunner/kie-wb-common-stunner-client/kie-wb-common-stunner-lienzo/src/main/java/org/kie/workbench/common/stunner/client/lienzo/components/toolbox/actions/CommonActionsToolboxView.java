@@ -27,6 +27,7 @@ import com.ait.lienzo.shared.core.types.Direction;
 import org.kie.workbench.common.stunner.client.lienzo.components.glyph.LienzoGlyphRenderers;
 import org.kie.workbench.common.stunner.core.client.components.toolbox.actions.ActionsToolbox;
 import org.kie.workbench.common.stunner.core.client.components.toolbox.actions.CommonActionsToolbox;
+import org.kie.workbench.common.stunner.core.client.components.toolbox.actions.JsToolboxConfig;
 
 /**
  * It renders the toolbox' actions as first level button items.
@@ -59,8 +60,8 @@ public class CommonActionsToolboxView
                 .at(TOOLBOX_AT)
                 .grid(new AutoGrid.Builder()
                               .forBoundingBox(getToolboxView().getBoundingBox())
-                              .withPadding(BUTTON_PADDING)
-                              .withIconSize(BUTTON_SIZE)
+                              .withPadding(JsToolboxConfig.INSTANCE.getButtonPadding())
+                              .withIconSize(JsToolboxConfig.INSTANCE.getButtonSize())
                               .towards(GRID_TOWARDS)
                               .build())
                 .useShowExecutor(ToolboxVisibilityExecutors.upScaleX())
@@ -79,6 +80,6 @@ public class CommonActionsToolboxView
 
     @Override
     protected double getGlyphSize() {
-        return BUTTON_SIZE;
+        return JsToolboxConfig.INSTANCE.getButtonSize();
     }
 }

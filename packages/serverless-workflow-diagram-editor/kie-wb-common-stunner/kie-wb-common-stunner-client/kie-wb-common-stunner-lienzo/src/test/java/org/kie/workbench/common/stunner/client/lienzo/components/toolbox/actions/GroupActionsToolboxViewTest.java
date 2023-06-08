@@ -34,12 +34,14 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.kie.workbench.common.stunner.core.client.components.toolbox.actions.GroupedActionsToolbox;
+import org.kie.workbench.common.stunner.core.client.components.toolbox.actions.JsToolboxConfig;
 import org.kie.workbench.common.stunner.core.client.shape.view.event.MouseClickEvent;
 import org.kie.workbench.common.stunner.core.definition.shape.Glyph;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 
 import static org.junit.Assert.assertEquals;
+import static org.kie.workbench.common.stunner.client.lienzo.components.toolbox.actions.GroupActionsToolboxView.toDirection;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyDouble;
 import static org.mockito.ArgumentMatchers.eq;
@@ -132,7 +134,7 @@ public class GroupActionsToolboxViewTest
     private void assertConfigureToolbox() {
         verify(toolboxView,
                times(1))
-                .at(eq(GroupActionsToolboxView.TOOLBOX_AT));
+                .at(eq(toDirection(JsToolboxConfig.INSTANCE.getToolboxAt())));
         final ArgumentCaptor<Point2DGrid> gridCaptor = ArgumentCaptor.forClass(Point2DGrid.class);
         verify(toolboxView,
                times(1))
@@ -142,10 +144,10 @@ public class GroupActionsToolboxViewTest
                      grid.getRows());
         assertEquals(1,
                      grid.getCols());
-        assertEquals(AbstractActionsToolboxView.BUTTON_SIZE,
+        assertEquals(JsToolboxConfig.INSTANCE.getButtonSize(),
                      grid.getIconSize(),
                      0);
-        assertEquals(AbstractActionsToolboxView.BUTTON_PADDING,
+        assertEquals(JsToolboxConfig.INSTANCE.getButtonPadding(),
                      grid.getPadding(),
                      0);
     }
@@ -163,20 +165,20 @@ public class GroupActionsToolboxViewTest
         assertEquals(1,
                      grid.getCols());
 
-        assertEquals(AbstractActionsToolboxView.BUTTON_SIZE,
+        assertEquals(JsToolboxConfig.INSTANCE.getButtonSize(),
                      grid.getIconSize(),
                      0);
-        assertEquals(AbstractActionsToolboxView.BUTTON_PADDING,
+        assertEquals(JsToolboxConfig.INSTANCE.getButtonPadding(),
                      grid.getPadding(),
                      0);
-        assertEquals(GroupActionsToolboxView.ITEMS_GRID_TOWARDS,
+        assertEquals(toDirection(JsToolboxConfig.INSTANCE.getItemGridTowards()),
                      grid.getTowards());
     }
 
     private void assertTooltip() {
         verify(toolboxTooltip,
-               times(1)).at(GroupActionsToolboxView.TOOLTIP_AT);
+               times(1)).at(toDirection(JsToolboxConfig.INSTANCE.getTooltipAt()));
         verify(toolboxTooltip,
-               times(1)).towards(GroupActionsToolboxView.TOOLTIP_TOWARDS);
+               times(1)).towards(toDirection(JsToolboxConfig.INSTANCE.getTooltipTowards()));
     }
 }

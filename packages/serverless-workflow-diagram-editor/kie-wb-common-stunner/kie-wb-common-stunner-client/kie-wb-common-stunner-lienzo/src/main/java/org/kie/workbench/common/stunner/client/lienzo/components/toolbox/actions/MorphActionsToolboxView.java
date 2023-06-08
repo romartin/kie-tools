@@ -31,6 +31,7 @@ import com.ait.lienzo.shared.core.types.ColorName;
 import com.ait.lienzo.shared.core.types.Direction;
 import org.kie.workbench.common.stunner.client.lienzo.components.glyph.LienzoGlyphRenderers;
 import org.kie.workbench.common.stunner.core.client.components.toolbox.actions.ActionsToolbox;
+import org.kie.workbench.common.stunner.core.client.components.toolbox.actions.JsToolboxConfig;
 import org.kie.workbench.common.stunner.core.client.components.toolbox.actions.MorphActionsToolbox;
 import org.kie.workbench.common.stunner.core.client.resources.StunnerCommonIconsGlyphFactory;
 
@@ -93,8 +94,8 @@ public class MorphActionsToolboxView
     private void configureToolbox(final ActionsToolbox toolbox) {
         getToolboxView()
                 .at(TOOLBOX_AT)
-                .grid(createFixedGrid(BUTTON_SIZE,
-                                      BUTTON_PADDING,
+                .grid(createFixedGrid(JsToolboxConfig.INSTANCE.getButtonSize(),
+                                      JsToolboxConfig.INSTANCE.getButtonPadding(),
                                       1))
                 .useShowExecutor(ToolboxVisibilityExecutors.upScaleY())
                 .useHideExecutor(ToolboxVisibilityExecutors.downScaleY());
@@ -105,7 +106,7 @@ public class MorphActionsToolboxView
                                                  GRID_BUTTON_PADDING,
                                                  toolbox.size());
         final Group glyphView = renderGlyph(StunnerCommonIconsGlyphFactory.GEARS,
-                                            BUTTON_SIZE);
+                                            JsToolboxConfig.INSTANCE.getButtonSize());
         gridItem =
                 getToolboxFactory()
                         .buttons()
@@ -114,7 +115,7 @@ public class MorphActionsToolboxView
                         .decorate(getToolboxFactory()
                                           .decorators()
                                           .button()
-                                          .setPadding(BUTTON_PADDING))
+                                          .setPadding(JsToolboxConfig.INSTANCE.getButtonPadding()))
                         .decorateGrid(getToolboxFactory()
                                               .decorators()
                                               .button()

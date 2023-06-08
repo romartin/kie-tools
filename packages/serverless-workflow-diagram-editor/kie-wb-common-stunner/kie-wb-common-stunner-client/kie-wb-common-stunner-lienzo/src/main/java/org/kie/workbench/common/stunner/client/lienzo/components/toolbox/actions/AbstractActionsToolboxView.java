@@ -50,9 +50,6 @@ import static org.kie.workbench.common.stunner.client.lienzo.shape.view.ViewEven
 public abstract class AbstractActionsToolboxView<V extends AbstractActionsToolboxView>
         implements ActionsToolboxView<V> {
 
-    public static final double BUTTON_SIZE = 15;
-    public static final double BUTTON_PADDING = 5;
-
     private final LienzoGlyphRenderers glyphRenderers;
     final ToolboxFactory toolboxFactory;
     private WiresShapeToolbox toolboxView;
