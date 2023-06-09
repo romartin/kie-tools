@@ -35,6 +35,8 @@ import org.kie.workbench.common.stunner.core.definition.jsadapter.JsDefinitionSe
 import org.kie.workbench.common.stunner.core.definition.jsadapter.JsDomains;
 import org.kie.workbench.common.stunner.core.definition.jsadapter.JsPropertyAdapter;
 import org.kie.workbench.common.stunner.core.definition.jsadapter.JsRuleAdapter;
+import org.kie.workbench.common.stunner.core.factory.definition.JsDefinitionFactory;
+import org.kie.workbench.common.stunner.core.factory.definition.JsDynamicDefinitionBuilder;
 import org.kie.workbench.common.stunner.core.factory.graph.ElementFactory;
 import org.kie.workbench.common.stunner.core.registry.DynamicRegistry;
 import org.kie.workbench.common.stunner.core.rule.Rule;
@@ -52,8 +54,6 @@ public class DomainInitializer {
     @Inject
     DefinitionManager definitionManager;
     @Inject
-    DomainInitializer domainInitializer;
-    @Inject
     JsDomains domains;
     @Inject
     JsDefinitionSetAdapter jsDefinitionSetAdapter;
@@ -63,6 +63,8 @@ public class DomainInitializer {
     JsPropertyAdapter jsPropertyAdapter;
     @Inject
     JsRuleAdapter jsRuleAdapter;
+    @Inject
+    JsDefinitionFactory jsDefinitionFactory;
 
     private Collection<Rule> rules;
 
@@ -74,8 +76,7 @@ public class DomainInitializer {
                                                                             jsRuleAdapter);
         JsWindow.editor = new JsStunnerEditor();
         JsWindow.editor.definitions = jsDefinitionManager;
-        JsWindow.editor.domainInitializer = JsDomainInitializer.build(JsWindow.editor.definitions,
-                                                                      domainInitializer);
+        JsWindow.editor.domainInitializer = JsDomainInitializer.build(this);
 
         this.rules = new HashSet<>();
     }
@@ -105,6 +106,11 @@ public class DomainInitializer {
 
     public DomainInitializer addDefinitionById(String typeId) {
         domains.getDomain().addDefinition(typeId);
+        return this;
+    }
+
+    public DomainInitializer setDynamicDefinitionBuilder(JsDynamicDefinitionBuilder builder) {
+        jsDefinitionFactory.dynamicDefinitionBuilder = builder;
         return this;
     }
 

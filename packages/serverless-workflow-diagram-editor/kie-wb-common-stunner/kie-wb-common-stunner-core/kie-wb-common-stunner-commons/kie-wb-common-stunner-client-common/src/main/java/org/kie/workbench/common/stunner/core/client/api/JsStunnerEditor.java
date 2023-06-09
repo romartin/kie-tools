@@ -9,6 +9,7 @@ public class JsStunnerEditor {
     public JsDefinitionManager definitions;
     public JsDomainInitializer domainInitializer;
     public JsStunnerSession session;
+    // TODO shapeViewFactory
     public JsShapeViewFactory shapeViewFactory;
     public Object canvas;
 }

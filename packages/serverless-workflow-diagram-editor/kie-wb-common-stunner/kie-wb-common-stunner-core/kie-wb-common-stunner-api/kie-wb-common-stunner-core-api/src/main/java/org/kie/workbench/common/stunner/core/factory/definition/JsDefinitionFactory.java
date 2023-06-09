@@ -16,10 +16,14 @@
 
 package org.kie.workbench.common.stunner.core.factory.definition;
 
-import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Singleton;
 
-@ApplicationScoped
+import org.kie.workbench.common.stunner.core.definition.adapter.DefinitionId;
+
+@Singleton
 public class JsDefinitionFactory implements DefinitionFactory<Object> {
+
+    public JsDynamicDefinitionBuilder dynamicDefinitionBuilder;
 
     @Override
     public boolean accepts(String identifier) {
@@ -32,6 +36,12 @@ public class JsDefinitionFactory implements DefinitionFactory<Object> {
 
     @Override
     public Object build(String identifier) {
-        return createInstanceForType(identifier);
+        DefinitionId defId = DefinitionId.build(identifier);
+        if (null != dynamicDefinitionBuilder) {
+            if (defId.isDynamic()) {
+                return dynamicDefinitionBuilder.build(defId);
+            }
+        }
+        return createInstanceForType(defId.value());
     }
 }

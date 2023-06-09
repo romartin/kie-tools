@@ -30,7 +30,7 @@ public class DefinitionIdTest {
         DefinitionId id = DefinitionId.build(input);
         assertEquals(input, id.value());
         assertFalse(id.isDynamic());
-        assertEquals(input, id.type());
+        assertEquals(input, id.dynamicId());
     }
 
     @Test
@@ -40,6 +40,6 @@ public class DefinitionIdTest {
                                              "id1");
         assertEquals(input, id.value());
         assertTrue(id.isDynamic());
-        assertEquals("type", id.type());
+        assertEquals("id1", id.dynamicId());
     }
 }

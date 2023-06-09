@@ -52,7 +52,7 @@ public abstract class AbstractElementFactory<C, D extends Definition<C>, T exten
         final DefinitionId id = adapter.getId(definition);
         target.add(id.value());
         if (id.isDynamic()) {
-            target.add(id.type());
+            target.add(id.dynamicId());
         }
         String[] labels = adapter.getLabels(definition);
         if (null != labels) {

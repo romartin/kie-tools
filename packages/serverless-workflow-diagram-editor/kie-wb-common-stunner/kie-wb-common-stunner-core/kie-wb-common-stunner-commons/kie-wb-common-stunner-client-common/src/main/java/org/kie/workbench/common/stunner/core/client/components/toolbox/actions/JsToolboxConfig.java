@@ -1,6 +1,5 @@
 package org.kie.workbench.common.stunner.core.client.components.toolbox.actions;
 
-import elemental2.dom.DomGlobal;
 import jsinterop.annotations.JsType;
 
 @JsType
@@ -10,8 +9,7 @@ public interface JsToolboxConfig {
     };
 
     default double getButtonSize() {
-        // return 15;
-        return 25;
+        return 15;
     }
 
     default double getButtonPadding() {
@@ -23,8 +21,7 @@ public interface JsToolboxConfig {
     }
 
     default String getToolboxAt() {
-        // return "NORTH_EAST";
-        return "SOUTH_WEST";
+        return "NORTH_EAST";
     }
 
     default String getItemGridTowards() {
@@ -44,7 +41,6 @@ public interface JsToolboxConfig {
     }
 
     default boolean isNodeIdAllowed(String id) {
-        // return true;
-        return "org.kie.workbench.common.stunner.sw.definition.OperationState".equals(id);
+        return true;
     }
 }

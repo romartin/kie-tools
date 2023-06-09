@@ -22,6 +22,7 @@ import javax.inject.Inject;
 import org.appformer.kogito.bridge.client.resource.ResourceContentService;
 import org.jboss.errai.ui.client.local.spi.TranslationService;
 import org.kie.workbench.common.stunner.core.client.shape.Shape;
+import org.kie.workbench.common.stunner.core.definition.adapter.DefinitionId;
 import org.kie.workbench.common.stunner.core.definition.shape.Glyph;
 import org.kie.workbench.common.stunner.sw.client.resources.GlyphFactory;
 import org.kie.workbench.common.stunner.sw.client.shapes.EndShape;
@@ -83,7 +84,12 @@ public class ShapeFactory
 
     @Override
     @SuppressWarnings("all")
-    public Glyph getGlyph(String definitionId) {
+    public Glyph getGlyph(String raw) {
+        DefinitionId defId = DefinitionId.build(raw);
+        if (defId.isDynamic() && "ansible".equals(defId.dynamicId())) {
+            return GlyphFactory.STATE_ANSIBLE;
+        }
+        String definitionId = defId.value();
         if (definitionId.equals(getDefinitionId(InjectState.class))) {
             return GlyphFactory.STATE_INJECT;
         } else if (definitionId.equals(getDefinitionId(SwitchState.class))) {

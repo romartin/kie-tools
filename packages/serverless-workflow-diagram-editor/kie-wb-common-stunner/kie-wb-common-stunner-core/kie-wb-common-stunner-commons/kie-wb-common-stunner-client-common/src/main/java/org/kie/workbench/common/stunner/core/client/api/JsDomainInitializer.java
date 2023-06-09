@@ -21,21 +21,17 @@ import jsinterop.annotations.JsIgnore;
 import jsinterop.annotations.JsType;
 import jsinterop.base.Js;
 import jsinterop.base.JsPropertyMap;
-import org.kie.workbench.common.stunner.core.api.JsDefinitionManager;
 import org.kie.workbench.common.stunner.core.definition.jsadapter.JsAdapterUtils;
+import org.kie.workbench.common.stunner.core.factory.definition.JsDynamicDefinitionBuilder;
 
 @JsType
 public class JsDomainInitializer {
 
     @JsIgnore
     private DomainInitializer domainInitializer;
-    @JsIgnore
-    private JsDefinitionManager definitionManager;
 
-    public static JsDomainInitializer build(JsDefinitionManager definitionManager,
-                                            DomainInitializer domainInitializer) {
+    public static JsDomainInitializer build(DomainInitializer domainInitializer) {
         JsDomainInitializer i = new JsDomainInitializer();
-        i.definitionManager = definitionManager;
         i.domainInitializer = domainInitializer;
         return i;
     }
@@ -82,6 +78,11 @@ public class JsDomainInitializer {
                 domainInitializer.setLabelsById(typeId, stunnerDef.labels);
             }
         }
+        return this;
+    }
+
+    public JsDomainInitializer setDynamicDefinitionBuilder(JsDynamicDefinitionBuilder builder) {
+        domainInitializer.setDynamicDefinitionBuilder(builder);
         return this;
     }
 
