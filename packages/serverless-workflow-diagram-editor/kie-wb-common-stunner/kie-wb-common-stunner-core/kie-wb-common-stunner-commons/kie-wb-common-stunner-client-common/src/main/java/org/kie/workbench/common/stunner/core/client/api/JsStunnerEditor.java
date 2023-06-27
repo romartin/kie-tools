@@ -8,6 +8,7 @@ public class JsStunnerEditor {
 
     public JsDefinitionManager definitions;
     public JsDomainInitializer domainInitializer;
+    public JsStunnerEditorConfiguration configuration;
     public JsStunnerSession session;
     // TODO shapeViewFactory
     public JsShapeViewFactory shapeViewFactory;

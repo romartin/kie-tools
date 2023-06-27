@@ -22,7 +22,7 @@ TODO: Check actual js scope.
 
 })*/
 
-console.log("Execution of custom js domain initializer script.");
+console.error("Execution of custom js domain initializer script.");
 
 class Roger {
   name = "Roger";
@@ -33,14 +33,29 @@ if (true) {
     "org.kie.workbench.common.stunner.sw.definition.OperationState#ansible",
     null
   );
+
   window.editor.domainInitializer.setDynamicDefinitionBuilder((defId) => {
     const id = defId.value();
-    console.log("CALLED CUSTOM DEF BUILDER YEAH FOR TYPE:" + id);
+    console.error("CALLED CUSTOM DEF BUILDER YEAH FOR TYPE:" + id);
     const definition = eval("new window." + id + "()");
     definition.metadata = new window.org.kie.workbench.common.stunner.sw.definition.Metadata();
     definition.metadata.type = "ansible";
     return definition;
   });
+
+  console.error("CONFIGURING TOOLBOX 0 - INSTANCE: " + window.editor.configuration.toolbox);
+  window.editor.configuration.toolbox.buttonSizePx = 25;
+  window.editor.configuration.toolbox.toolboxAt = "SOUTH_EAST";
+  window.editor.configuration.toolbox.isNodeIdAllowed = (id) => {
+    console.error("isNodeIdAllowed: " + id);
+    // return id === "org.kie.workbench.common.stunner.sw.definition.OperationState#ansible";
+    return true;
+  };
+  window.editor.configuration.toolbox.isConnectorIdAllowed = (id) => {
+    console.error("isConnectorIdAllowed: " + id);
+    return true;
+  };
+  console.error("CONFIGURING TOOLBOX END");
 } else {
   window.Roger = Roger;
   window.editor.domainInitializer.addDefinition(Roger);
@@ -48,16 +63,6 @@ if (true) {
   window.editor.domainInitializer.setLabels(Roger, "rootNode", "state");
 }
 
-if (true) {
-  const tConfig =
-    window.org.kie.workbench.common.stunner.core.client.components.toolbox.actions.JsToolboxConfig.INSTANCE;
-  tConfig.getButtonSize = () => 25;
-  tConfig.getToolboxAt = () => "SOUTH_EAST";
-  tConfig.isNodeIdAllowed = (id) => {
-    console.log("isNodeIdAllowed: " + id);
-    return id === "org.kie.workbench.common.stunner.sw.definition.OperationState#ansible";
-  };
-}
 /*
 window.editor.parser = function (executionContext, raw) {
   console.log("Marshalling: " + raw);

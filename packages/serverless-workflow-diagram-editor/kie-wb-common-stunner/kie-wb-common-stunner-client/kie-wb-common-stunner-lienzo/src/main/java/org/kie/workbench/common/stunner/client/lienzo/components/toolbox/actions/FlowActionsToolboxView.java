@@ -32,11 +32,11 @@ import com.ait.lienzo.client.core.shape.toolbox.items.tooltip.ToolboxTextTooltip
 import com.ait.lienzo.shared.core.types.ColorName;
 import com.ait.lienzo.shared.core.types.Direction;
 import org.kie.workbench.common.stunner.client.lienzo.components.glyph.LienzoGlyphRenderers;
+import org.kie.workbench.common.stunner.core.client.api.JsWindow;
 import org.kie.workbench.common.stunner.core.client.components.toolbox.actions.ActionsToolbox;
 import org.kie.workbench.common.stunner.core.client.components.toolbox.actions.ActionsToolboxView;
 import org.kie.workbench.common.stunner.core.client.components.toolbox.actions.FlowActionsToolbox;
 import org.kie.workbench.common.stunner.core.client.components.toolbox.actions.IsToolboxActionDraggable;
-import org.kie.workbench.common.stunner.core.client.components.toolbox.actions.JsToolboxConfig;
 import org.kie.workbench.common.stunner.core.client.components.toolbox.actions.ToolboxAction;
 
 /**
@@ -70,14 +70,14 @@ public class FlowActionsToolboxView
                 .at(TOOLBOX_AT)
                 .grid(new AutoGrid.Builder()
                               .forBoundingBox(getToolboxView().getBoundingBox())
-                              .withPadding(JsToolboxConfig.INSTANCE.getButtonSize())
+                              .withPadding(JsWindow.editor.configuration.toolbox.buttonSizePx)
                               .withIconSize(getGlyphSize())
                               .towards(GRID_TOWARDS)
                               .build())
                 .decorate(getToolboxFactory()
                                   .decorators()
                                   .box()
-                                  .setPadding(JsToolboxConfig.INSTANCE.getButtonPadding())
+                                  .setPadding(JsWindow.editor.configuration.toolbox.buttonPaddingPx)
                                   .configure(path -> {
                                       path.setFillAlpha(0.95);
                                       path.setFillColor(ColorName.WHITE);
@@ -117,7 +117,7 @@ public class FlowActionsToolboxView
 
     @Override
     protected double getGlyphSize() {
-        return JsToolboxConfig.INSTANCE.getButtonSize();
+        return JsWindow.editor.configuration.toolbox.buttonSizePx;
     }
 
     @Override

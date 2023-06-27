@@ -30,8 +30,8 @@ import com.ait.lienzo.client.core.shape.toolbox.items.tooltip.ToolboxTextTooltip
 import com.ait.lienzo.shared.core.types.ColorName;
 import com.ait.lienzo.shared.core.types.Direction;
 import org.kie.workbench.common.stunner.client.lienzo.components.glyph.LienzoGlyphRenderers;
+import org.kie.workbench.common.stunner.core.client.api.JsWindow;
 import org.kie.workbench.common.stunner.core.client.components.toolbox.actions.ActionsToolbox;
-import org.kie.workbench.common.stunner.core.client.components.toolbox.actions.JsToolboxConfig;
 import org.kie.workbench.common.stunner.core.client.components.toolbox.actions.MorphActionsToolbox;
 import org.kie.workbench.common.stunner.core.client.resources.StunnerCommonIconsGlyphFactory;
 
@@ -94,8 +94,8 @@ public class MorphActionsToolboxView
     private void configureToolbox(final ActionsToolbox toolbox) {
         getToolboxView()
                 .at(TOOLBOX_AT)
-                .grid(createFixedGrid(JsToolboxConfig.INSTANCE.getButtonSize(),
-                                      JsToolboxConfig.INSTANCE.getButtonPadding(),
+                .grid(createFixedGrid(JsWindow.editor.configuration.toolbox.buttonSizePx,
+                                      JsWindow.editor.configuration.toolbox.buttonPaddingPx,
                                       1))
                 .useShowExecutor(ToolboxVisibilityExecutors.upScaleY())
                 .useHideExecutor(ToolboxVisibilityExecutors.downScaleY());
@@ -106,7 +106,7 @@ public class MorphActionsToolboxView
                                                  GRID_BUTTON_PADDING,
                                                  toolbox.size());
         final Group glyphView = renderGlyph(StunnerCommonIconsGlyphFactory.GEARS,
-                                            JsToolboxConfig.INSTANCE.getButtonSize());
+                                            JsWindow.editor.configuration.toolbox.buttonSizePx);
         gridItem =
                 getToolboxFactory()
                         .buttons()
@@ -115,7 +115,7 @@ public class MorphActionsToolboxView
                         .decorate(getToolboxFactory()
                                           .decorators()
                                           .button()
-                                          .setPadding(JsToolboxConfig.INSTANCE.getButtonPadding()))
+                                          .setPadding(JsWindow.editor.configuration.toolbox.buttonPaddingPx))
                         .decorateGrid(getToolboxFactory()
                                               .decorators()
                                               .button()

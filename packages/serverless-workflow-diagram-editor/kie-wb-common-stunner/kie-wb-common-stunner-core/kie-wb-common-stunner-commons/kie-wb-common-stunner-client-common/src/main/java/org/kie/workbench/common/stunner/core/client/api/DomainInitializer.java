@@ -27,6 +27,7 @@ import javax.annotation.PostConstruct;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
+import elemental2.dom.DomGlobal;
 import org.kie.workbench.common.stunner.core.api.DefinitionManager;
 import org.kie.workbench.common.stunner.core.api.JsDefinitionManager;
 import org.kie.workbench.common.stunner.core.definition.jsadapter.JsAdapterUtils;
@@ -77,6 +78,8 @@ public class DomainInitializer {
         JsWindow.editor = new JsStunnerEditor();
         JsWindow.editor.definitions = jsDefinitionManager;
         JsWindow.editor.domainInitializer = JsDomainInitializer.build(this);
+        DomGlobal.console.error("CREATING JsStunnerEditorConfiguration!!");
+        JsWindow.editor.configuration = JsStunnerEditorConfiguration.create();
 
         this.rules = new HashSet<>();
     }
